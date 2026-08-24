@@ -54,7 +54,7 @@ Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')
     Route::view('/dashboard', 'bawahan.dashboard')->name('dashboard');
     Route::get('/idp/daftar', [IdpController::class, 'daftarBawahan'])->name('idp.daftar');
     Route::post('/idp/daftar/{idp}/rencana', [IdpController::class, 'storeRencanaBawahan'])->name('idp.rencana.store');
-    Route::view('/idp/penetapan', 'bawahan.idp.penetapan')->name('idp.penetapan');
+    Route::get('/idp/penetapan', [IdpController::class, 'penetapanBawahan'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanBawahan'])->name('idp.pemantauan');
     Route::get('/idp/evaluasi', [IdpController::class, 'evaluasiBawahan'])->name('idp.evaluasi');
     Route::get('/sertifikat', [SertifikatController::class, 'indexBawahan'])->name('sertifikat');

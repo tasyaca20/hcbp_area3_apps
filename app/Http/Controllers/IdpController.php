@@ -136,6 +136,14 @@ class IdpController extends Controller
         return view('admin-area.idp.pemantauan', compact('rows'));
     }
 
+    public function penetapanBawahan()
+    {
+        $rows = IDP::where('id_bawahan', auth()->id())
+            ->with(['rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')])
+            ->get();
+        return view('bawahan.idp.penetapan', compact('rows'));
+    }
+
     public function penetapanAtasan()
     {
         $rencana = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])
@@ -164,9 +172,7 @@ class IdpController extends Controller
                         ->first();
                     if ($child) {
                         $child->update([
-                            'pembelajaran_10_persen' => ($values['p10'] !== $values['orig_p10']) ? $values['p10'] : null,
-                            'social_learning_20_persen' => ($values['s20'] !== $values['orig_s20']) ? $values['s20'] : null,
-                            'action_learning_70_persen' => ($values['a70'] !== $values['orig_a70']) ? $values['a70'] : null,
+                            'feedback_atasan' => $values['feedback'] ?? null,
                             'status' => $data['status'],
                         ]);
                     }
@@ -204,24 +210,33 @@ class IdpController extends Controller
     {
         $data = $request->validate([
             'nama' => ['required', 'string', 'max:150'],
-            'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip'],
+            'nip' => ['required', 'string', 'max:50'],
             'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'],
-            'username' => ['required', 'string', 'max:100', 'unique:pengguna,username'],
+            'username' => ['required', 'string', 'max:100'],
             'password' => ['required', 'string', 'min:6'],
             'business_area' => ['nullable', 'string', 'max:100'],
             'periode_idp' => ['required', 'in:Batch-1,Batch-2'],
         ]);
 
-        $bawahan = Pengguna::create([
-            'nama' => $data['nama'],
-            'nip' => $data['nip'],
-            'id_jabatan' => $data['id_jabatan'],
-            'username' => $data['username'],
-            'password_hash' => Hash::make($data['password']),
-            'role' => 'bawahan',
-            'unit_induk' => auth()->user()->unit_induk,
-            'status_aktif' => true,
-        ]);
+        $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
+        
+        if (!$bawahan) {
+            $request->validate([
+                'nip' => ['unique:pengguna,nip'],
+                'username' => ['unique:pengguna,username'],
+            ]);
+
+            $bawahan = Pengguna::create([
+                'nama' => $data['nama'],
+                'nip' => $data['nip'],
+                'id_jabatan' => $data['id_jabatan'],
+                'username' => $data['username'],
+                'password_hash' => Hash::make($data['password']),
+                'role' => 'bawahan',
+                'unit_induk' => auth()->user()->unit_induk,
+                'status_aktif' => true,
+            ]);
+        }
 
         IDP::create([
             'id_bawahan' => $bawahan->id_pengguna,

@@ -63,17 +63,9 @@
             <div class="flex justify-between gap-3"><strong>{{ $rencana->kompetensi->kode_kompetensi }} — {{ $rencana->kompetensi->nama_kompetensi }}</strong><span class="rounded px-2 py-1 text-xs bg-amber-100 text-amber-700">Perlu Diperbaiki</span></div>
             <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-2 space-y-2 text-xs">
               @php($hasRevision = false)
-              @if($rencana->pembelajaran_10_persen)
+              @if($rencana->feedback_atasan)
                 @php($hasRevision = true)
-                <div><span class="font-semibold text-amber-700">10% Pembelajaran:</span><br>{{ $rencana->pembelajaran_10_persen }}</div>
-              @endif
-              @if($rencana->social_learning_20_persen)
-                @php($hasRevision = true)
-                <div><span class="font-semibold text-amber-700">20% Social Learning:</span><br>{{ $rencana->social_learning_20_persen }}</div>
-              @endif
-              @if($rencana->action_learning_70_persen)
-                @php($hasRevision = true)
-                <div><span class="font-semibold text-amber-700">70% Action Learning:</span><br>{{ $rencana->action_learning_70_persen }}</div>
+                <div><span class="font-semibold text-amber-700">Catatan Revisi:</span><br>{{ $rencana->feedback_atasan }}</div>
               @endif
               @if(!$hasRevision)
                 <p class="text-slate-500">Tidak ada detail revisi</p>

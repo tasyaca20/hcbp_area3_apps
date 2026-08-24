@@ -32,6 +32,7 @@
               'p10' => $item->pembelajaran_10_persen,
               's20' => $item->social_learning_20_persen,
               'a70' => $item->action_learning_70_persen,
+              'feedback' => $item->feedback_atasan,
             ])->values();
             $kompData = [
               'umum' => $komp->where('jenis', 'umum')->map(fn ($k) => ['kode' => $k->kode_kompetensi, 'kompetensi' => $k->nama_kompetensi])->values(),
@@ -109,9 +110,15 @@
         return `<tr class="border-t border-slate-200">
           <td class="px-3 py-2">${index + 1}</td>
           <td class="px-3 py-2"><strong>${item.kode}</strong><br><span class="text-xs text-slate-500">${item.kompetensi}</span></td>
-          <td class="px-3 py-2"><textarea name="p10_${item.id}" class="w-full rounded-lg border-slate-300 text-sm" rows="2">${item.p10 || ''}</textarea></td>
-          <td class="px-3 py-2"><textarea name="s20_${item.id}" class="w-full rounded-lg border-slate-300 text-sm" rows="2">${item.s20 || ''}</textarea></td>
-          <td class="px-3 py-2"><textarea name="a70_${item.id}" class="w-full rounded-lg border-slate-300 text-sm" rows="2">${item.a70 || ''}</textarea></td>
+          <td class="px-3 py-2"><textarea name="p10_${item.id}" class="w-full rounded-lg border-slate-300 text-sm" rows="2" readonly>${item.p10 || ''}</textarea></td>
+          <td class="px-3 py-2"><textarea name="s20_${item.id}" class="w-full rounded-lg border-slate-300 text-sm" rows="2" readonly>${item.s20 || ''}</textarea></td>
+          <td class="px-3 py-2"><textarea name="a70_${item.id}" class="w-full rounded-lg border-slate-300 text-sm" rows="2" readonly>${item.a70 || ''}</textarea></td>
+        </tr>
+        <tr>
+          <td colspan="5" class="px-3 py-2">
+            <label class="block text-sm font-medium text-amber-700">Catatan Revisi:</label>
+            <textarea name="feedback_${item.id}" class="w-full rounded-lg border-amber-300 bg-amber-50 text-sm mt-1" rows="2" placeholder="Tulis catatan revisi untuk kompetensi ini...">${item.feedback || ''}</textarea>
+          </td>
         </tr>`;
       }
       return `<tr class="border-t border-slate-200">
@@ -120,7 +127,8 @@
         <td class="px-3 py-2 whitespace-pre-line">${item.p10 || '-'}</td>
         <td class="px-3 py-2 whitespace-pre-line">${item.s20 || '-'}</td>
         <td class="px-3 py-2 whitespace-pre-line">${item.a70 || '-'}</td>
-      </tr>`;
+      </tr>
+      ${item.feedback ? `<tr class="bg-amber-50/50"><td colspan="5" class="px-3 py-2 text-xs text-amber-700"><strong>Catatan Revisi:</strong> ${item.feedback}</td></tr>` : ''}`;
     }).join('');
   }
 
@@ -162,17 +170,10 @@
     if (editMode) {
       const kompetensiData = {};
       currentItems.forEach((item) => {
-        const p10El = document.querySelector(`[name="p10_${item.id}"]`);
-        const s20El = document.querySelector(`[name="s20_${item.id}"]`);
-        const a70El = document.querySelector(`[name="a70_${item.id}"]`);
-        if (p10El) {
+        const feedbackEl = document.querySelector(`[name="feedback_${item.id}"]`);
+        if (feedbackEl) {
           kompetensiData[item.id] = {
-            p10: p10El.value,
-            s20: s20El ? s20El.value : '',
-            a70: a70El ? a70El.value : '',
-            orig_p10: item.p10 || '',
-            orig_s20: item.s20 || '',
-            orig_a70: item.a70 || ''
+            feedback: feedbackEl.value
           };
         }
       });
