@@ -172,7 +172,9 @@ class IdpController extends Controller
                         ->first();
                     if ($child) {
                         $child->update([
-                            'feedback_atasan' => $values['feedback'] ?? null,
+                            'pembelajaran_10_persen' => $values['p10'] ?? $child->pembelajaran_10_persen,
+                            'social_learning_20_persen' => $values['s20'] ?? $child->social_learning_20_persen,
+                            'action_learning_70_persen' => $values['a70'] ?? $child->action_learning_70_persen,
                             'status' => $data['status'],
                         ]);
                     }

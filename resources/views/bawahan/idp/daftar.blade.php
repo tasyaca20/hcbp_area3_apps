@@ -55,20 +55,25 @@
       @endif
 
       @if($row->rencanaPengembangan->where('status', 'Revisi')->isNotEmpty())
-      <div class="border border-slate-300 rounded-xl p-5">
-        <h2 class="font-semibold mb-3">Hasil Penetapan Atasan - Kolom yang Direvisi</h2>
+      <div class="border border-amber-300 bg-amber-50/50 rounded-xl p-5">
+        <h2 class="font-semibold text-amber-800 mb-3">IDP Perlu Perbaikan (Direvisi Atasan)</h2>
+        <p class="text-xs text-amber-700 mb-3">Atasan telah mengubah/mengoreksi isi dari kolom pembelajaran berikut. Silakan cek dan sesuaikan pada form usulan di bawah:</p>
         <div class="space-y-3">
           @foreach($row->rencanaPengembangan->where('status', 'Revisi') as $rencana)
-          <div class="rounded-lg border border-slate-200 p-3 text-sm">
-            <div class="flex justify-between gap-3"><strong>{{ $rencana->kompetensi->kode_kompetensi }} — {{ $rencana->kompetensi->nama_kompetensi }}</strong><span class="rounded px-2 py-1 text-xs bg-amber-100 text-amber-700">Perlu Diperbaiki</span></div>
-            <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-2 space-y-2 text-xs">
-              @php($hasRevision = false)
-              @if($rencana->feedback_atasan)
-                @php($hasRevision = true)
-                <div><span class="font-semibold text-amber-700">Catatan Revisi:</span><br>{{ $rencana->feedback_atasan }}</div>
+          <div class="rounded-lg border border-amber-200 bg-white p-3 text-sm">
+            <div class="flex justify-between gap-3">
+              <strong>{{ $rencana->kompetensi->kode_kompetensi }} — {{ $rencana->kompetensi->nama_kompetensi }}</strong>
+              <span class="rounded px-2 py-1 text-xs bg-amber-100 text-amber-700 font-semibold">Status: Revisi</span>
+            </div>
+            <div class="mt-2 space-y-1 text-xs text-slate-700">
+              @if($rencana->pembelajaran_10_persen)
+                <div><span class="font-medium text-slate-500">10% Pembelajaran:</span> {{ $rencana->pembelajaran_10_persen }}</div>
               @endif
-              @if(!$hasRevision)
-                <p class="text-slate-500">Tidak ada detail revisi</p>
+              @if($rencana->social_learning_20_persen)
+                <div><span class="font-medium text-slate-500">20% Social Learning:</span> {{ $rencana->social_learning_20_persen }}</div>
+              @endif
+              @if($rencana->action_learning_70_persen)
+                <div><span class="font-medium text-slate-500">70% Action Learning:</span> {{ $rencana->action_learning_70_persen }}</div>
               @endif
             </div>
           </div>
