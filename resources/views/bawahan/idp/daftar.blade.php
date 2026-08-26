@@ -54,12 +54,13 @@
       </div>
       @endif
 
-      @if($row->rencanaPengembangan->where('status', 'Revisi')->isNotEmpty())
+      @php($revisiItems = $row->rencanaPengembangan->where('direvisi_oleh_atasan', true))
+      @if($revisiItems->isNotEmpty())
       <div class="border border-amber-300 bg-amber-50/50 rounded-xl p-5">
         <h2 class="font-semibold text-amber-800 mb-3">IDP Perlu Perbaikan (Direvisi Atasan)</h2>
         <p class="text-xs text-amber-700 mb-3">Atasan telah mengubah/mengoreksi isi dari kolom pembelajaran berikut. Silakan cek dan sesuaikan pada form usulan di bawah:</p>
         <div class="space-y-3">
-          @foreach($row->rencanaPengembangan->where('status', 'Revisi') as $rencana)
+          @foreach($revisiItems as $rencana)
           <div class="rounded-lg border border-amber-200 bg-white p-3 text-sm">
             <div class="flex justify-between gap-3">
               <strong>{{ $rencana->kompetensi->kode_kompetensi }} — {{ $rencana->kompetensi->nama_kompetensi }}</strong>

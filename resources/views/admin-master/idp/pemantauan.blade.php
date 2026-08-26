@@ -28,34 +28,58 @@
           <th class="px-4 py-4 font-semibold">Nama Bawahan</th>
           <th class="px-4 py-4 font-semibold">Jabatan</th>
           <th class="px-4 py-4 font-semibold">Nama Atasan</th>
+          <th class="px-4 py-4 font-semibold">Jabatan Atasan</th>
           <th class="px-4 py-4 font-semibold">Unit Induk</th>
           <th class="px-4 py-4 font-semibold">Status</th>
-          <th class="px-4 py-4 font-semibold">Progress</th>
+          <th class="px-4 py-4 font-semibold">Kompetensi</th>
           <th class="px-4 py-4 font-semibold">10% Pembelajaran</th>
           <th class="px-4 py-4 font-semibold">20% Social</th>
-          <th class="px-4 py-4 font-semibold">70% Experimental</th>
+          <th class="px-4 py-4 font-semibold">70% Action Learning</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
         @forelse ($rows as $index => $row)
-        <tr class="hover:bg-slate-50">
-          <td class="px-4 py-4">{{ $index + 1 }}</td>
-          <td class="px-4 py-4 font-medium">{{ $row->bawahan->nama ?? '-' }}</td>
-          <td class="px-4 py-4">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
-          <td class="px-4 py-4">{{ $row->atasan->nama ?? '-' }}</td>
-          <td class="px-4 py-4">{{ $row->bawahan->unit_induk ?? '-' }}</td>
-          <td class="px-4 py-4">
-            @php($status = $row->monitoring->status_perencanaan ?? 'Belum ada')
-            <span class="px-2 py-1 rounded text-xs font-medium {{ $status === 'Disetujui' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">{{ $status }}</span>
-          </td>
-          <td class="px-4 py-4">{{ $row->monitoring->progress_percent ?? 0 }}%</td>
-          <td class="px-4 py-4">{{ $row->monitoring->pembelajaran_10_persen ?? '-' }}</td>
-          <td class="px-4 py-4">{{ $row->monitoring->social_learning_20_persen ?? '-' }}</td>
-          <td class="px-4 py-4">{{ $row->monitoring->experimental_learning_70_persen ?? '-' }}</td>
-        </tr>
+          @php($penetapan = $row->rencanaPengembangan->where('status', 'Disetujui'))
+          @if($penetapan->isNotEmpty())
+            @foreach($penetapan as $rencana)
+            <tr class="hover:bg-slate-50">
+              @if($loop->first)
+              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $index + 1 }}</td>
+              <td class="px-4 py-4 font-medium align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->nama ?? '-' }}</td>
+              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
+              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nama ?? '-' }}</td>
+              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td>
+              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->unit_induk ?? '-' }}</td>
+              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">
+                <span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">Disetujui</span>
+              </td>
+              @endif
+              <td class="px-4 py-4">
+                <div class="font-medium">{{ $rencana->kompetensi->kode_kompetensi ?? '-' }}</div>
+                <div class="text-slate-500">{{ $rencana->kompetensi->nama_kompetensi ?? '-' }}</div>
+              </td>
+              <td class="px-4 py-4">{{ $rencana->pembelajaran_10_persen ?? '-' }}</td>
+              <td class="px-4 py-4">{{ $rencana->social_learning_20_persen ?? '-' }}</td>
+              <td class="px-4 py-4">{{ $rencana->action_learning_70_persen ?? '-' }}</td>
+            </tr>
+            @endforeach
+          @else
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-4">{{ $index + 1 }}</td>
+              <td class="px-4 py-4 font-medium">{{ $row->bawahan->nama ?? '-' }}</td>
+              <td class="px-4 py-4">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
+              <td class="px-4 py-4">{{ $row->atasan->nama ?? '-' }}</td>
+              <td class="px-4 py-4">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td>
+              <td class="px-4 py-4">{{ $row->bawahan->unit_induk ?? '-' }}</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">Belum Disetujui</span>
+              </td>
+              <td class="px-4 py-4 text-slate-400" colspan="4">Belum ada penetapan IDP</td>
+            </tr>
+          @endif
         @empty
         <tr>
-          <td colspan="10" class="px-4 py-8 text-center text-slate-500">Belum ada data IDP.</td>
+          <td colspan="11" class="px-4 py-8 text-center text-slate-500">Belum ada data IDP.</td>
         </tr>
         @endforelse
       </tbody>

@@ -17,6 +17,7 @@ class RencanaPengembanganIDP extends Model
         'action_learning_70_persen',
         'status',
         'feedback_atasan',
+        'direvisi_oleh_atasan',
     ];
 
     public function kompetensi()

@@ -15,7 +15,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('admin-master.')->group(function () {
     Route::view('/dashboard', 'admin-master.dashboard')->name('dashboard');
     Route::get('/idp/daftar', [IdpController::class, 'daftar'])->name('idp.daftar');
-    Route::view('/idp/penetapan', 'admin-master.idp.penetapan')->name('idp.penetapan');
+    Route::get('/idp/penetapan', [IdpController::class, 'penetapan'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauan'])->name('idp.pemantauan');
     Route::view('/idp/evaluasi', 'admin-master.idp.evaluasi')->name('idp.evaluasi');
     Route::get('/sertifikat', [SertifikatController::class, 'index'])->name('sertifikat');

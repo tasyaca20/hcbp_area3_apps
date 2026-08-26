@@ -23,6 +23,16 @@ class IdpController extends Controller
         return view('admin-master.idp.daftar', compact('rows'));
     }
 
+    public function penetapan()
+    {
+        $rows = IDP::query()
+            ->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
+            ->orderBy('id_daftar_idp')
+            ->get();
+
+        return view('admin-master.idp.penetapan', compact('rows'));
+    }
+
     public function daftarArea()
     {
         $user = auth()->user();
@@ -117,7 +127,7 @@ class IdpController extends Controller
     public function pemantauan()
     {
         $rows = IDP::query()
-            ->with(['bawahan', 'atasan', 'monitoring'])
+            ->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
             ->orderBy('id_daftar_idp')
             ->get();
 
@@ -163,6 +173,8 @@ class IdpController extends Controller
             'kompetensi_data' => ['nullable', 'string'],
         ]);
 
+        $revisedIds = [];
+
         if (!empty($data['kompetensi_data'])) {
             $kompetensiData = json_decode($data['kompetensi_data'], true);
             if (is_array($kompetensiData)) {
@@ -171,28 +183,40 @@ class IdpController extends Controller
                         ->whereHas('daftarIdp', fn ($q) => $q->where('id_atasan', auth()->id()))
                         ->first();
                     if ($child) {
+                        $originalP10 = $child->pembelajaran_10_persen;
+                        $originalS20 = $child->social_learning_20_persen;
+                        $originalA70 = $child->action_learning_70_persen;
+
+                        $newP10 = $values['p10'] ?? $child->pembelajaran_10_persen;
+                        $newS20 = $values['s20'] ?? $child->social_learning_20_persen;
+                        $newA70 = $values['a70'] ?? $child->action_learning_70_persen;
+
+                        $isRevised = ($originalP10 !== $newP10) || ($originalS20 !== $newS20) || ($originalA70 !== $newA70);
+
                         $child->update([
-                            'pembelajaran_10_persen' => $values['p10'] ?? $child->pembelajaran_10_persen,
-                            'social_learning_20_persen' => $values['s20'] ?? $child->social_learning_20_persen,
-                            'action_learning_70_persen' => $values['a70'] ?? $child->action_learning_70_persen,
+                            'pembelajaran_10_persen' => $newP10,
+                            'social_learning_20_persen' => $newS20,
+                            'action_learning_70_persen' => $newA70,
                             'status' => $data['status'],
+                            'direvisi_oleh_atasan' => $isRevised,
                         ]);
+
+                        $revisedIds[] = $idRencana;
                     }
                 }
                 
-                // Set status rencana yang lain di grup ini yang tidak masuk list edit ke status yang dipilih
                 RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)
-                    ->where('status', 'Diajukan')
-                    ->update(['status' => $data['status']]);
+                    ->whereIn('status', ['Diajukan', 'Revisi'])
+                    ->whereNotIn('id_rencana', $revisedIds)
+                    ->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
 
                 return back()->with('success', 'Rencana IDP berhasil ditinjau.');
             }
         }
 
-        // Update semua rencana dalam daftar IDP yang sama ke status yang dipilih
         RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)
-            ->where('status', 'Diajukan')
-            ->update(['status' => $data['status']]);
+            ->whereIn('status', ['Diajukan', 'Revisi'])
+            ->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
 
         return back()->with('success', 'Rencana IDP berhasil ditinjau.');
     }
