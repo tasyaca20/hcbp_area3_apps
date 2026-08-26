@@ -186,9 +186,9 @@
       <header class="w-full sticky top-0 bg-white border-b border-slate-200 z-50">
         <div class="flex justify-between items-center px-8 py-3 h-[76px]">
           <div class="flex items-center gap-4">
-            <img class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDJt_RfDkCMKLoLuYjQYLtTeeZYuMTa2O1KK74i5Y2zWE68LgCQAKwqGFqHHhfiQePnhQf2MTWfLY50j31fy9aKDzdxmSiIxp1rJbnnwdz65t9mKZhBVde2SYu6uD6hj8jouvTIUOkOwQxLOevjpCk0qvGOJmaWk3erhh5QYxh0L6FtUponS26HFWe7F1nlZ1WRrun_MbHApoyLmNMNTrqBLM3updUiayESWApj6UscQr3ETxOGjQz5dNgPjItkfwFshA" alt="Danantara Indonesia logo" />
+            <img class="h-5 object-contain" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.png') }}" alt="Danantara Indonesia logo" />
             <div class="w-px h-7 bg-slate-200"></div>
-            <img class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6Ys1h54zAgVQsAoiFwQp7pADnJ2Iq1noBOyG4UdPkF5XPbDbBsQwdPZ4BVXO1fgZxQ0kUPVkYqYgkFiZ6qcpo_vtUXO9da5gXTv6VhZznC-8Bwrx4HVm0UwDHBoe7ZuyJ1r01CYAgTuFwuJakEcYRMWYJ5IIiv5IMfogO5YeCdUyjVloAgqQzWVcRX7DMfGcKAmm4U5vYT3Qi1EsljRZOIS2FbXuYmh33c7UCaYufYGs-7Jvgz0UZv2OnZYvy08P3OCU" alt="PLN logo" />
+            <img class="h-6 object-contain" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
           </div>
           <div class="flex items-center gap-4">
             <button class="relative p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500" type="button">

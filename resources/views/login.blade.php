@@ -150,9 +150,9 @@
 <body class="bg-surface-container-low min-h-screen flex flex-col relative overflow-x-hidden">
   <header class="w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop py-lg z-20 relative">
     <div class="flex items-center gap-md">
-      <img class="h-24 md:h-27 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChlbJGsd6iy22SElkS62y9C2mEYlz6VOAhDSWY2d6Fpj43kQhzBiYbBuJW801slNt1aF27pvhWPDsS8LhuzzJqsZhQCIBTmZMuBIlX41uEwcDIXEchkG1N7D1p2YJ4kCKjm5DtKlBLzXaMizBm846DqunvMIDgT1jVIXiPXRuH0gpgKEV-agSx80yN7jCkqPBONzmuoMFiMiTn477RMyOSaWLwb-pODEgQfkotzK4cE9u-YJyvTu8McuUekDs0OkyZUEA" alt="Danantara Indonesia" />
+      <img class="h-6 md:h-27 w-auto object-contain" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.png') }}" alt="Danantara Indonesia logo" />
       <div class="w-[1px] h-12 md:h-14 bg-outline-variant"></div>
-      <img class="h-12 md:h-14 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzYvvk2etW1R5GwI1vnWgbOfDpWB8it5GS2m4X8TR2ndGdRlSID7gdx8ULcDEbEdIa9lZJNRJpjF4J3v90w90dhgjYHP53s856_khFomKFjjAsDXOMb1EWe7Vhaf8GK7-Q1ASjLYdYj3plDfYuBA5BlBOzafJ2rMHpI-9JJrKVneyMGiT1QyAVU9xAuJqiXsvU2NM9HiN3x8YsqUdjPgyLWNqSxRa31tjSa4mxGCQmw_7VzVXlJdRocBcYkcH0C4fm-Hs" alt="PLN" />
+      <img class="h-6 md:h-8 w-auto object-contain" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
     </div>
     <div class="font-headline-md text-headline-md text-primary font-bold hidden md:block">HCBP Area 3 Apps</div>
   </header>
