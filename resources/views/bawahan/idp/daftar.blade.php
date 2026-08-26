@@ -139,6 +139,10 @@
         </div>
       </div>
 
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Form Usulan IDP</h2>
+      </div>
+
       <div class="overflow-x-auto border border-slate-200 rounded-xl">
         <table class="w-full text-sm">
           <thead class="bg-slate-50">
@@ -156,25 +160,28 @@
             <tr class="border-t border-slate-200">
               <td class="px-3 py-2">{{ $i + 1 }}</td>
               <td class="px-3 py-2">
-                <select name="kompetensi[{{ $i }}][id_kompetensi]" class="w-full rounded-lg border-slate-300 text-sm" {{ $i < 3 ? 'required' : '' }}>
+                <select name="kompetensi[{{ $i }}][id_kompetensi]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" {{ $i < 3 ? 'required' : '' }} disabled>
                   <option value="">Pilih kompetensi</option>
                   @foreach($kompetensiTeknis as $kom)
                     <option value="{{ $kom->id_kompetensi }}" @selected($selected?->id_kompetensi === $kom->id_kompetensi)>{{ $kom->kode_kompetensi }} - {{ $kom->nama_kompetensi }}</option>
                   @endforeach
                 </select>
               </td>
-              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][pembelajaran_10_persen]" class="w-full rounded-lg border-slate-300 text-sm">{{ $selected->pembelajaran_10_persen ?? '' }}</textarea></td>
-              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][social_learning_20_persen]" class="w-full rounded-lg border-slate-300 text-sm">{{ $selected->social_learning_20_persen ?? '' }}</textarea></td>
-              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][action_learning_70_persen]" class="w-full rounded-lg border-slate-300 text-sm">{{ $selected->action_learning_70_persen ?? '' }}</textarea></td>
+              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][pembelajaran_10_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->pembelajaran_10_persen ?? '' }}</textarea></td>
+              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][social_learning_20_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->social_learning_20_persen ?? '' }}</textarea></td>
+              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][action_learning_70_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->action_learning_70_persen ?? '' }}</textarea></td>
             </tr>
             @endfor
           </tbody>
         </table>
       </div>
 
-      <div class="flex justify-end gap-3">
-        <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" onclick="setActionAndSubmit(this, 'simpan')">Simpan</button>
-        <button type="button" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white" onclick="setActionAndSubmit(this, 'kirim')">Kirim</button>
+      <div class="flex justify-end gap-3 mt-4">
+        <button type="button" id="btnEdit{{ $row->id_daftar_idp }}" class="rounded-lg bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors" onclick="enableEdit({{ $row->id_daftar_idp }})">Edit IDP</button>
+        <div id="actionButtons{{ $row->id_daftar_idp }}" class="flex gap-3" style="display: none;">
+          <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" onclick="setActionAndSubmit(this, 'simpan')">Simpan</button>
+          <button type="button" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white" onclick="setActionAndSubmit(this, 'kirim')">Kirim</button>
+        </div>
       </div>
     </form>
   @empty
@@ -183,6 +190,13 @@
 </div>
 
 <script>
+  function enableEdit(id) {
+    const fields = document.querySelectorAll('.field-idp-' + id);
+    fields.forEach(field => field.removeAttribute('disabled'));
+    document.getElementById('btnEdit' + id).style.display = 'none';
+    document.getElementById('actionButtons' + id).style.display = 'flex';
+  }
+
   function setActionAndSubmit(button, action) {
     const form = button.closest('form');
     form.querySelector('input[name="submit_action"]').value = action;
