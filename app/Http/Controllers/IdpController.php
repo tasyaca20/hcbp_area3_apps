@@ -45,6 +45,18 @@ class IdpController extends Controller
         return view('admin-area.idp.daftar', compact('rows'));
     }
 
+    public function penetapanArea()
+    {
+        $user = auth()->user();
+        $rows = IDP::query()
+            ->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))
+            ->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
+            ->orderBy('id_daftar_idp')
+            ->get();
+
+        return view('admin-area.idp.penetapan', compact('rows'));
+    }
+
     public function daftarAtasan()
     {
         $rows = IDP::query()
