@@ -1,0 +1,21 @@
+@php($pageTitle = 'Coaching Bawahan')
+@php($activeSection = 'coaching')
+@php($activePage = 'coaching')
+
+@extends('layouts.app', ['title' => $pageTitle])
+
+@section('content')
+@forelse($rows as $row)
+<div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8">
+  <h1 class="text-lg font-bold text-slate-900">Individual Development Program (IDP) - <i>Talent Home Coming</i></h1>
+  <p class="text-sm text-slate-600">Coaching</p>
+  <div class="mt-4 grid gap-4 text-base font-semibold sm:grid-cols-2">
+    <div class="space-y-2"><p>Nama Bawahan: <span class="font-normal">{{ $row->bawahan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->bawahan?->nip ?? '-' }}</span></p><p>Jabatan: <span class="font-normal">{{ $row->bawahan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p><p>Unit Induk: <span class="font-normal">{{ $row->bawahan?->unit_induk ?? '-' }}</span></p></div>
+    <div class="space-y-2"><p>Nama Atasan: <span class="font-normal">{{ $row->atasan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->atasan?->nip ?? '-' }}</span></p><p>Jabatan Atasan: <span class="font-normal">{{ $row->atasan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p></div>
+  </div>
+  <div class="mt-14 overflow-x-auto"><table class="min-w-[1400px] w-full text-left text-xs"><thead class="bg-[#31599b] text-white"><tr><th class="px-4 py-4 font-semibold">NO</th><th class="px-4 py-4 font-semibold">KOMPETENSI TEKNIS</th><th class="px-4 py-4 font-semibold">10% PEMBELAJARAN<br>(PERENCANAAN)</th><th class="px-4 py-4 font-semibold">10% PEMBELAJARAN<br>(REALISASI)</th><th class="px-4 py-4 font-semibold">20% SOCIAL<br>LEARNING</th><th class="px-4 py-4 font-semibold">20% SOCIAL LEARNING<br>(REALISASI)</th><th class="px-4 py-4 font-semibold">70% ACTION LEARNING<br>(PERENCANAAN)</th><th class="px-4 py-4 font-semibold">70% ACTION LEARNING<br>(REALISASI)</th></tr></thead><tbody class="divide-y divide-slate-100">@forelse($row->rencanaPengembangan as $index => $plan)<tr class="align-top"><td class="border border-slate-700 px-2 py-2 text-center">{{ $index + 1 }}</td><td class="border border-slate-700 px-3 py-2"><div class="font-medium">{{ $plan->kompetensi?->kode_kompetensi ?? '-' }}</div><div>{{ $plan->kompetensi?->nama_kompetensi ?? '-' }}</div></td><td class="border border-slate-700 px-3 py-2">{{ $plan->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">{{ $row->monitoring?->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">{{ $plan->social_learning_20_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">{{ $row->monitoring?->social_learning_20_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">{{ $plan->action_learning_70_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">{{ $row->monitoring?->experimental_learning_70_persen ?? 'Belum dibuat' }}</td></tr>@empty<tr><td class="border border-slate-700 px-2 py-2 text-center">1</td><td colspan="7" class="border border-slate-700 px-3 py-2 text-slate-500">Belum ada rencana pengembangan yang disetujui.</td></tr>@endforelse</tbody></table></div>
+</div>
+@empty
+<div class="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center text-slate-500">Belum ada data coaching bawahan.</div>
+@endforelse
+@endsection

@@ -116,11 +116,10 @@
   const importFile = document.querySelector('#importFile');
   document.querySelector('#importButton').onclick = () => importFile.click();
   importFile.onchange = () => importFile.files.length && importForm.submit();
+  document.querySelector('#templateButton').onclick = () => window.location.href = @json(route('atasan.idp.template'));
   const addModal = document.querySelector('#addModal');
   const editModal = document.querySelector('#editModal');
   const editForm = document.querySelector('#editForm');
-  document.querySelector('#importButton').onclick = () => Swal.fire({icon:'info',text:'fitur import bawahan belum tersedia.'});
-  document.querySelector('#templateButton').onclick = () => Swal.fire({icon:'info',text:'fitur template bawahan belum tersedia.'});
   document.querySelector('#addButton').onclick = () => addModal.classList.replace('hidden', 'flex');
   document.querySelector('[data-close]').onclick = () => addModal.classList.replace('flex', 'hidden');
   document.querySelector('[data-close-edit]').onclick = () => editModal.classList.replace('flex', 'hidden');

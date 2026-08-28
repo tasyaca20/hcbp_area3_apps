@@ -71,7 +71,7 @@
     </div>
     <div class="xl:col-span-6 h-full">
       <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-sm h-full">
-        <table class="w-full h-full text-xs border-collapse">
+        <table data-table-search="false" data-table-scroll="false" class="w-full h-full text-xs border-collapse">
           <thead class="bg-slate-50 border-b border-slate-200 text-slate-700">
             <tr>
               <th class="px-4 py-3 text-left font-bold">Unit Area</th>

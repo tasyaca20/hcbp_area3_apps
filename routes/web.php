@@ -17,6 +17,7 @@ Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('
     Route::get('/idp/daftar', [IdpController::class, 'daftar'])->name('idp.daftar');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapan'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauan'])->name('idp.pemantauan');
+    Route::get('/coaching/pemantauan', [IdpController::class, 'pemantauanCoaching'])->name('coaching.pemantauan');
     Route::view('/idp/evaluasi', 'admin-master.idp.evaluasi')->name('idp.evaluasi');
     Route::get('/sertifikat', [SertifikatController::class, 'index'])->name('sertifikat');
     Route::get('/setting-role', [SettingRoleController::class, 'index'])->name('setting-role');
@@ -31,6 +32,7 @@ Route::middleware(['auth', 'role:admin_area'])->prefix('admin-area')->name('admi
     Route::get('/idp/daftar', [IdpController::class, 'daftarArea'])->name('idp.daftar');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanArea'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanArea'])->name('idp.pemantauan');
+    Route::get('/coaching/pemantauan', [IdpController::class, 'pemantauanCoachingArea'])->name('coaching.pemantauan');
     Route::view('/idp/evaluasi', 'admin-area.idp.evaluasi')->name('idp.evaluasi');
     Route::get('/sertifikat', [SertifikatController::class, 'indexArea'])->name('sertifikat');
 });
@@ -47,6 +49,7 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanAtasan'])->name('idp.pemantauan');
     Route::put('/idp/pemantauan/{idp}', [IdpController::class, 'updatePemantauanAtasan'])->name('idp.pemantauan.update');
     Route::get('/idp/evaluasi', [EvaluasiController::class, 'evaluasiAtasan'])->name('idp.evaluasi');
+    Route::get('/coaching', [IdpController::class, 'coachingAtasan'])->name('coaching.index');
     Route::post('/idp/evaluasi/{idp}', [EvaluasiController::class, 'storeEvaluasi'])->name('idp.evaluasi.store');
 });
 
@@ -58,4 +61,6 @@ Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanBawahan'])->name('idp.pemantauan');
     Route::get('/idp/evaluasi', [IdpController::class, 'evaluasiBawahan'])->name('idp.evaluasi');
     Route::get('/sertifikat', [SertifikatController::class, 'indexBawahan'])->name('sertifikat');
+    Route::get('/coaching', [IdpController::class, 'coachingBawahan'])->name('coaching.index');
+    Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('coaching.bukti');
 });

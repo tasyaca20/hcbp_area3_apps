@@ -74,11 +74,17 @@
             </summary>
             <nav class="pl-10 space-y-1 mt-1">
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.daftar') }}">Daftar IDP</a>
-              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'penetapan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.penetapan') }}">Penetapan IDP</a>
-              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.pemantauan') }}">Pemantauan IDP</a>
+              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.pemantauan') }}">Penetapan dan Pemantauan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>
+          <a class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-colors group {{ request()->routeIs('admin-master.coaching.pemantauan') ? 'bg-slate-100 font-semibold text-[#0a192f]' : 'text-[#0a192f]/80 hover:bg-slate-50' }}" href="{{ route('admin-master.coaching.pemantauan') }}">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[20px]">monitoring</span>
+              <span class="text-[15px]">Pemantauan Coaching</span>
+            </div>
+            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
+          </a>
           <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-master.sertifikat') }}">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
@@ -115,11 +121,17 @@
             </summary>
             <nav class="pl-10 space-y-1 mt-1">
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.daftar') }}">Daftar IDP</a>
-              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'penetapan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.penetapan') }}">Penetapan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.pemantauan') }}">Pemantauan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>
+          <a class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-colors group {{ request()->routeIs('admin-area.coaching.pemantauan') ? 'bg-slate-100 font-semibold text-[#0a192f]' : 'text-[#0a192f]/80 hover:bg-slate-50' }}" href="{{ route('admin-area.coaching.pemantauan') }}">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[20px]">monitoring</span>
+              <span class="text-[15px]">Pemantauan Coaching</span>
+            </div>
+            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
+          </a>
           <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-area.sertifikat') }}">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
@@ -143,6 +155,13 @@
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>
+          <details class="open:group" @if(($activeSection ?? '') === 'coaching') open @endif>
+            <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
+              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">forum</span><span class="text-[15px]">Coaching</span></div>
+              <span class="material-symbols-outlined text-[16px] text-slate-300 group-open:rotate-90">chevron_right</span>
+            </summary>
+            <nav class="pl-10 space-y-1 mt-1"><a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.coaching.index') }}">Coaching Bawahan</a></nav>
+          </details>
         @elseif(auth()->user()->role === 'bawahan')
           <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ request()->routeIs('bawahan.dashboard') ? 'bg-slate-100' : '' }}" href="{{ route('bawahan.dashboard') }}">
             <span class="material-symbols-outlined filled text-[20px]">dashboard</span>
@@ -162,6 +181,13 @@
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.idp.pemantauan') }}">Pemantauan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
+          </details>
+          <details class="open:group" @if(($activeSection ?? '') === 'coaching') open @endif>
+            <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
+              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">forum</span><span class="text-[15px]">Coaching</span></div>
+              <span class="material-symbols-outlined text-[16px] text-slate-300 group-open:rotate-90">chevron_right</span>
+            </summary>
+            <nav class="pl-10 space-y-1 mt-1"><a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.coaching.index') }}">Coaching Saya</a></nav>
           </details>
           <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('bawahan.sertifikat') }}">
             <div class="flex items-center gap-3">
@@ -246,6 +272,54 @@
             form.submit();
           }
         });
+      });
+      document.querySelectorAll('table:not([data-table-scroll="false"])').forEach((table) => {
+        table.parentElement.classList.add('overflow-x-auto');
+        table.classList.add('min-w-full', 'w-max');
+        table.querySelectorAll('th, td').forEach((cell) => cell.classList.add('whitespace-nowrap'));
+      });
+      document.querySelectorAll('table:not([data-table-search="false"])').forEach((table) => {
+        const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
+        if (!rows.length) return;
+        const container = table.parentElement;
+        const search = document.createElement('input');
+        search.type = 'search';
+        search.placeholder = 'Cari data...';
+        search.setAttribute('aria-label', 'Cari data tabel');
+        search.className = 'mb-3 block w-80 rounded-lg border-slate-300 bg-white text-sm focus:border-[#31599b] focus:ring-[#31599b]';
+        const searchRow = document.createElement('div');
+        searchRow.className = 'mb-3 flex justify-end';
+        search.classList.remove('mb-3');
+        searchRow.appendChild(search);
+        container.parentElement.insertBefore(searchRow, container);
+
+        if (table.dataset.tablePagination === 'false') {
+          search.addEventListener('input', () => {
+            const keyword = search.value.toLowerCase();
+            rows.forEach((row) => row.hidden = !row.textContent.toLowerCase().includes(keyword));
+          });
+          return;
+        }
+
+        const pageSize = 10;
+        let page = 1;
+        const pagination = document.createElement('div');
+        pagination.className = 'mt-4 flex items-center justify-between gap-4 text-sm text-slate-500';
+        container.appendChild(pagination);
+        const render = () => {
+          const keyword = search.value.toLowerCase();
+          const filtered = rows.filter((row) => row.textContent.toLowerCase().includes(keyword));
+          const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+          page = Math.min(page, totalPages);
+          rows.forEach((row) => row.hidden = true);
+          filtered.slice((page - 1) * pageSize, page * pageSize).forEach((row) => row.hidden = false);
+          const pageOptions = Array.from({ length: totalPages }, (_, index) => `<option value="${index + 1}" ${page === index + 1 ? 'selected' : ''}>${index + 1}</option>`).join('');
+          pagination.innerHTML = `<span>Menampilkan ${filtered.length ? (page - 1) * pageSize + 1 : 0}–${Math.min(page * pageSize, filtered.length)} dari ${filtered.length} data</span><div class="flex flex-wrap items-center gap-2"><button type="button" data-page="1" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&lt;&lt;</button><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&lt;</button><select aria-label="Pilih halaman" class="rounded border-slate-300 py-1 text-sm focus:border-[#31599b] focus:ring-[#31599b]">${pageOptions}</select><button type="button" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&gt;</button><button type="button" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&gt;&gt;</button></div>`;
+          pagination.querySelectorAll('button:not([disabled])').forEach((button) => button.addEventListener('click', () => { page = Number(button.dataset.page); render(); }));
+          pagination.querySelector('select').addEventListener('change', (event) => { page = Number(event.target.value); render(); });
+        };
+        search.addEventListener('input', () => { page = 1; render(); });
+        render();
       });
     </script>
   </body>

@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TemplateImportIdpAtasanExport;
 use App\Models\EvaluasiIDP;
 use App\Models\IDP;
 use App\Models\Jabatan;
+use App\Models\MonitoringIDP;
 use App\Models\Pengguna;
 use App\Models\RencanaPengembanganIDP;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class IdpController extends Controller
 {
@@ -50,7 +54,7 @@ class IdpController extends Controller
         $user = auth()->user();
         $rows = IDP::query()
             ->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))
-            ->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
+            ->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
             ->orderBy('id_daftar_idp')
             ->get();
 
@@ -139,7 +143,7 @@ class IdpController extends Controller
     public function pemantauan()
     {
         $rows = IDP::query()
-            ->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
+            ->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])
             ->orderBy('id_daftar_idp')
             ->get();
 
@@ -156,6 +160,92 @@ class IdpController extends Controller
             ->get();
 
         return view('admin-area.idp.pemantauan', compact('rows'));
+    }
+
+    public function pemantauanCoaching()
+    {
+        return $this->coachingMonitoringView('admin-master.coaching.pemantauan');
+    }
+
+    public function pemantauanCoachingArea()
+    {
+        return $this->coachingMonitoringView(
+            'admin-master.coaching.pemantauan',
+            auth()->user()->unit_induk
+        );
+    }
+
+    public function coachingAtasan()
+    {
+        return $this->coachingView('atasan.coaching.index', 'id_atasan');
+    }
+
+    public function coachingBawahan()
+    {
+        return $this->coachingView('bawahan.coaching.index', 'id_bawahan');
+    }
+
+    public function uploadBuktiCoaching(Request $request, IDP $idp)
+    {
+        abort_unless($idp->id_bawahan === auth()->id(), 403);
+
+        $data = $request->validate([
+            'bukti_10' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'bukti_20' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'bukti_70' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+        ]);
+
+        $monitoring = MonitoringIDP::firstOrCreate(['id_daftar_idp' => $idp->id_daftar_idp]);
+        $fields = ['bukti_10' => 'bukti_pembelajaran_10_persen', 'bukti_20' => 'bukti_social_learning_20_persen', 'bukti_70' => 'bukti_experimental_learning_70_persen'];
+
+        foreach ($fields as $input => $column) {
+            if ($request->hasFile($input)) {
+                $monitoring->{$column} = $request->file($input)->store("coaching-evidence/{$idp->id_daftar_idp}", 'public');
+            }
+        }
+
+        $monitoring->save();
+
+        return back()->with('success', 'Bukti coaching berhasil diunggah.');
+    }
+
+    private function coachingView(string $view, string $userColumn)
+    {
+        $rows = IDP::query()
+            ->where($userColumn, auth()->id())
+            ->with([
+                'bawahan.jabatan',
+                'atasan.jabatan',
+                'monitoring',
+                'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi'),
+            ])
+            ->orderBy('id_daftar_idp')
+            ->get();
+
+        return view($view, compact('rows'));
+    }
+
+    private function coachingMonitoringView(string $view, ?string $unitInduk = null)
+    {
+        $query = IDP::query()
+            ->with([
+                'bawahan.jabatan',
+                'atasan.jabatan',
+                'monitoring',
+                'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi'),
+            ])
+            ->orderBy('id_daftar_idp');
+
+        if ($unitInduk) {
+            $query->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $unitInduk));
+        }
+
+        $summaryRows = (clone $query)->get();
+
+        return view($view, [
+            'rows' => $query->paginate(10),
+            'summaryRows' => $summaryRows,
+        ]);
     }
 
     public function penetapanBawahan()
@@ -244,6 +334,83 @@ class IdpController extends Controller
         return view('atasan.idp.pemantauan', compact('rows'));
     }
 
+    public function downloadTemplateImportAtasan()
+    {
+        return Excel::download(new TemplateImportIdpAtasanExport, 'template-import-idp-atasan.xlsx');
+    }
+
+    public function importAtasan(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120'],
+        ]);
+
+        $rows = Excel::toArray(new \stdClass, $request->file('file'))[0] ?? [];
+        $headers = array_map(fn ($header) => strtolower(trim((string) $header)), array_shift($rows) ?? []);
+        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'business_area', 'periode_idp'];
+
+        if ($headers !== $requiredHeaders) {
+            return back()->with('error', 'Format Excel tidak sesuai. Unduh Template Excel terlebih dahulu.');
+        }
+
+        try {
+            DB::transaction(function () use ($rows, $headers) {
+                foreach ($rows as $index => $row) {
+                    if (! array_filter($row, fn ($value) => $value !== null && $value !== '')) {
+                        continue;
+                    }
+
+                    $data = array_map(
+                        fn ($value) => is_string($value) ? trim($value) : ($value === null ? null : (string) $value),
+                        array_combine($headers, array_pad($row, count($headers), null))
+                    );
+                    $validator = Validator::make($data, [
+                        'nip' => ['required', 'string', 'max:50'],
+                        'nama' => ['required', 'string', 'max:150'],
+                        'job_code' => ['required', 'string', 'exists:jabatan,job_code'],
+                        'username' => ['required', 'string', 'max:100'],
+                        'password' => ['required', 'string', 'min:6'],
+                        'business_area' => ['nullable', 'string', 'max:100'],
+                        'periode_idp' => ['required', 'in:Batch-1,Batch-2'],
+                    ]);
+
+                    if ($validator->fails()) {
+                        throw new \InvalidArgumentException('Baris '.($index + 2).': '.implode(' ', $validator->errors()->all()));
+                    }
+
+                    $data = $validator->validated();
+                    $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
+
+                    if ($bawahan && ($bawahan->nip !== $data['nip'] || $bawahan->username !== $data['username'])) {
+                        throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atau username sudah dipakai karyawan lain.');
+                    }
+
+                    if (! $bawahan) {
+                        $bawahan = Pengguna::create([
+                            'nama' => $data['nama'],
+                            'nip' => $data['nip'],
+                            'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'),
+                            'username' => $data['username'],
+                            'password_hash' => Hash::make($data['password']),
+                            'role' => 'bawahan',
+                            'unit_induk' => auth()->user()->unit_induk,
+                            'status_aktif' => true,
+                        ]);
+                    }
+
+                    IDP::updateOrCreate(
+                        ['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => auth()->id(), 'periode_idp' => $data['periode_idp']],
+                        ['business_area' => $data['business_area']]
+                    );
+                }
+            });
+        } catch (\InvalidArgumentException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Data bawahan berhasil diimport.');
+    }
+
     public function storeAtasan(Request $request)
     {
         $data = $request->validate([
@@ -257,8 +424,8 @@ class IdpController extends Controller
         ]);
 
         $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
-        
-        if (!$bawahan) {
+
+        if (! $bawahan) {
             $request->validate([
                 'nip' => ['unique:pengguna,nip'],
                 'username' => ['unique:pengguna,username'],
