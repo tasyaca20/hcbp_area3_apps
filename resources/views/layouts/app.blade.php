@@ -85,24 +85,10 @@
             </div>
             <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
           </a>
-          <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-master.sertifikat') }}">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
-              <span class="text-[15px]">Sertifikat Kompetensi</span>
-            </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
-          </a>
           <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-master.setting-role') }}">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[20px]">settings_account_box</span>
               <span class="text-[15px]">Setting Role</span>
-            </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
-          </a>
-          <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-master.km-content') }}">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px]">assignment</span>
-              <span class="text-[15px]">Detail KM HCBP Area 3</span>
             </div>
             <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
           </a>
@@ -129,13 +115,6 @@
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[20px]">monitoring</span>
               <span class="text-[15px]">Pemantauan Coaching</span>
-            </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
-          </a>
-          <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-area.sertifikat') }}">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
-              <span class="text-[15px]">Sertifikat Kompetensi</span>
             </div>
             <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
           </a>
@@ -189,13 +168,6 @@
             </summary>
             <nav class="pl-10 space-y-1 mt-1"><a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.coaching.index') }}">Coaching Saya</a></nav>
           </details>
-          <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('bawahan.sertifikat') }}">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
-              <span class="text-[15px]">Sertifikat Saya</span>
-            </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
-          </a>
         @endif
       </nav>
       <div class="p-4 border-t border-slate-200">

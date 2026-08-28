@@ -40,9 +40,5 @@ class DatabaseSeeder extends Seeder
             'progress_percent' => 0,
         ]);
 
-        DB::table('km_content')->insert([
-            'judul' => 'Knowledge Management HCBP Area 3',
-            'konten' => 'Konten dummy tanpa mengubah data master kompetensi.',
-        ]);
     }
 }

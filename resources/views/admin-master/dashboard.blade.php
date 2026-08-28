@@ -35,17 +35,6 @@
     </div>
   </div>
   <div class="bg-white border border-[#E9EDF3] rounded-2xl shadow-sm p-5 flex items-center gap-4">
-    <div class="w-12 h-12 rounded-full bg-[#0a192f] flex items-center justify-center text-white shrink-0"><span class="material-symbols-outlined filled">workspace_premium</span></div>
-    <div class="flex-1">
-      <p class="text-[12px] text-slate-400 leading-tight">Data Jumlah Data Tersertifikat Kompetensi</p>
-      <h3 class="text-[24px] font-bold text-[#0a192f] leading-tight">1.245</h3>
-      <p class="text-[11px] text-slate-400">Data Tersertifikat</p>
-    </div>
-    <div class="text-right shrink-0"><span class="text-[12px] font-bold text-emerald-500">↑ 9,3%</span>
-      <p class="text-[10px] text-slate-400 whitespace-nowrap">dari bulan lalu</p>
-    </div>
-  </div>
-  <div class="bg-white border border-[#E9EDF3] rounded-2xl shadow-sm p-5 flex items-center gap-4">
     <div class="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center text-white shrink-0"><span class="material-symbols-outlined filled">badge</span></div>
     <div class="flex-1">
       <p class="text-[12px] text-slate-400 leading-tight">Progres Laporan Budaya</p>
