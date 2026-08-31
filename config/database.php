@@ -24,11 +24,8 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => null,
-            // Vercel cannot reach Railway's private network hostname or localhost.
-            // In production, prefer the Railway public TCP proxy unless an explicit
-            // DB_HOST_PUBLIC is supplied in Vercel.
-            'host' => env('DB_HOST_PUBLIC', env('APP_ENV') === 'production' ? 'sakura.proxy.rlwy.net' : env('DB_HOST', '127.0.0.1')),
-            'port' => env('DB_PORT_PUBLIC', env('APP_ENV') === 'production' ? '10132' : env('DB_PORT', '3306')),
+            'host' => env('DB_HOST', 'sakura.proxy.rlwy.net'),
+            'port' => env('DB_PORT', '10132'),
             'database' => env('DB_DATABASE', 'railway'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', env('MYSQLPASSWORD', '')),
