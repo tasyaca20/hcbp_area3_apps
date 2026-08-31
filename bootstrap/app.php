@@ -25,7 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withProviders([
-        // Explicit core providers keep the Laravel serverless bootstrap deterministic.
         CacheServiceProvider::class,
         CookieServiceProvider::class,
         DatabaseServiceProvider::class,
@@ -39,6 +38,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ViewServiceProvider::class,
         AppServiceProvider::class,
     ])
+    ->registered(function (Application $app): void {
+        // Force the two bindings required by Laravel's router/Blade stack in Vercel's
+        // serverless bootstrap, even when a cached provider manifest is incomplete.
+        $app->register(FilesystemServiceProvider::class, true);
+        $app->register(ViewServiceProvider::class, true);
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
