@@ -49,8 +49,8 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/idp/daftar/template', [IdpController::class, 'downloadTemplateImportAtasan'])->name('idp.template');
     Route::post('/idp/daftar/import', [IdpController::class, 'importAtasan'])->name('idp.import');
     Route::post('/idp/daftar', [IdpController::class, 'storeAtasan'])->name('idp.store');
-    Route::put('/atasan/idp/daftar/{idp}', [IdpController::class, 'updateAtasan'])->name('idp.update');
-    Route::delete('/atasan/idp/daftar/{idp}', [IdpController::class, 'destroyAtasan'])->name('idp.destroy');
+    Route::put('/idp/daftar/{idp}', [IdpController::class, 'updateAtasan'])->name('idp.update');
+    Route::delete('/idp/daftar/{idp}', [IdpController::class, 'destroyAtasan'])->name('idp.destroy');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanAtasan'])->name('idp.penetapan');
     Route::put('/idp/penetapan/{rencana}', [IdpController::class, 'reviewRencanaAtasan'])->name('idp.penetapan.review');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanAtasan'])->name('idp.pemantauan');
