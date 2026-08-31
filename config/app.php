@@ -20,7 +20,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
     'providers' => ServiceProvider::defaultProviders()->merge([
-        Maatwebsite\Excel\ExcelServiceProvider::class,
         App\Providers\AppServiceProvider::class,
     ])->toArray(),
     'aliases' => Facade::defaultAliases()->toArray(),
