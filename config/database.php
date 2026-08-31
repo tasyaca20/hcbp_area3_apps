@@ -24,13 +24,13 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => null,
-            // Railway's public TCP proxy is the production-safe fallback for Vercel.
-            'host' => env('DB_HOST', 'sakura.proxy.rlwy.net'),
-            'port' => env('DB_PORT', '10132'),
+            // Vercel cannot reach Railway's private network hostname or localhost.
+            // In production, prefer the Railway public TCP proxy unless an explicit
+            // DB_HOST_PUBLIC is supplied in Vercel.
+            'host' => env('DB_HOST_PUBLIC', env('APP_ENV') === 'production' ? 'sakura.proxy.rlwy.net' : env('DB_HOST', '127.0.0.1')),
+            'port' => env('DB_PORT_PUBLIC', env('APP_ENV') === 'production' ? '10132' : env('DB_PORT', '3306')),
             'database' => env('DB_DATABASE', 'railway'),
             'username' => env('DB_USERNAME', 'root'),
-            // Never commit the password. Accept either conventional Laravel names
-            // or Railway's MYSQLPASSWORD if the latter was copied into Vercel.
             'password' => env('DB_PASSWORD', env('MYSQLPASSWORD', '')),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
