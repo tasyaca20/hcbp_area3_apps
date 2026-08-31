@@ -24,3 +24,7 @@ Untuk upload bukti coaching, gunakan object storage yang persisten pada producti
 ## Deployment
 
 Push ke branch `main` akan memicu deployment otomatis jika repository sudah terhubung ke Vercel. Build frontend dijalankan melalui `vercel-build.sh`, sementara request aplikasi diarahkan ke `api/index.php` sebagai front controller Laravel.
+
+## Database
+
+Production database is managed externally; keep credentials only in Vercel Production Environment Variables and never commit secrets to this repository.
