@@ -11,14 +11,12 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Hashing\HashServiceProvider;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\TranslationServiceProvider;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\View\ViewServiceProvider;
-use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -53,7 +51,4 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
-        $exceptions->render(function (Throwable $e) {
-            return new Response(get_class($e) . ': ' . $e->getMessage(), 500);
-        });
     })->create();
