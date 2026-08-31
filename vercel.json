@@ -18,10 +18,5 @@
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
-  ],
-  "build": {
-    "env": {
-      "NPM_CONFIG_PRODUCTION": "false"
-    }
-  }
+  ]
 }
