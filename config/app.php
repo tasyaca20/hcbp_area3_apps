@@ -13,7 +13,9 @@ return [
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'id'),
     'faker_locale' => env('APP_FAKER_LOCALE', 'id_ID'),
     'cipher' => 'AES-256-CBC',
-    'key' => env('APP_KEY'),
+    // Temporary production fallback so the app can boot when Vercel APP_KEY is absent.
+    // Set APP_KEY in Vercel for the final production configuration.
+    'key' => env('APP_KEY', 'base64:Q7pVY9g5t3H2m8L4c6N1s0KzR5xW2bF9dJ7hG3qP8aM='),
     'previous_keys' => array_values(array_filter(explode(',', (string) env('APP_PREVIOUS_KEYS', '')))),
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
