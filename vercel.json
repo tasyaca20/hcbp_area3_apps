@@ -23,5 +23,5 @@
       "dest": "/api/index.php"
     }
   ],
-  "buildCommand": "npm install --include=dev && npm run build"
+  "buildCommand": "sh vercel-build.sh"
 }
