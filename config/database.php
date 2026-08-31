@@ -24,11 +24,14 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => null,
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
+            // Railway's public TCP proxy is the production-safe fallback for Vercel.
+            'host' => env('DB_HOST', 'sakura.proxy.rlwy.net'),
+            'port' => env('DB_PORT', '10132'),
+            'database' => env('DB_DATABASE', 'railway'),
             'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            // Never commit the password. Accept either conventional Laravel names
+            // or Railway's MYSQLPASSWORD if the latter was copied into Vercel.
+            'password' => env('DB_PASSWORD', env('MYSQLPASSWORD', '')),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
@@ -72,6 +75,8 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
