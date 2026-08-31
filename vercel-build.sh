@@ -1,13 +1,11 @@
 #!/bin/sh
 set -eu
 
-# Never reuse Laravel's compiled service/config manifests from a previous Vercel build.
+# Vercel's PHP builder installs Composer dependencies before buildCommand.
+# Clear any compiled Laravel manifests restored from a previous deployment.
 rm -f bootstrap/cache/*.php
 
-# Build the PHP dependency tree from composer.lock on every deployment.
-composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
-
-# Rebuild Laravel's package manifest after the fresh dependency install.
+# Rebuild Laravel's package manifest from the freshly installed vendor tree.
 php artisan package:discover --ansi
 php artisan config:clear --ansi || true
 php artisan route:clear --ansi || true
