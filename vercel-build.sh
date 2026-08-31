@@ -1,9 +1,9 @@
 #!/bin/sh
 set -eu
 
-# Do not ship compiled Laravel manifests from an older Vercel cache.
-rm -f bootstrap/cache/*.php
+# Never ship stale Laravel compiled manifests from a previous build cache.
+rm -f bootstrap/cache/*.php 2>/dev/null || true
 
-# Build frontend assets. PHP dependencies are handled by the Vercel PHP runtime builder.
-npm install --include=dev --no-package-lock --no-audit --no-fund --ignore-scripts=false
+# Vercel's PHP builder installs Composer dependencies.
+# Only build the frontend assets here.
 npm run build
