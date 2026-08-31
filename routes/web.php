@@ -11,6 +11,7 @@ Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Temporary production diagnostics. Remove after DB verification.
 Route::get('/__dbcheck', function () {
     try {
         DB::connection()->getPdo();
@@ -18,9 +19,7 @@ Route::get('/__dbcheck', function () {
         return response()->json(['ok' => true, 'driver' => DB::connection()->getDriverName(), 'pengguna_count' => $count]);
     } catch (Throwable $e) {
         report($e);
-        $message = $e->getMessage();
-        $message = preg_replace('/password=([^&\s]+)/i', 'password=[redacted]', $message);
-        return response()->json(['ok' => false, 'error' => get_class($e), 'message' => $message], 500);
+        return response()->json(['ok' => false, 'error' => get_class($e), 'message' => 'Database connection failed'], 500);
     }
 })->name('__dbcheck');
 
