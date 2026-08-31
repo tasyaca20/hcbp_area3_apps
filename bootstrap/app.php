@@ -1,11 +1,22 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use Illuminate\Cache\CacheServiceProvider;
+use Illuminate\Cookie\CookieServiceProvider;
+use Illuminate\Database\DatabaseServiceProvider;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Filesystem\FilesystemServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Hashing\HashServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\PaginationServiceProvider;
+use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
+use Illuminate\View\ViewServiceProvider;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,11 +24,21 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withProviders(
-        ServiceProvider::defaultProviders()->merge([
-            AppServiceProvider::class,
-        ])->toArray()
-    )
+    ->withProviders([
+        // Explicit core providers keep the Laravel serverless bootstrap deterministic.
+        CacheServiceProvider::class,
+        CookieServiceProvider::class,
+        DatabaseServiceProvider::class,
+        EncryptionServiceProvider::class,
+        FilesystemServiceProvider::class,
+        HashServiceProvider::class,
+        PaginationServiceProvider::class,
+        SessionServiceProvider::class,
+        TranslationServiceProvider::class,
+        ValidationServiceProvider::class,
+        ViewServiceProvider::class,
+        AppServiceProvider::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
