@@ -6,19 +6,12 @@ use App\Models\Pengguna;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\ViewServiceProvider;
 
 class AuthController extends Controller
 {
     public function showLogin()
     {
-        return response()->json([
-            'view_bound' => app()->bound('view'),
-            'view_provider_loaded' => count(app()->getProviders(ViewServiceProvider::class)) > 0,
-            'view_provider_class' => class_exists(ViewServiceProvider::class),
-            'app_providers_contains_view' => in_array(ViewServiceProvider::class, config('app.providers', []), true),
-            'view_config_exists' => config()->has('view'),
-        ]);
+        return view('login');
     }
 
     public function login(Request $request)
