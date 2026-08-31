@@ -14,5 +14,6 @@
     { "src": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|eot|otf|webp|avif|txt))$", "dest": "/public/$1" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ],
-  "buildCommand": "sh vercel-build.sh"
+  "buildCommand": "sh vercel-build.sh",
+  "outputDirectory": "public"
 }
