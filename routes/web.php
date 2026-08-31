@@ -18,7 +18,9 @@ Route::get('/__dbcheck', function () {
         return response()->json(['ok' => true, 'driver' => DB::connection()->getDriverName(), 'pengguna_count' => $count]);
     } catch (Throwable $e) {
         report($e);
-        return response()->json(['ok' => false, 'error' => get_class($e)], 500);
+        $message = $e->getMessage();
+        $message = preg_replace('/password=([^&\s]+)/i', 'password=[redacted]', $message);
+        return response()->json(['ok' => false, 'error' => get_class($e), 'message' => $message], 500);
     }
 })->name('__dbcheck');
 
