@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\SettingRoleController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
@@ -57,4 +58,15 @@ Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')
     Route::get('/idp/evaluasi', [IdpController::class, 'evaluasiBawahan'])->name('idp.evaluasi');
     Route::get('/coaching', [IdpController::class, 'coachingBawahan'])->name('coaching.index');
     Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('coaching.bukti');
+});
+
+// Temporary non-sensitive production connectivity probe; remove after verification.
+Route::get('/__dbcheck', function () {
+    try {
+        DB::select('SELECT 1');
+        return response()->json(['ok' => true, 'pengguna_table' => DB::getSchemaBuilder()->hasTable('pengguna')]);
+    } catch (Throwable $e) {
+        report($e);
+        return response()->json(['ok' => false], 503);
+    }
 });
