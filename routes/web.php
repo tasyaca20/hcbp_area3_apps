@@ -4,18 +4,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\SettingRoleController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Temporary one-shot production verification. Remove immediately after the check.
-Route::get('/__verify-login', function (Request $request) {
-    $request->merge(['username' => 'admin', 'password' => 'admin123']);
-    return app(AuthController::class)->login($request);
-});
 
 Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('admin-master.')->group(function () {
     Route::view('/dashboard', 'admin-master.dashboard')->name('dashboard');
