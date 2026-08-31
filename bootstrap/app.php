@@ -11,12 +11,14 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Hashing\HashServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\PaginationServiceProvider;
 use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\TranslationServiceProvider;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\View\ViewServiceProvider;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -39,8 +41,6 @@ return Application::configure(basePath: dirname(__DIR__))
         AppServiceProvider::class,
     ])
     ->registered(function (Application $app): void {
-        // Force the two bindings required by Laravel's router/Blade stack in Vercel's
-        // serverless bootstrap, even when a cached provider manifest is incomplete.
         $app->register(FilesystemServiceProvider::class, true);
         $app->register(ViewServiceProvider::class, true);
     })
@@ -53,4 +53,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($request->is('__diagnostic__')) {
+                return new Response(get_class($e) . ': ' . $e->getMessage(), 500);
+            }
+        });
     })->create();
