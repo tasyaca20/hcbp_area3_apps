@@ -1,9 +1,9 @@
 #!/bin/sh
 set -eu
 
-# Laravel's ProviderRepository needs bootstrap/cache to exist during Composer
-# package discovery. Keep the directory in the deployment and let the Vercel
-# PHP builder generate fresh manifests instead of deleting them here.
+# Production deployment trigger: Laravel reads the Railway MySQL settings from
+# Vercel Production Environment Variables / vercel.json at runtime.
+# Keep bootstrap/cache available during Composer package discovery.
 mkdir -p bootstrap/cache
 chmod 775 bootstrap/cache 2>/dev/null || true
 
