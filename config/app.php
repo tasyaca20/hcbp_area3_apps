@@ -21,6 +21,7 @@ return [
     ],
     'providers' => ServiceProvider::defaultProviders()->merge([
         App\Providers\AppServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
     ])->toArray(),
     'aliases' => Facade::defaultAliases()->toArray(),
 ];
