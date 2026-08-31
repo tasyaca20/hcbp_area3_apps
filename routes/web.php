@@ -4,11 +4,23 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\SettingRoleController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/__dbcheck', function () {
+    try {
+        DB::connection()->getPdo();
+        $count = DB::table('pengguna')->count();
+        return response()->json(['ok' => true, 'driver' => DB::connection()->getDriverName(), 'pengguna_count' => $count]);
+    } catch (Throwable $e) {
+        report($e);
+        return response()->json(['ok' => false, 'error' => get_class($e)], 500);
+    }
+})->name('__dbcheck');
 
 Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('admin-master.')->group(function () {
     Route::view('/dashboard', 'admin-master.dashboard')->name('dashboard');
@@ -37,8 +49,8 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/idp/daftar/template', [IdpController::class, 'downloadTemplateImportAtasan'])->name('idp.template');
     Route::post('/idp/daftar/import', [IdpController::class, 'importAtasan'])->name('idp.import');
     Route::post('/idp/daftar', [IdpController::class, 'storeAtasan'])->name('idp.store');
-    Route::put('/idp/daftar/{idp}', [IdpController::class, 'updateAtasan'])->name('idp.update');
-    Route::delete('/idp/daftar/{idp}', [IdpController::class, 'destroyAtasan'])->name('idp.destroy');
+    Route::put('/atasan/idp/daftar/{idp}', [IdpController::class, 'updateAtasan'])->name('idp.update');
+    Route::delete('/atasan/idp/daftar/{idp}', [IdpController::class, 'destroyAtasan'])->name('idp.destroy');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanAtasan'])->name('idp.penetapan');
     Route::put('/idp/penetapan/{rencana}', [IdpController::class, 'reviewRencanaAtasan'])->name('idp.penetapan.review');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanAtasan'])->name('idp.pemantauan');
