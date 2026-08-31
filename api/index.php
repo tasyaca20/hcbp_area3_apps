@@ -1,8 +1,7 @@
 <?php
 
 // Vercel functions have an immutable deployment filesystem. Prepare writable
-// runtime directories before Laravel boots, and provide safe production
-// defaults when the hosting environment does not inject Laravel DB aliases.
+// runtime directories before Laravel boots.
 $runtimeViewPath = '/tmp/laravel-views';
 if (! is_dir($runtimeViewPath)) {
     @mkdir($runtimeViewPath, 0777, true);
@@ -15,24 +14,20 @@ if (! getenv('VIEW_COMPILED_PATH')) {
     putenv('VIEW_COMPILED_PATH='.$runtimeViewPath);
 }
 
-// Ensure Vercel production uses the Railway MySQL TCP proxy. These values are
-// non-secret; the password must remain a Vercel Environment Variable.
-$runtimeEnv = [
-    'APP_ENV' => 'production',
-    'DB_CONNECTION' => 'mysql',
-    'DB_HOST' => 'sakura.proxy.rlwy.net',
-    'DB_PORT' => '10132',
-    'DB_DATABASE' => 'railway',
-    'DB_USERNAME' => 'root',
-];
-foreach ($runtimeEnv as $key => $value) {
-    if (! getenv($key)) {
-        putenv($key.'='.$value);
-    }
+// This application is intentionally pinned to the public Railway MySQL TCP
+// proxy in Vercel production. These are non-secret connection coordinates;
+// the password remains a Vercel Environment Variable.
+if (getenv('VERCEL')) {
+    putenv('APP_ENV=production');
+    putenv('DB_CONNECTION=mysql');
+    putenv('DB_HOST=sakura.proxy.rlwy.net');
+    putenv('DB_PORT=10132');
+    putenv('DB_DATABASE=railway');
+    putenv('DB_USERNAME=root');
 }
 
-// Railway commonly names the secret MYSQLPASSWORD. Support it transparently
-// when DB_PASSWORD was not separately configured in Vercel.
+// Railway commonly names the secret MYSQLPASSWORD. Support it when
+// DB_PASSWORD is not separately configured in Vercel.
 if (! getenv('DB_PASSWORD') && getenv('MYSQLPASSWORD')) {
     putenv('DB_PASSWORD='.getenv('MYSQLPASSWORD'));
 }
