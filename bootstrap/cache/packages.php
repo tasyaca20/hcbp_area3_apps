@@ -1,7 +1,1 @@
-<?php
-
-return [
-    'packages' => [],
-    'providers' => [],
-    'aliases' => [],
-];
+<?php return [];
