@@ -14,9 +14,8 @@ if (! getenv('VIEW_COMPILED_PATH')) {
     putenv('VIEW_COMPILED_PATH='.$runtimeViewPath);
 }
 
-// This application is intentionally pinned to the public Railway MySQL TCP
-// proxy in Vercel production. These are non-secret connection coordinates;
-// the password remains a Vercel Environment Variable.
+// Pin Vercel production to the public Railway MySQL TCP proxy. These are
+// non-secret connection coordinates; the password remains in Vercel env.
 if (getenv('VERCEL')) {
     putenv('APP_ENV=production');
     putenv('DB_CONNECTION=mysql');
@@ -24,12 +23,17 @@ if (getenv('VERCEL')) {
     putenv('DB_PORT=10132');
     putenv('DB_DATABASE=railway');
     putenv('DB_USERNAME=root');
+    // A stale DB_URL can override host/port in Laravel's database manager.
+    putenv('DB_URL=');
 }
 
-// Railway commonly names the secret MYSQLPASSWORD. Support it when
-// DB_PASSWORD is not separately configured in Vercel.
-if (! getenv('DB_PASSWORD') && getenv('MYSQLPASSWORD')) {
-    putenv('DB_PASSWORD='.getenv('MYSQLPASSWORD'));
+// Support the common Railway secret names when DB_PASSWORD is not present.
+if (! getenv('DB_PASSWORD')) {
+    if (getenv('MYSQLPASSWORD')) {
+        putenv('DB_PASSWORD='.getenv('MYSQLPASSWORD'));
+    } elseif (getenv('MYSQL_ROOT_PASSWORD')) {
+        putenv('DB_PASSWORD='.getenv('MYSQL_ROOT_PASSWORD'));
+    }
 }
 
 require dirname(__DIR__) . '/public/index.php';
