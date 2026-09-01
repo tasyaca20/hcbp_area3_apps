@@ -43,4 +43,14 @@ class IDP extends Model
     {
         return $this->hasMany(RencanaPengembanganIDP::class, 'id_daftar_idp', 'id_daftar_idp');
     }
+
+    public function coachingBuktiPerRencana()
+    {
+        return $this->hasMany(CoachingBukti::class, 'id_daftar_idp', 'id_daftar_idp')->whereNull('id_rencana');
+    }
+
+    public function coachingBukti()
+    {
+        return $this->hasMany(CoachingBukti::class, 'id_daftar_idp', 'id_daftar_idp');
+    }
 }

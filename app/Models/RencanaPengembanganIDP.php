@@ -29,4 +29,9 @@ class RencanaPengembanganIDP extends Model
     {
         return $this->belongsTo(IDP::class, 'id_daftar_idp', 'id_daftar_idp');
     }
+
+    public function coachingBukti()
+    {
+        return $this->hasMany(CoachingBukti::class, 'id_rencana', 'id_rencana');
+    }
 }

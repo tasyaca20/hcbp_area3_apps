@@ -9,11 +9,13 @@ use App\Models\Jabatan;
 use App\Models\MonitoringIDP;
 use App\Models\Pengguna;
 use App\Models\RencanaPengembanganIDP;
+use App\Models\CoachingBukti;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class IdpController extends Controller
 {
@@ -110,17 +112,59 @@ class IdpController extends Controller
     public function uploadBuktiCoaching(Request $request, IDP $idp)
     {
         abort_unless($idp->id_bawahan === auth()->id(), 403);
-        $request->validate(['bukti_10' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], 'bukti_20' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], 'bukti_70' => ['nullable', 'file', 'mimes:pdf', 'max:5120']]);
-        $monitoring = MonitoringIDP::firstOrCreate(['id_daftar_idp' => $idp->id_daftar_idp]);
-        $fields = ['bukti_10' => 'bukti_pembelajaran_10_persen', 'bukti_20' => 'bukti_social_learning_20_persen', 'bukti_70' => 'bukti_experimental_learning_70_persen'];
-        foreach ($fields as $input => $column) if ($request->hasFile($input)) $monitoring->{$column} = $request->file($input)->store("coaching-evidence/{$idp->id_daftar_idp}", 'public');
-        $monitoring->save();
+
+        $validated = $request->validate([
+            'bukti_10' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'bukti_20' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'bukti_70' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'plan_id' => ['nullable', 'exists:rencana_pengembangan_idp,id_rencana'],
+        ]);
+
+        $planId = $request->plan_id;
+        $fields = [
+            'bukti_10' => 10,
+            'bukti_20' => 20,
+            'bukti_70' => 70,
+        ];
+
+        foreach ($fields as $input => $jenis) {
+            if ($request->hasFile($input)) {
+                $file = $request->file($input);
+                $path = $file->store("coaching-evidence/{$idp->id_daftar_idp}", 'public');
+                
+                $query = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+                    ->where('jenis', $jenis);
+                
+                if ($planId) {
+                    $query->where('id_rencana', $planId);
+                } else {
+                    $query->whereNull('id_rencana');
+                }
+                
+                $query->delete();
+                
+                CoachingBukti::create([
+                    'id_daftar_idp' => $idp->id_daftar_idp,
+                    'id_rencana' => $planId,
+                    'jenis' => $jenis,
+                    'file_path' => $path,
+                ]);
+            }
+        }
+
         return back()->with('success', 'Bukti coaching berhasil diunggah.');
     }
 
     private function coachingView(string $view, string $userColumn)
     {
-        $rows = IDP::query()->where($userColumn, auth()->id())->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->where($userColumn, auth()->id())
+            ->with([
+                'bawahan.jabatan',
+                'atasan.jabatan',
+                'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])
+            ])
+            ->orderBy('id_daftar_idp')
+            ->get();
         return view($view, compact('rows'));
     }
 
@@ -274,5 +318,35 @@ class IdpController extends Controller
     {
         $idp->delete();
         return back()->with('success', 'Data IDP berhasil dihapus.');
+    }
+
+    public function downloadCoachingBukti(IDP $idp, $type, $idRencana = null)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'atasan') {
+            abort_unless($idp->id_atasan === $user->id, 403);
+        } elseif ($user->role === 'bawahan') {
+            abort_unless($idp->id_bawahan === $user->id, 403);
+        }
+
+        $query = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+            ->where('jenis', $type);
+        
+        if ($idRencana) {
+            $query->where('id_rencana', $idRencana);
+        } else {
+            $query->whereNull('id_rencana');
+        }
+        
+        $coachingBukti = $query->first();
+        abort_unless($coachingBukti, 404);
+
+        $filePath = $coachingBukti->file_path;
+        abort_unless(Storage::exists($filePath), 404);
+
+        $fileName = basename($filePath);
+
+        return Storage::download($filePath, $fileName);
     }
 }
