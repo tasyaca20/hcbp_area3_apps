@@ -4,24 +4,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\SettingRoleController;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Temporary production diagnostics. Remove after DB verification.
-Route::get('/__dbcheck', function () {
-    try {
-        DB::connection()->getPdo();
-        $count = DB::table('pengguna')->count();
-        return response()->json(['ok' => true, 'driver' => DB::connection()->getDriverName(), 'pengguna_count' => $count]);
-    } catch (Throwable $e) {
-        report($e);
-        return response()->json(['ok' => false, 'error' => get_class($e), 'message' => 'Database connection failed'], 500);
-    }
-})->name('__dbcheck');
 
 Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('admin-master.')->group(function () {
     Route::view('/dashboard', 'admin-master.dashboard')->name('dashboard');
