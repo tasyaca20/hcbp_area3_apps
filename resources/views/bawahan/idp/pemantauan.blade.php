@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Pemantauan IDP - Bawahan'])
 
 @section('content')
-<div class="bg-white border border-slate-200 rounded-2xl p-6">
+<div class="bawahan-section bg-white border border-slate-200 rounded-2xl p-6">
   <h1 class="text-xl font-bold mb-4">Pemantauan IDP Saya</h1>
   <div class="overflow-x-auto">
     <table class="w-full text-sm">

@@ -25,7 +25,7 @@
     <span class="text-xs text-slate-400">Update progres bawahan</span>
   </div>
   <div class="overflow-x-auto">
-    <table class="min-w-[1200px] w-full text-left text-xs">
+    <table data-table-search="false" data-table-pagination="false" class="min-w-[1200px] w-full text-left text-xs">
       <thead class="bg-[#31599b] text-white">
         <tr>
           <th class="px-4 py-4 font-semibold">No.</th>

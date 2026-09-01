@@ -245,12 +245,20 @@
           }
         });
       });
-      document.querySelectorAll('table:not([data-table-scroll="false"])').forEach((table) => {
+      // Skip search/pagination for bawahan pages (tables inside .bawahan-tables-only)
+      const isBawahan = document.querySelector('[data-role="bawahan"]');
+      document.querySelectorAll('table:not([data-table-search="false"])').forEach((table) => {
+        // Skip if inside bawahan section
+        if (isBawahan && table.closest('.bawahan-section')) return;
+
         table.parentElement.classList.add('overflow-x-auto');
         table.classList.add('min-w-full', 'w-max');
         table.querySelectorAll('th, td').forEach((cell) => cell.classList.add('whitespace-nowrap'));
       });
       document.querySelectorAll('table:not([data-table-search="false"])').forEach((table) => {
+        // Skip if inside bawahan section
+        if (table.closest('.bawahan-section')) return;
+
         const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
         if (!rows.length) return;
         const container = table.parentElement;

@@ -4,7 +4,7 @@
 @if(session('success'))
 <script>Swal.fire({icon:'success',text:@json(session('success'))});</script>
 @endif
-<div class="bg-white border border-slate-200 rounded-2xl p-6">
+<div class="bawahan-section bg-white border border-slate-200 rounded-2xl p-6">
   <div class="mb-6">
     <h1 class="text-xl font-bold">Ketentuan IDP - Bawahan</h1>
     <ol class="list-decimal ml-6 mt-2 text-sm space-y-1 text-slate-700">
@@ -36,7 +36,7 @@
       <div class="border border-emerald-200 rounded-xl p-5">
         <h2 class="font-semibold mb-3">Hasil IDP Disetujui Atasan</h2>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+        <table class="w-full text-sm">
             <thead class="bg-emerald-50"><tr><th class="px-3 py-3 text-left w-12">NO</th><th class="px-3 py-3 text-left">KOMPETENSI TEKNIS</th><th class="px-3 py-3 text-left">10% PEMBELAJARAN</th><th class="px-3 py-3 text-left">20% SOCIAL LEARNING</th><th class="px-3 py-3 text-left">70% ACTION LEARNING</th></tr></thead>
             <tbody>
               @foreach($row->rencanaPengembangan->where('status', 'Disetujui') as $rencana)
@@ -144,7 +144,7 @@
       </div>
 
       <div class="overflow-x-auto border border-slate-200 rounded-xl">
-        <table class="w-full text-sm">
+        <table data-table-search="false" data-table-pagination="false" class="w-full text-sm">
           <thead class="bg-slate-50">
             <tr>
               <th class="px-3 py-3 text-left w-12">NO</th>

@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Evaluasi IDP - Bawahan'])
 
 @section('content')
-<div class="bg-white border border-slate-200 rounded-2xl p-6">
+<div class="bawahan-section bg-white border border-slate-200 rounded-2xl p-6">
   <h1 class="text-xl font-bold mb-4">Hasil Evaluasi</h1>
   <div class="space-y-4">
     @forelse($evaluasi as $item)

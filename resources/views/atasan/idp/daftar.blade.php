@@ -19,39 +19,41 @@
       <button id="addButton" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white">Tambah Bawahan</button>
     </div>
   </div>
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50">
+  <div class="overflow-x-auto rounded-xl border border-slate-200">
+    <table data-table-search="false" data-table-pagination="false" class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-600">
         <tr>
-          <th class="px-4 py-3 text-left">No</th>
-          <th class="px-4 py-3 text-left">Nama Bawahan</th>
-          <th class="px-4 py-3 text-left">NIP</th>
-          <th class="px-4 py-3 text-left">Jabatan</th>
-          <th class="px-4 py-3 text-left">Periode</th>
-          <th class="px-4 py-3 text-left">Business Area</th>
-          <th class="px-4 py-3 text-left">Aksi</th>
+          <th class="px-4 py-3 text-left font-semibold">No</th>
+          <th class="px-4 py-3 text-left font-semibold">Nama Bawahan</th>
+          <th class="px-4 py-3 text-left font-semibold">NIP</th>
+          <th class="px-4 py-3 text-left font-semibold">Jabatan</th>
+          <th class="px-4 py-3 text-left font-semibold">Periode</th>
+          <th class="px-4 py-3 text-left font-semibold">Business Area</th>
+          <th class="px-4 py-3 text-left font-semibold">Aksi</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-slate-100">
         @forelse($rows as $i => $row)
-        <tr class="hover:bg-slate-50">
-          <td class="px-4 py-3">{{ $i + 1 }}</td>
-          <td class="px-4 py-3">{{ $row->bawahan->nama ?? '-' }}</td>
-          <td class="px-4 py-3">{{ $row->bawahan->nip ?? '-' }}</td>
-          <td class="px-4 py-3">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
-          <td class="px-4 py-3">{{ $row->periode_idp }}</td>
-          <td class="px-4 py-3">{{ $row->business_area ?? '-' }}</td>
+        <tr class="hover:bg-slate-50/60">
+          <td class="px-4 py-3 text-slate-500">{{ $i + 1 }}</td>
+          <td class="px-4 py-3 font-medium text-slate-800">{{ $row->bawahan->nama ?? '-' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ $row->bawahan->nip ?? '-' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
+          <td class="px-4 py-3"><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#31599b]">{{ $row->periode_idp }}</span></td>
+          <td class="px-4 py-3 text-slate-600">{{ $row->business_area ?? '-' }}</td>
           <td class="px-4 py-3">
-            <button class="text-blue-600 hover:underline mr-2" data-id="{{ $row->id_daftar_idp }}" data-nama="{{ $row->bawahan->nama ?? '' }}" data-nip="{{ $row->bawahan->nip ?? '' }}" data-jabatan="{{ $row->bawahan->id_jabatan ?? '' }}" data-username="{{ $row->bawahan->username ?? '' }}" data-business-area="{{ $row->business_area ?? '' }}" data-periode="{{ $row->periode_idp }}" onclick="editUser(this)">Edit</button>
-            <form id="delete-{{ $row->id_daftar_idp }}" class="inline" action="{{ route('atasan.idp.destroy', $row) }}" method="POST" style="display:none;">
-              @csrf
-              @method('DELETE')
-            </form>
-            <button class="text-red-600 hover:underline" onclick="deleteUser('{{ $row->id_daftar_idp }}')">Hapus</button>
+            <div class="flex items-center gap-2">
+              <button class="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50" data-id="{{ $row->id_daftar_idp }}" data-nama="{{ $row->bawahan->nama ?? '' }}" data-nip="{{ $row->bawahan->nip ?? '' }}" data-jabatan="{{ $row->bawahan->id_jabatan ?? '' }}" data-username="{{ $row->bawahan->username ?? '' }}" data-business-area="{{ $row->business_area ?? '' }}" data-periode="{{ $row->periode_idp }}" onclick="editUser(this)">Edit</button>
+              <form id="delete-{{ $row->id_daftar_idp }}" class="inline" action="{{ route('atasan.idp.destroy', $row) }}" method="POST" style="display:none;">
+                @csrf
+                @method('DELETE')
+              </form>
+              <button class="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-50" onclick="deleteUser('{{ $row->id_daftar_idp }}')">Hapus</button>
+            </div>
           </td>
         </tr>
         @empty
-        <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">Tidak ada data</td></tr>
+        <tr><td colspan="7" class="px-4 py-10 text-center text-slate-400">Tidak ada data</td></tr>
         @endforelse
       </tbody>
     </table>
