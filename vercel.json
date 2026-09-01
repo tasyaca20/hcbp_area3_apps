@@ -1,0 +1,43 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.8.0"
+    }
+  },
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_CONFIG_CACHE": "/tmp/laravel-config.php",
+    "APP_EVENTS_CACHE": "/tmp/laravel-events.php",
+    "APP_PACKAGES_CACHE": "/tmp/laravel-packages.php",
+    "APP_ROUTES_CACHE": "/tmp/laravel-routes.php",
+    "APP_SERVICES_CACHE": "/tmp/laravel-services.php",
+    "VIEW_COMPILED_PATH": "/tmp/laravel-views",
+    "SESSION_DRIVER": "cookie",
+    "CACHE_STORE": "array",
+    "LOG_CHANNEL": "stderr",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "sakura.proxy.rlwy.net",
+    "DB_PORT": "10132",
+    "DB_DATABASE": "railway",
+    "DB_USERNAME": "root"
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+  "routes": [
+    { "src": "/$", "dest": "/api/index.php" },
+    { "src": "/index.php$", "dest": "/api/index.php" },
+    { "src": "/(favicon\\.ico|robots\\.txt)$", "dest": "/public/$1" },
+    { "src": "/build/(.*)", "dest": "/public/build/$1" },
+    { "src": "/storage/(.*)", "dest": "/public/storage/$1" },
+    { "src": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2|eot|otf|webp|avif|txt))$", "dest": "/public/$1" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
+  ],
+  "buildCommand": "sh vercel-build.sh",
+  "outputDirectory": "public"
+}
