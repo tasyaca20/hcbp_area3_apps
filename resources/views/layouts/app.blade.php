@@ -254,15 +254,22 @@
         const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
         if (!rows.length) return;
         const container = table.parentElement;
+        const searchRow = document.createElement('div');
+        searchRow.className = 'mb-6 mt-3 px-2 flex justify-end';
+        const searchWrapper = document.createElement('div');
+        searchWrapper.className = 'relative w-full sm:w-72';
+        searchWrapper.innerHTML = `
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+        `;
         const search = document.createElement('input');
         search.type = 'search';
         search.placeholder = 'Cari data...';
         search.setAttribute('aria-label', 'Cari data tabel');
-        search.className = 'mb-3 block w-80 rounded-lg border-slate-300 bg-white text-sm focus:border-[#31599b] focus:ring-[#31599b]';
-        const searchRow = document.createElement('div');
-        searchRow.className = 'mb-3 flex justify-end';
-        search.classList.remove('mb-3');
-        searchRow.appendChild(search);
+        search.className = 'block w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm shadow-sm transition placeholder:text-slate-400 focus:border-[#31599b] focus:outline-none focus:ring-1 focus:ring-[#31599b]';
+        searchWrapper.appendChild(search);
+        searchRow.appendChild(searchWrapper);
         container.parentElement.insertBefore(searchRow, container);
 
         if (table.dataset.tablePagination === 'false') {
@@ -276,8 +283,8 @@
         const pageSize = 10;
         let page = 1;
         const pagination = document.createElement('div');
-        pagination.className = 'mt-4 flex items-center justify-between gap-4 text-sm text-slate-500';
-        container.appendChild(pagination);
+        pagination.className = 'mt-5 mb-2 px-1 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 text-sm text-slate-500 border-t border-slate-100';
+        container.after(pagination);
         const render = () => {
           const keyword = search.value.toLowerCase();
           const filtered = rows.filter((row) => row.textContent.toLowerCase().includes(keyword));
@@ -286,7 +293,7 @@
           rows.forEach((row) => row.hidden = true);
           filtered.slice((page - 1) * pageSize, page * pageSize).forEach((row) => row.hidden = false);
           const pageOptions = Array.from({ length: totalPages }, (_, index) => `<option value="${index + 1}" ${page === index + 1 ? 'selected' : ''}>${index + 1}</option>`).join('');
-          pagination.innerHTML = `<span>Menampilkan ${filtered.length ? (page - 1) * pageSize + 1 : 0}–${Math.min(page * pageSize, filtered.length)} dari ${filtered.length} data</span><div class="flex flex-wrap items-center gap-2"><button type="button" data-page="1" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&lt;&lt;</button><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&lt;</button><select aria-label="Pilih halaman" class="rounded border-slate-300 py-1 text-sm focus:border-[#31599b] focus:ring-[#31599b]">${pageOptions}</select><button type="button" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&gt;</button><button type="button" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50">&gt;&gt;</button></div>`;
+          pagination.innerHTML = `<span>Menampilkan ${filtered.length ? (page - 1) * pageSize + 1 : 0}–${Math.min(page * pageSize, filtered.length)} dari ${filtered.length} data</span><div class="flex flex-wrap items-center gap-2"><button type="button" data-page="1" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&lt;&lt;</button><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&lt;</button><select aria-label="Pilih halaman" class="rounded border border-slate-300 py-1 text-sm bg-white focus:border-[#31599b] focus:ring-[#31599b] transition">${pageOptions}</select><button type="button" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&gt;</button><button type="button" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&gt;&gt;</button></div>`;
           pagination.querySelectorAll('button:not([disabled])').forEach((button) => button.addEventListener('click', () => { page = Number(button.dataset.page); render(); }));
           pagination.querySelector('select').addEventListener('change', (event) => { page = Number(event.target.value); render(); });
         };
