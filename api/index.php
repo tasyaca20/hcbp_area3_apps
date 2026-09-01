@@ -7,24 +7,15 @@ if (! is_dir($runtimeViewPath)) {
     @mkdir($runtimeViewPath, 0777, true);
 }
 
-if (! getenv('APP_KEY')) {
-    putenv('APP_KEY=base64:Q7pVY9g5t3H2m8L4c6N1s0KzR5xW2bF9dJ7hG3qP8aM=');
-}
 if (! getenv('VIEW_COMPILED_PATH')) {
     putenv('VIEW_COMPILED_PATH='.$runtimeViewPath);
 }
 
-// Pin Vercel production to the public Railway MySQL TCP proxy. These are
-// non-secret connection coordinates; the password remains in Vercel env.
+// Production connection settings belong in Vercel environment variables.
+// Do not keep APP_KEY or database credentials in source control.
 if (getenv('VERCEL')) {
     putenv('APP_ENV=production');
     putenv('DB_CONNECTION=mysql');
-    putenv('DB_HOST=sakura.proxy.rlwy.net');
-    putenv('DB_PORT=10132');
-    putenv('DB_DATABASE=railway');
-    putenv('DB_USERNAME=root');
-    // A stale DB_URL can override host/port in Laravel's database manager.
-    putenv('DB_URL=');
 }
 
 // Support the common Railway secret names when DB_PASSWORD is not present.
