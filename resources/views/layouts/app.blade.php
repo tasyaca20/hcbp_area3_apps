@@ -108,7 +108,7 @@
             </summary>
             <nav class="pl-10 space-y-1 mt-1">
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.daftar') }}">Daftar IDP</a>
-              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.pemantauan') }}">Pemantauan IDP</a>
+              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.pemantauan') }}">Penetapan dan Pemantauan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>

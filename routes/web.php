@@ -13,6 +13,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('admin-master.')->group(function () {
     Route::view('/dashboard', 'admin-master.dashboard')->name('dashboard');
     Route::get('/idp/daftar', [IdpController::class, 'daftar'])->name('idp.daftar');
+    Route::get('/idp/daftar/template', [IdpController::class, 'downloadTemplateImportMaster'])->name('idp.template');
+    Route::post('/idp/daftar/import', [IdpController::class, 'importMaster'])->name('idp.import');
+    Route::post('/idp/daftar', [IdpController::class, 'storeMaster'])->name('idp.store');
+    Route::put('/idp/daftar/{idp}', [IdpController::class, 'updateMaster'])->name('idp.update');
+    Route::delete('/idp/daftar/{idp}', [IdpController::class, 'destroyMaster'])->name('idp.destroy');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapan'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauan'])->name('idp.pemantauan');
     Route::get('/coaching/pemantauan', [IdpController::class, 'pemantauanCoaching'])->name('coaching.pemantauan');
@@ -34,11 +39,6 @@ Route::middleware(['auth', 'role:admin_area'])->prefix('admin-area')->name('admi
 
 Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->group(function () {
     Route::get('/idp/daftar', [IdpController::class, 'daftarAtasan'])->name('idp.daftar');
-    Route::get('/idp/daftar/template', [IdpController::class, 'downloadTemplateImportAtasan'])->name('idp.template');
-    Route::post('/idp/daftar/import', [IdpController::class, 'importAtasan'])->name('idp.import');
-    Route::post('/idp/daftar', [IdpController::class, 'storeAtasan'])->name('idp.store');
-    Route::put('/idp/daftar/{idp}', [IdpController::class, 'updateAtasan'])->name('idp.update');
-    Route::delete('/idp/daftar/{idp}', [IdpController::class, 'destroyAtasan'])->name('idp.destroy');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanAtasan'])->name('idp.penetapan');
     Route::put('/idp/penetapan/{rencana}', [IdpController::class, 'reviewRencanaAtasan'])->name('idp.penetapan.review');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanAtasan'])->name('idp.pemantauan');
@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/coaching', [IdpController::class, 'coachingAtasan'])->name('coaching.index');
     Route::post('/idp/evaluasi/{idp}', [EvaluasiController::class, 'storeEvaluasi'])->name('idp.evaluasi.store');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
+    Route::get('/coaching/{idp}/export-pdf', [IdpController::class, 'exportCoachingPdf'])->name('coaching.export-pdf');
     Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('idp.upload.bukti.coaching');
 });
 
@@ -60,4 +61,5 @@ Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')
     Route::get('/coaching', [IdpController::class, 'coachingBawahan'])->name('coaching.index');
     Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('coaching.bukti');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
+    Route::get('/coaching/{idp}/export-pdf', [IdpController::class, 'exportCoachingPdf'])->name('coaching.export-pdf');
 });

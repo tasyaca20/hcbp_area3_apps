@@ -16,13 +16,76 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class IdpController extends Controller
 {
     public function daftar()
     {
-        $rows = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->get();
-        return view('admin-master.idp.daftar', compact('rows'));
+        $rows = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
+        $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
+        return view('admin-master.idp.daftar', compact('rows', 'jabatan'));
+    }
+
+    public function downloadTemplateImportMaster()
+    {
+        return Excel::download(new TemplateImportIdpAtasanExport, 'template-import-idp-master.xlsx');
+    }
+
+    public function importMaster(Request $request)
+    {
+        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
+        $rows = Excel::toArray(new \stdClass, $request->file('file'))[0] ?? [];
+        $headers = array_map(fn ($header) => strtolower(trim((string) $header)), array_shift($rows) ?? []);
+        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'nip_atasan', 'business_area', 'periode_idp'];
+        if ($headers !== $requiredHeaders) return back()->with('error', 'Format Excel tidak sesuai. Unduh Template Excel terlebih dahulu.');
+        try {
+            DB::transaction(function () use ($rows, $headers) {
+                foreach ($rows as $index => $row) {
+                    if (! array_filter($row, fn ($value) => $value !== null && $value !== '')) continue;
+                    $data = array_map(fn ($value) => is_string($value) ? trim($value) : ($value === null ? null : (string) $value), array_combine($headers, array_pad($row, count($headers), null)));
+                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'nip_atasan' => ['required', 'string', 'max:50'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+                    if ($validator->fails()) throw new \InvalidArgumentException('Baris '.($index + 2).': '.implode(' ', $validator->errors()->all()));
+                    $data = $validator->validated();
+                    $atasan = Pengguna::where('nip', $data['nip_atasan'])->where('role', 'atasan')->first();
+                    if (! $atasan) throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atasan tidak ditemukan.');
+                    $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
+                    if ($bawahan && ($bawahan->nip !== $data['nip'] || $bawahan->username !== $data['username'])) throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atau username sudah dipakai karyawan lain.');
+                    if (! $bawahan) $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'status_aktif' => true]);
+                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => $atasan->id_pengguna, 'periode_idp' => $data['periode_idp']], ['business_area' => $data['business_area']]);
+                }
+            });
+        } catch (\InvalidArgumentException $exception) { return back()->with('error', $exception->getMessage()); }
+        return back()->with('success', 'Data bawahan berhasil diimport.');
+    }
+
+    public function storeMaster(Request $request)
+    {
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
+        if (! $bawahan) {
+            $request->validate(['nip' => ['unique:pengguna,nip'], 'username' => ['unique:pengguna,username']]);
+            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'status_aktif' => true]);
+        }
+        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        return back()->with('success', 'Bawahan berhasil ditambahkan.');
+    }
+
+    public function updateMaster(Request $request, IDP $idp)
+    {
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $bawahan = Pengguna::findOrFail($idp->id_bawahan);
+        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username']]);
+        if (! empty($data['password'])) $bawahan->password_hash = Hash::make($data['password']);
+        $bawahan->save();
+        $idp->update(['business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        return back()->with('success', 'Bawahan berhasil diperbarui.');
+    }
+
+    public function destroyMaster(IDP $idp)
+    {
+        Pengguna::whereKey($idp->id_bawahan)->delete();
+        return back()->with('success', 'Bawahan berhasil dihapus.');
     }
 
     public function penetapan()
@@ -35,7 +98,68 @@ class IdpController extends Controller
     {
         $user = auth()->user();
         $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->get();
-        return view('admin-area.idp.daftar', compact('rows'));
+        $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
+        return view('admin-area.idp.daftar', compact('rows', 'jabatan'));
+    }
+
+    public function downloadTemplateImportArea() { return Excel::download(new TemplateImportIdpAtasanExport, 'template-import-idp-area.xlsx'); }
+
+    public function importArea(Request $request)
+    {
+        $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
+        $rows = Excel::toArray(new \stdClass, $request->file('file'))[0] ?? [];
+        $headers = array_map(fn ($header) => strtolower(trim((string) $header)), array_shift($rows) ?? []);
+        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'business_area', 'periode_idp'];
+        if ($headers !== $requiredHeaders) return back()->with('error', 'Format Excel tidak sesuai. Unduh Template Excel terlebih dahulu.');
+        try {
+            DB::transaction(function () use ($rows, $headers) {
+                foreach ($rows as $index => $row) {
+                    if (! array_filter($row, fn ($value) => $value !== null && $value !== '')) continue;
+                    $data = array_map(fn ($value) => is_string($value) ? trim($value) : ($value === null ? null : (string) $value), array_combine($headers, array_pad($row, count($headers), null)));
+                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+                    if ($validator->fails()) throw new \InvalidArgumentException('Baris '.($index + 2).': '.implode(' ', $validator->errors()->all()));
+                    $data = $validator->validated();
+                    $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
+                    if ($bawahan && ($bawahan->nip !== $data['nip'] || $bawahan->username !== $data['username'])) throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atau username sudah dipakai karyawan lain.');
+                    if (! $bawahan) $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => auth()->user()->unit_induk, 'status_aktif' => true]);
+                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'periode_idp' => $data['periode_idp']], ['business_area' => $data['business_area']]);
+                }
+            });
+        } catch (\InvalidArgumentException $exception) { return back()->with('error', $exception->getMessage()); }
+        return back()->with('success', 'Data bawahan berhasil diimport.');
+    }
+
+    public function storeArea(Request $request)
+    {
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
+        if (! $bawahan) {
+            $request->validate(['nip' => ['unique:pengguna,nip'], 'username' => ['unique:pengguna,username']]);
+            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => auth()->user()->unit_induk, 'status_aktif' => true]);
+        }
+        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        return back()->with('success', 'Bawahan berhasil ditambahkan.');
+    }
+
+    public function updateArea(Request $request, IDP $idp)
+    {
+        $user = auth()->user();
+        abort_unless($idp->bawahan && $idp->bawahan->unit_induk === $user->unit_induk, 403);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $bawahan = Pengguna::findOrFail($idp->id_bawahan);
+        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username']]);
+        if (! empty($data['password'])) $bawahan->password_hash = Hash::make($data['password']);
+        $bawahan->save();
+        $idp->update(['business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        return back()->with('success', 'Bawahan berhasil diperbarui.');
+    }
+
+    public function destroyArea(IDP $idp)
+    {
+        $user = auth()->user();
+        abort_unless($idp->bawahan && $idp->bawahan->unit_induk === $user->unit_induk, 403);
+        Pengguna::whereKey($idp->id_bawahan)->delete();
+        return back()->with('success', 'Bawahan berhasil dihapus.');
     }
 
     public function penetapanArea()
@@ -155,6 +279,13 @@ class IdpController extends Controller
         return back()->with('success', 'Bukti coaching berhasil diunggah.');
     }
 
+    private function syncStatusRencanaKeMonitoring(int $idDaftarIdp): void
+    {
+        $statuses = RencanaPengembanganIDP::where('id_daftar_idp', $idDaftarIdp)->pluck('status');
+        $status = $statuses->contains('Revisi') ? 'Revisi' : ($statuses->contains('Diajukan') ? 'Diajukan' : ($statuses->contains('Berjalan') ? 'Berjalan' : ($statuses->contains('Disetujui') ? 'Disetujui' : ($statuses->contains('Selesai') ? 'Selesai' : 'Draft'))));
+        DB::table('monitoring_idp')->updateOrInsert(['id_daftar_idp' => $idDaftarIdp], ['status_perencanaan' => $status, 'updated_at' => now()]);
+    }
+
     private function coachingView(string $view, string $userColumn)
     {
         $rows = IDP::query()->where($userColumn, auth()->id())
@@ -207,16 +338,18 @@ class IdpController extends Controller
                     }
                 }
                 RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)->whereIn('status', ['Diajukan', 'Revisi'])->whereNotIn('id_rencana', $revisedIds)->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
+                $this->syncStatusRencanaKeMonitoring($rencana->id_daftar_idp);
                 return back()->with('success', 'Rencana IDP berhasil ditinjau.');
             }
         }
         RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)->whereIn('status', ['Diajukan', 'Revisi'])->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
+        $this->syncStatusRencanaKeMonitoring($rencana->id_daftar_idp);
         return back()->with('success', 'Rencana IDP berhasil ditinjau.');
     }
 
     public function pemantauanAtasan()
     {
-        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan', 'atasan', 'monitoring'])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
         return view('atasan.idp.pemantauan', compact('rows'));
     }
 
@@ -281,14 +414,15 @@ class IdpController extends Controller
     public function updatePemantauanAtasan(Request $request, IDP $idp)
     {
         abort_unless($idp->id_atasan === auth()->id(), 403);
-        $data = $request->validate(['status_perencanaan' => ['required', 'in:Diajukan,Revisi,Disetujui,Berjalan,Selesai'], 'pembelajaran_10_persen' => ['nullable', 'string'], 'social_learning_20_persen' => ['nullable', 'string'], 'experimental_learning_70_persen' => ['nullable', 'string'], 'progress_percent' => ['nullable', 'integer', 'min:0', 'max:100']]);
+        $data = $request->validate(['status_perencanaan' => ['required', 'in:Draft,Diajukan,Revisi,Disetujui,Berjalan,Selesai'], 'pembelajaran_10_persen' => ['nullable', 'string'], 'social_learning_20_persen' => ['nullable', 'string'], 'experimental_learning_70_persen' => ['nullable', 'string'], 'progress_percent' => ['nullable', 'integer', 'min:0', 'max:100']]);
         DB::table('monitoring_idp')->updateOrInsert(['id_daftar_idp' => $idp->id_daftar_idp], array_merge($data, ['updated_at' => now()]));
+        RencanaPengembanganIDP::where('id_daftar_idp', $idp->id_daftar_idp)->update(['status' => $data['status_perencanaan']]);
         return back()->with('success', 'Pemantauan berhasil diperbarui.');
     }
 
     public function pemantauanBawahan()
     {
-        $rows = IDP::query()->where('id_bawahan', auth()->id())->with(['bawahan', 'atasan', 'monitoring'])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->where('id_bawahan', auth()->id())->with(['bawahan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
         return view('bawahan.idp.pemantauan', compact('rows'));
     }
 
@@ -343,10 +477,33 @@ class IdpController extends Controller
         abort_unless($coachingBukti, 404);
 
         $filePath = $coachingBukti->file_path;
-        abort_unless(Storage::exists($filePath), 404);
+        abort_unless(Storage::disk('public')->exists($filePath), 404);
 
         $fileName = basename($filePath);
 
-        return Storage::download($filePath, $fileName);
+        return Storage::disk('public')->download($filePath, $fileName);
+    }
+
+    public function exportCoachingPdf(IDP $idp)
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'atasan') {
+            abort_unless($idp->id_atasan === $user->id, 403);
+        } elseif ($user->role === 'bawahan') {
+            abort_unless($idp->id_bawahan === $user->id, 403);
+        }
+
+        $idp->load([
+            'bawahan.jabatan',
+            'atasan.jabatan',
+            'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])
+        ]);
+
+        $pdf = Pdf::loadView('pdf.coaching', compact('idp'));
+        
+        $fileName = 'coaching-' . ($idp->bawahan?->nama ?? 'unknown') . '-' . date('Y-m-d') . '.pdf';
+        
+        return $pdf->download($fileName);
     }
 }

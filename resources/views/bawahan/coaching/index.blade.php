@@ -5,10 +5,26 @@
 @extends('layouts.app', ['title' => $pageTitle])
 
 @section('content')
+<div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 h-[220px] flex items-center">
+  <div class="absolute inset-0 z-0">
+    <div class="w-full h-full" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCjz6BR9t1xAm_4yTRtjUFCuOHqIkeE5EKFN9IU8hG8k_u3B7psxquSS6Suk591TY9q_Y27C-c3_8Z_HW-o9T4mcs-BSs8NcCHUUxWxaIBP5fVyRf74hO-H-p4ikb76omJMmeg7ue3VDxPp1T-0X1MDCB76X944-1OQyLGojPYj3yPCpw1wjdFvEbWlt83s8VQfKiYaIR8j8f1RfVnP8NMKIKcRo4783TuNbljKJLkY62hs9DzkeU81TZVA3E9SyXdF3Ck'); background-size: cover; background-position: center right;"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent"></div>
+  </div>
+  <div class="relative z-10 px-8 max-w-xl">
+    <h1 class="text-[27px] font-bold text-[#0a192f] mb-2 leading-tight">Coaching Saya</h1>
+    <p class="text-slate-500 text-[15px]">Pantau progres coaching dan unggah bukti kegiatan.</p>
+  </div>
+</div>
+
 @forelse($rows as $row)
 <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8">
-  <h1 class="text-lg font-bold text-slate-900">Individual Development Program (IDP) - <i>Talent Home Coming</i></h1>
-  <p class="text-sm text-slate-600">Coaching</p>
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-lg font-bold text-slate-900">Individual Development Program (IDP) - <i>Talent Home Coming</i></h1>
+      <p class="text-sm text-slate-600">Coaching</p>
+    </div>
+    <a href="{{ route('bawahan.coaching.export-pdf', ['idp' => $row->id_daftar_idp]) }}" class="rounded-lg bg-[#31599b] px-4 py-2 text-xs font-semibold text-white hover:bg-[#264178]">Export PDF</a>
+  </div>
   <div class="mt-4 grid gap-4 text-base font-semibold sm:grid-cols-2">
     <div class="space-y-2"><p>Nama Bawahan: <span class="font-normal">{{ $row->bawahan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->bawahan?->nip ?? '-' }}</span></p><p>Jabatan: <span class="font-normal">{{ $row->bawahan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p><p>Unit Induk: <span class="font-normal">{{ $row->bawahan?->unit_induk ?? '-' }}</span></p></div>
     <div class="space-y-2"><p>Nama Atasan: <span class="font-normal">{{ $row->atasan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->atasan?->nip ?? '-' }}</span></p><p>Jabatan Atasan: <span class="font-normal">{{ $row->atasan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p></div>

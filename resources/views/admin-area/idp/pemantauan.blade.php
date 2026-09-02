@@ -11,7 +11,7 @@
     <div class="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent"></div>
   </div>
   <div class="relative z-10 px-8 max-w-xl">
-    <h1 class="text-[27px] font-bold text-[#0a192f] mb-2 leading-tight">Pemantauan IDP</h1>
+    <h1 class="text-[27px] font-bold text-[#0a192f] mb-2 leading-tight">Penetapan dan Pemantauan IDP</h1>
     <p class="text-slate-500 text-[15px]">Pantau progres rencana pengembangan pegawai pada area Anda.</p>
   </div>
 </div>
