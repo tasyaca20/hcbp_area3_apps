@@ -235,7 +235,7 @@ class IdpController extends Controller
 
     public function uploadBuktiCoaching(Request $request, IDP $idp)
     {
-        abort_unless($idp->id_bawahan === auth()->id(), 403);
+        abort_unless($idp->id_bawahan === auth()->user()->id_pengguna, 403);
 
         $validated = $request->validate([
             'bukti_10' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
@@ -244,7 +244,8 @@ class IdpController extends Controller
             'plan_id' => ['nullable', 'exists:rencana_pengembangan_idp,id_rencana'],
         ]);
 
-        $planId = $request->plan_id;
+        $planId = $validated['plan_id'] ?? null;
+        abort_unless($planId && RencanaPengembanganIDP::whereKey($planId)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 422);
         $fields = [
             'bukti_10' => 10,
             'bukti_20' => 20,
@@ -301,7 +302,7 @@ class IdpController extends Controller
 
     private function coachingMonitoringView(string $view, ?string $unitInduk = null)
     {
-        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp');
+        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])])->orderBy('id_daftar_idp');
         if ($unitInduk) $query->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $unitInduk));
         $summaryRows = (clone $query)->get();
         return view($view, ['rows' => $query->paginate(10), 'summaryRows' => $summaryRows]);
@@ -459,15 +460,21 @@ class IdpController extends Controller
         $user = auth()->user();
 
         if ($user->role === 'atasan') {
-            abort_unless($idp->id_atasan === $user->id, 403);
+            abort_unless($idp->id_atasan === $user->id_pengguna, 403);
         } elseif ($user->role === 'bawahan') {
-            abort_unless($idp->id_bawahan === $user->id, 403);
+            abort_unless($idp->id_bawahan === $user->id_pengguna, 403);
+        } elseif ($user->role === 'admin_area') {
+            abort_unless($idp->bawahan?->unit_induk === $user->unit_induk, 403);
+        } elseif ($user->role !== 'admin_master') {
+            abort(403);
         }
 
+        abort_unless(in_array((int) $type, [10, 20, 70], true), 404);
         $query = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
             ->where('jenis', $type);
         
         if ($idRencana) {
+            abort_unless(RencanaPengembanganIDP::whereKey($idRencana)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 404);
             $query->where('id_rencana', $idRencana);
         } else {
             $query->whereNull('id_rencana');
@@ -489,9 +496,9 @@ class IdpController extends Controller
         $user = auth()->user();
 
         if ($user->role === 'atasan') {
-            abort_unless($idp->id_atasan === $user->id, 403);
+            abort_unless($idp->id_atasan === $user->id_pengguna, 403);
         } elseif ($user->role === 'bawahan') {
-            abort_unless($idp->id_bawahan === $user->id, 403);
+            abort_unless($idp->id_bawahan === $user->id_pengguna, 403);
         }
 
         $idp->load([
