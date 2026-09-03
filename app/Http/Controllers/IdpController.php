@@ -246,8 +246,6 @@ class IdpController extends Controller
 
         $planId = $validated['plan_id'] ?? null;
         abort_unless($planId && RencanaPengembanganIDP::whereKey($planId)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 422);
-        abort_if($planId && ! RencanaPengembanganIDP::where('id_rencana', $planId)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 403);
-
         $fields = [
             'bukti_10' => 10,
             'bukti_20' => 20,
