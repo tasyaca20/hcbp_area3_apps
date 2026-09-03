@@ -17,6 +17,7 @@ class CoachingBukti extends Model
         'id_rencana',
         'jenis',
         'file_path',
+        'original_name',
     ];
 
     protected $casts = [

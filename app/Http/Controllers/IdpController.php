@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class IdpController extends Controller
 {
@@ -245,7 +245,12 @@ class IdpController extends Controller
         ]);
 
         $planId = $validated['plan_id'] ?? null;
+<<<<<<< HEAD
         abort_unless($planId && RencanaPengembanganIDP::whereKey($planId)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 422);
+=======
+        abort_if($planId && ! RencanaPengembanganIDP::where('id_rencana', $planId)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 403);
+
+>>>>>>> d0f3aac699f51ab6d401934eac153ed470759e72
         $fields = [
             'bukti_10' => 10,
             'bukti_20' => 20,
@@ -256,6 +261,7 @@ class IdpController extends Controller
             if ($request->hasFile($input)) {
                 $file = $request->file($input);
                 $path = $file->store("coaching-evidence/{$idp->id_daftar_idp}", 'public');
+                $originalName = $file->getClientOriginalName();
                 
                 $query = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
                     ->where('jenis', $jenis);
@@ -266,13 +272,18 @@ class IdpController extends Controller
                     $query->whereNull('id_rencana');
                 }
                 
-                $query->delete();
+                $existing = $query->first();
+                if ($existing) {
+                    Storage::disk('public')->delete($existing->file_path);
+                    $existing->delete();
+                }
                 
                 CoachingBukti::create([
                     'id_daftar_idp' => $idp->id_daftar_idp,
                     'id_rencana' => $planId,
                     'jenis' => $jenis,
                     'file_path' => $path,
+                    'original_name' => $originalName,
                 ]);
             }
         }
@@ -463,10 +474,13 @@ class IdpController extends Controller
             abort_unless($idp->id_atasan === $user->id_pengguna, 403);
         } elseif ($user->role === 'bawahan') {
             abort_unless($idp->id_bawahan === $user->id_pengguna, 403);
+<<<<<<< HEAD
         } elseif ($user->role === 'admin_area') {
             abort_unless($idp->bawahan?->unit_induk === $user->unit_induk, 403);
         } elseif ($user->role !== 'admin_master') {
             abort(403);
+=======
+>>>>>>> d0f3aac699f51ab6d401934eac153ed470759e72
         }
 
         abort_unless(in_array((int) $type, [10, 20, 70], true), 404);
@@ -476,25 +490,27 @@ class IdpController extends Controller
         if ($idRencana) {
             abort_unless(RencanaPengembanganIDP::whereKey($idRencana)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 404);
             $query->where('id_rencana', $idRencana);
-        } else {
-            $query->whereNull('id_rencana');
         }
         
         $coachingBukti = $query->first();
+        if (! $coachingBukti) {
+            $coachingBukti = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+                ->where('jenis', $type)
+                ->latest('id_coaching_bukti')
+                ->first();
+        }
         abort_unless($coachingBukti, 404);
 
         $filePath = $coachingBukti->file_path;
         abort_unless(Storage::disk('public')->exists($filePath), 404);
 
-        $fileName = basename($filePath);
+        $fileName = $coachingBukti->original_name ?? basename($filePath);
 
         return Storage::disk('public')->download($filePath, $fileName);
     }
 
-    public function exportCoachingPdf(IDP $idp)
-    {
-        $user = auth()->user();
 
+<<<<<<< HEAD
         if ($user->role === 'atasan') {
             abort_unless($idp->id_atasan === $user->id_pengguna, 403);
         } elseif ($user->role === 'bawahan') {
@@ -513,4 +529,6 @@ class IdpController extends Controller
         
         return $pdf->download($fileName);
     }
+=======
+>>>>>>> d0f3aac699f51ab6d401934eac153ed470759e72
 }
