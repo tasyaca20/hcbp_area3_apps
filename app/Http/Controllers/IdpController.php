@@ -471,13 +471,6 @@ class IdpController extends Controller
             abort_unless($idp->id_atasan === $user->id_pengguna, 403);
         } elseif ($user->role === 'bawahan') {
             abort_unless($idp->id_bawahan === $user->id_pengguna, 403);
-<<<<<<< HEAD
-        } elseif ($user->role === 'admin_area') {
-            abort_unless($idp->bawahan?->unit_induk === $user->unit_induk, 403);
-        } elseif ($user->role !== 'admin_master') {
-            abort(403);
-=======
->>>>>>> d0f3aac699f51ab6d401934eac153ed470759e72
         }
 
         abort_unless(in_array((int) $type, [10, 20, 70], true), 404);
@@ -507,25 +500,4 @@ class IdpController extends Controller
     }
 
 
-<<<<<<< HEAD
-        if ($user->role === 'atasan') {
-            abort_unless($idp->id_atasan === $user->id_pengguna, 403);
-        } elseif ($user->role === 'bawahan') {
-            abort_unless($idp->id_bawahan === $user->id_pengguna, 403);
-        }
-
-        $idp->load([
-            'bawahan.jabatan',
-            'atasan.jabatan',
-            'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])
-        ]);
-
-        $pdf = Pdf::loadView('pdf.coaching', compact('idp'));
-        
-        $fileName = 'coaching-' . ($idp->bawahan?->nama ?? 'unknown') . '-' . date('Y-m-d') . '.pdf';
-        
-        return $pdf->download($fileName);
-    }
-=======
->>>>>>> d0f3aac699f51ab6d401934eac153ed470759e72
 }
