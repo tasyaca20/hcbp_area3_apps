@@ -47,7 +47,6 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/coaching', [IdpController::class, 'coachingAtasan'])->name('coaching.index');
     Route::post('/idp/evaluasi/{idp}', [EvaluasiController::class, 'storeEvaluasi'])->name('idp.evaluasi.store');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
-    Route::get('/coaching/{idp}/export-pdf', [IdpController::class, 'exportCoachingPdf'])->name('coaching.export-pdf');
     Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('idp.upload.bukti.coaching');
 });
 
@@ -61,5 +60,4 @@ Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')
     Route::get('/coaching', [IdpController::class, 'coachingBawahan'])->name('coaching.index');
     Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('coaching.bukti');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
-    Route::get('/coaching/{idp}/export-pdf', [IdpController::class, 'exportCoachingPdf'])->name('coaching.export-pdf');
 });
