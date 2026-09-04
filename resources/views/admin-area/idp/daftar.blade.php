@@ -25,6 +25,7 @@
           <th class="px-4 py-3 text-left font-semibold">NIP</th>
           <th class="px-4 py-3 text-left font-semibold">Jabatan</th>
           <th class="px-4 py-3 text-left font-semibold">Nama Atasan</th>
+          <th class="px-4 py-3 text-left font-semibold">NIP Atasan</th>
           <th class="px-4 py-3 text-left font-semibold">Periode</th>
           <th class="px-4 py-3 text-left font-semibold">Business Area</th>
         </tr>
@@ -37,11 +38,12 @@
           <td class="px-4 py-3 text-slate-600">{{ $row->bawahan->nip ?? '-' }}</td>
           <td class="px-4 py-3 text-slate-600">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
           <td class="px-4 py-3 text-slate-600">{{ $row->atasan->nama ?? '-' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ $row->atasan->nip ?? '-' }}</td>
           <td class="px-4 py-3"><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#31599b]">{{ $row->periode_idp }}</span></td>
           <td class="px-4 py-3 text-slate-600">{{ $row->business_area ?? '-' }}</td>
         </tr>
         @empty
-        <tr><td colspan="7" class="px-4 py-10 text-center text-slate-400">Tidak ada data</td></tr>
+        <tr><td colspan="8" class="px-4 py-10 text-center text-slate-400">Tidak ada data</td></tr>
         @endforelse
       </tbody>
     </table>

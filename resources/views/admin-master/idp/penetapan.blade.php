@@ -31,6 +31,7 @@
           <th class="px-4 py-4 font-semibold">Nama Pegawai</th>
           <th class="px-4 py-4 font-semibold">Jabatan</th>
           <th class="px-4 py-4 font-semibold">Nama Atasan</th>
+          <th class="px-4 py-4 font-semibold">NIP Atasan</th>
           <th class="px-4 py-4 font-semibold">Jabatan Atasan</th>
           <th class="px-4 py-4 font-semibold">Unit Induk</th>
           <th class="px-4 py-4 font-semibold">Status</th>
@@ -50,8 +51,9 @@
               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $index + 1 }}</td>
               <td class="px-4 py-4 font-medium align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->nama ?? '-' }}</td>
               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
-              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nama ?? '-' }}</td>
-              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td>
+               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nama ?? '-' }}</td>
+               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nip ?? '-' }}</td>
+               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td>
               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->unit_induk ?? '-' }}</td>
               <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">
                 <span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">Disetujui</span>
@@ -71,8 +73,9 @@
               <td class="px-4 py-4">{{ $index + 1 }}</td>
               <td class="px-4 py-4 font-medium">{{ $row->bawahan->nama ?? '-' }}</td>
               <td class="px-4 py-4">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
-              <td class="px-4 py-4">{{ $row->atasan->nama ?? '-' }}</td>
-              <td class="px-4 py-4">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td>
+               <td class="px-4 py-4">{{ $row->atasan->nama ?? '-' }}</td>
+               <td class="px-4 py-4">{{ $row->atasan->nip ?? '-' }}</td>
+               <td class="px-4 py-4">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td>
               <td class="px-4 py-4">{{ $row->bawahan->unit_induk ?? '-' }}</td>
               <td class="px-4 py-4">
                 <span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">Belum Disetujui</span>
@@ -82,7 +85,7 @@
           @endif
         @empty
         <tr>
-          <td colspan="11" class="px-4 py-8 text-center text-slate-500">Belum ada data IDP.</td>
+          <td colspan="12" class="px-4 py-8 text-center text-slate-500">Belum ada data IDP.</td>
         </tr>
         @endforelse
       </tbody>

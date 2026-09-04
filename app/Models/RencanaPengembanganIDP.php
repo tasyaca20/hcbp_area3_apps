@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RencanaPengembanganIDP extends Model
 {
     protected $table = 'rencana_pengembangan_idp';
+
     protected $primaryKey = 'id_rencana';
 
     protected $fillable = [
@@ -15,6 +16,9 @@ class RencanaPengembanganIDP extends Model
         'pembelajaran_10_persen',
         'social_learning_20_persen',
         'action_learning_70_persen',
+        'deskripsi_realisasi_10',
+        'deskripsi_realisasi_20',
+        'deskripsi_realisasi_70',
         'status',
         'feedback_atasan',
         'direvisi_oleh_atasan',
