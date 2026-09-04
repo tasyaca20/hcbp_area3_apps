@@ -171,16 +171,7 @@
           </details>
         @endif
       </nav>
-      <div class="p-4 border-t border-slate-200">
-        <form method="POST" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="flex items-center gap-3 px-4 py-3 w-full text-red-600 hover:bg-red-50 rounded-xl transition-colors">
-            <span class="material-symbols-outlined text-[20px]">logout</span>
-            <span class="text-[15px]">Logout</span>
-          </button>
-        </form>
-      </div>
-    </aside>
+     </aside>
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fafc]">
       <header class="w-full sticky top-0 bg-white border-b border-slate-200 z-50">
         <div class="flex justify-between items-center px-8 py-3 h-[76px]">
@@ -194,14 +185,25 @@
               <span class="material-symbols-outlined">notifications</span>
               <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] text-white flex items-center justify-center font-bold">3</span>
             </button>
-            <div class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-1 pr-3 rounded-full transition-colors">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-semibold">{{ strtoupper(substr(auth()->user()->nama, 0, 2)) }}</div>
-              <div class="hidden md:flex flex-col">
-                <span class="text-[13px] font-semibold text-[#0a192f] leading-tight">Halo, {{ auth()->user()->nama }}</span>
-                <span class="text-[11px] text-slate-400 leading-tight">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</span>
+            <details class="relative">
+              <summary class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-1 pr-3 rounded-full transition-colors list-none">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-semibold">{{ strtoupper(substr(auth()->user()->nama, 0, 2)) }}</div>
+                <div class="hidden md:flex flex-col">
+                  <span class="text-[13px] font-semibold text-[#0a192f] leading-tight">Halo, {{ auth()->user()->nama }}</span>
+                  <span class="text-[11px] text-slate-400 leading-tight">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</span>
+                </div>
+                <span class="material-symbols-outlined text-slate-400 text-[18px] ml-1">expand_more</span>
+              </summary>
+              <div class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-[100]">
+                <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <button type="submit" class="flex items-center gap-3 px-4 py-2.5 w-full text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    <span>Logout</span>
+                  </button>
+                </form>
               </div>
-              <span class="material-symbols-outlined text-slate-400 text-[18px] ml-1">expand_more</span>
-            </div>
+            </details>
           </div>
         </div>
       </header>

@@ -71,6 +71,7 @@
     <div class="grid gap-4">
       <label class="block text-sm font-medium">Nama<input name="nama" class="mt-1 w-full rounded-lg border-slate-300" required></label>
       <label class="block text-sm font-medium">NIP<input name="nip" class="mt-1 w-full rounded-lg border-slate-300" required></label>
+      <label class="block text-sm font-medium">NIP Atasan<input name="nip_atasan" class="mt-1 w-full rounded-lg border-slate-300" required></label>
       <label class="block text-sm font-medium">Jabatan
         <select name="id_jabatan" class="mt-1 w-full rounded-lg border-slate-300">
           <option value="">Pilih Jabatan</option>
