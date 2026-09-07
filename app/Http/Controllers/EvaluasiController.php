@@ -22,7 +22,7 @@ class EvaluasiController extends Controller
     public function storeEvaluasi(Request $request, IDP $idp)
     {
         $data = $request->validate([
-            'skor' => ['required', 'integer', 'min:0', 'max:100'],
+            'skor' => ['required', 'integer', 'in:0,1,2'],
             'feedback' => ['required', 'string'],
         ]);
 

@@ -23,7 +23,7 @@
       @csrf
       <h2 class="font-semibold">{{ $row->bawahan->nama ?? '-' }}</h2>
       <p class="text-xs text-slate-400 mb-4">{{ $row->bawahan->nip ?? '-' }}</p>
-      <label class="block text-sm font-medium">Skor (0-100)<input name="skor" type="number" min="0" max="100" required class="mt-1 w-full rounded-lg border-slate-300" /></label>
+      <label class="block text-sm font-medium">Nilai Akhir<select name="skor" required class="mt-1 w-full rounded-lg border-slate-300"><option value="">Pilih nilai</option><option value="0">0 - Belum bisa</option><option value="1">1 - Bisa, butuh pendamping</option><option value="2">2 - Sudah bisa/mandiri</option></select></label>
       <label class="block text-sm font-medium mt-3">Feedback<textarea name="feedback" required class="mt-1 w-full rounded-lg border-slate-300" rows="3"></textarea></label>
       <button type="submit" class="mt-4 rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white">Simpan Evaluasi</button>
     </form>

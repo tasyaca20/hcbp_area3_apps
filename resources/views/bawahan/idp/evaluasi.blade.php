@@ -12,21 +12,19 @@
   </div>
 </div>
 
-<div class="bawahan-section bg-white border border-slate-200 rounded-2xl p-6">
-  <h1 class="text-xl font-bold mb-4">Hasil Evaluasi</h1>
-  <div class="space-y-4">
-    @forelse($evaluasi as $item)
-    <div class="border border-slate-200 rounded-xl p-4">
-      <div class="flex items-center justify-between">
-        <h2 class="font-semibold">{{ $item->daftarIdp->atasan->nama ?? '-' }}</h2>
-        <span class="text-sm text-slate-500">{{ $item->tanggal_evaluasi?->format('d/m/Y') }}</span>
-      </div>
-      <p class="mt-2 text-sm"><strong>Skor:</strong> {{ $item->skor }}</p>
-      <p class="mt-2 text-sm"><strong>Feedback:</strong> {{ $item->feedback }}</p>
-    </div>
-    @empty
-    <p class="text-slate-400">Belum ada feedback.</p>
-    @endforelse
+<div class="bawahan-section mt-6 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8">
+  <h1 class="text-lg font-bold text-slate-900">Hasil Evaluasi</h1>
+  <div class="mt-6 overflow-x-auto">
+    <table class="min-w-[900px] w-full text-left text-sm">
+      <thead class="bg-[#31599b] text-white"><tr><th class="px-4 py-4">No</th><th class="px-4 py-4">Nama Atasan</th><th class="px-4 py-4">Periode IDP</th><th class="px-4 py-4">Nilai Akhir</th><th class="px-4 py-4">Feedback</th><th class="px-4 py-4">Tanggal</th></tr></thead>
+      <tbody class="divide-y divide-slate-100">
+        @forelse($evaluasi as $index => $item)
+        <tr class="align-top"><td class="border border-slate-700 px-3 py-2 text-center">{{ $index + 1 }}</td><td class="border border-slate-700 px-3 py-2">{{ $item->daftarIdp->atasan->nama ?? '-' }}</td><td class="border border-slate-700 px-3 py-2">{{ $item->daftarIdp->periode ?? '-' }}</td><td class="border border-slate-700 px-3 py-2">{{ [0 => '0 - Belum bisa', 1 => '1 - Bisa, butuh pendamping', 2 => '2 - Sudah bisa/mandiri'][$item->skor] ?? '-' }}</td><td class="border border-slate-700 px-3 py-2">{{ $item->feedback }}</td><td class="border border-slate-700 px-3 py-2">{{ $item->tanggal_evaluasi?->format('d/m/Y') }}</td></tr>
+        @empty
+        <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">Belum ada evaluasi.</td></tr>
+        @endforelse
+      </tbody>
+    </table>
   </div>
 </div>
 @endsection
