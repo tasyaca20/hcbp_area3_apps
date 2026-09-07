@@ -76,16 +76,10 @@
             <nav class="pl-10 space-y-1 mt-1">
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.daftar') }}">Daftar IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.pemantauan') }}">Penetapan dan Pemantauan IDP</a>
+              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan-coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.coaching.pemantauan') }}">Pemantauan Coaching</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-master.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>
-          <a class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-colors group {{ request()->routeIs('admin-master.coaching.pemantauan') ? 'bg-slate-100 font-semibold text-[#0a192f]' : 'text-[#0a192f]/80 hover:bg-slate-50' }}" href="{{ route('admin-master.coaching.pemantauan') }}">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px]">monitoring</span>
-              <span class="text-[15px]">Pemantauan Coaching</span>
-            </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
-          </a>
           <a class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors group" href="{{ route('admin-master.setting-role') }}">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-[20px]">settings_account_box</span>
@@ -109,16 +103,10 @@
             <nav class="pl-10 space-y-1 mt-1">
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.daftar') }}">Daftar IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.pemantauan') }}">Penetapan dan Pemantauan IDP</a>
+              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan-coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.coaching.pemantauan') }}">Pemantauan Coaching</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('admin-area.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>
-          <a class="flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-colors group {{ request()->routeIs('admin-area.coaching.pemantauan') ? 'bg-slate-100 font-semibold text-[#0a192f]' : 'text-[#0a192f]/80 hover:bg-slate-50' }}" href="{{ route('admin-area.coaching.pemantauan') }}">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px]">monitoring</span>
-              <span class="text-[15px]">Pemantauan Coaching</span>
-            </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-300">chevron_right</span>
-          </a>
         @elseif(auth()->user()->role === 'atasan')
           <details class="open:group" @if(($activeSection ?? '') === 'idp') open @endif>
             <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">

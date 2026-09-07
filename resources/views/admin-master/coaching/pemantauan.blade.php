@@ -1,6 +1,6 @@
 @php($pageTitle = 'Pemantauan Coaching IDP')
-@php($activeSection = 'coaching')
-@php($activePage = 'pemantauan')
+@php($activeSection = 'idp')
+@php($activePage = 'pemantauan-coaching')
 @php($statuses = ['Belum Mengisi Sesi Coaching', 'Menunggu Persetujuan', 'Disetujui'])
 @php($statusClasses = ['bg-red-100 text-red-700', 'bg-yellow-100 text-yellow-700', 'bg-green-100 text-green-700'])
 @php($units = $summaryRows->pluck('bawahan.unit_induk')->filter()->unique()->values())
