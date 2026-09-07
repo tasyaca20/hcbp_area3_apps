@@ -48,7 +48,7 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/coaching', [IdpController::class, 'coachingAtasan'])->name('coaching.index');
     Route::post('/idp/evaluasi/{idp}', [EvaluasiController::class, 'storeEvaluasi'])->name('idp.evaluasi.store');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
-    Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('idp.upload.bukti.coaching');
+    Route::put('/coaching/{idp}/bukti/{coachingBukti}/review', [IdpController::class, 'reviewCoachingAtasan'])->name('coaching.review');
 });
 
 Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')->group(function () {

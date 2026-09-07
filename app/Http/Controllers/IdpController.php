@@ -305,6 +305,22 @@ class IdpController extends Controller
         return $this->coachingView('bawahan.coaching.index', 'id_bawahan');
     }
 
+    public function reviewCoachingAtasan(Request $request, IDP $idp, CoachingBukti $coachingBukti)
+    {
+        abort_unless($idp->id_atasan === auth()->id() && $coachingBukti->id_daftar_idp === $idp->id_daftar_idp, 403);
+        $data = $request->validate([
+            'status_atasan' => ['required', 'in:setuju,revisi'],
+            'catatan_revisi' => ['required_if:status_atasan,revisi', 'nullable', 'string', 'max:2000'],
+        ]);
+
+        $coachingBukti->update([
+            'status_atasan' => $data['status_atasan'],
+            'catatan_revisi' => $data['status_atasan'] === 'revisi' ? $data['catatan_revisi'] : null,
+        ]);
+
+        return back()->with('success', 'Status coaching berhasil diperbarui.');
+    }
+
     public function uploadBuktiCoaching(Request $request, IDP $idp)
     {
         abort_unless($idp->id_bawahan === auth()->user()->id_pengguna, 403);
@@ -326,8 +342,12 @@ class IdpController extends Controller
         $rencana = RencanaPengembanganIDP::findOrFail($planId);
         foreach ([10, 20, 70] as $jenis) {
             $field = "deskripsi_realisasi_{$jenis}";
-            if ($request->has($field)) {
+            if ($request->has($field) && $rencana->$field !== $validated[$field]) {
                 $rencana->update([$field => $validated[$field]]);
+                CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+                    ->where('id_rencana', $planId)
+                    ->where('jenis', $jenis)
+                    ->update(['status_atasan' => 'pending', 'catatan_revisi' => null]);
             }
         }
 
