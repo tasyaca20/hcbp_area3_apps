@@ -143,10 +143,6 @@
             <nav class="pl-10 space-y-1 mt-1"><a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.coaching.index') }}">Coaching Bawahan</a></nav>
           </details>
         @elseif(auth()->user()->role === 'bawahan')
-          <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ request()->routeIs('bawahan.dashboard') ? 'bg-slate-100' : '' }}" href="{{ route('bawahan.dashboard') }}">
-            <span class="material-symbols-outlined filled text-[20px]">dashboard</span>
-            <span class="text-[15px]">Dashboard</span>
-          </a>
           <details class="open:group" @if(($activeSection ?? '') === 'idp') open @endif>
             <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
               <div class="flex items-center gap-3">

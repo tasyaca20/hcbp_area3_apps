@@ -44,7 +44,6 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanAtasan'])->name('idp.penetapan');
     Route::put('/idp/penetapan/{rencana}', [IdpController::class, 'reviewRencanaAtasan'])->name('idp.penetapan.review');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanAtasan'])->name('idp.pemantauan');
-    Route::put('/idp/pemantauan/{idp}', [IdpController::class, 'updatePemantauanAtasan'])->name('idp.pemantauan.update');
     Route::get('/idp/evaluasi', [EvaluasiController::class, 'evaluasiAtasan'])->name('idp.evaluasi');
     Route::get('/coaching', [IdpController::class, 'coachingAtasan'])->name('coaching.index');
     Route::post('/idp/evaluasi/{idp}', [EvaluasiController::class, 'storeEvaluasi'])->name('idp.evaluasi.store');
@@ -53,7 +52,6 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
 });
 
 Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')->group(function () {
-    Route::view('/dashboard', 'bawahan.dashboard')->name('dashboard');
     Route::get('/idp/daftar', [IdpController::class, 'daftarBawahan'])->name('idp.daftar');
     Route::post('/idp/daftar/{idp}/rencana', [IdpController::class, 'storeRencanaBawahan'])->name('idp.rencana.store');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanBawahan'])->name('idp.penetapan');

@@ -22,7 +22,7 @@ class CheckRole
                 'admin_master' => redirect()->route('admin-master.dashboard'),
                 'admin_area' => redirect()->route('admin-area.dashboard'),
                 'atasan' => redirect()->route('atasan.idp.daftar'),
-                'bawahan' => redirect()->route('bawahan.dashboard'),
+                'bawahan' => redirect()->route('bawahan.idp.daftar'),
                 default => redirect()->route('login'),
             };
         }
