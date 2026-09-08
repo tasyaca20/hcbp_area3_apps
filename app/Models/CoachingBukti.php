@@ -18,6 +18,8 @@ class CoachingBukti extends Model
         'jenis',
         'file_path',
         'original_name',
+        'status_atasan',
+        'catatan_revisi',
     ];
 
     protected $casts = [
