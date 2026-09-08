@@ -1,6 +1,6 @@
 @php($pageTitle = 'Pemantauan Coaching IDP')
-@php($activeSection = 'coaching')
-@php($activePage = 'pemantauan')
+@php($activeSection = 'idp')
+@php($activePage = 'pemantauan-coaching')
 
 @extends('layouts.app', ['title' => $pageTitle])
 
