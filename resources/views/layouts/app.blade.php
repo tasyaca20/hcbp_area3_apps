@@ -108,7 +108,7 @@
             </nav>
           </details>
         @elseif(auth()->user()->role === 'atasan')
-          <details class="open:group" @if(($activeSection ?? '') === 'idp') open @endif>
+          <details class="open:group" @if(in_array(($activeSection ?? ''), ['idp', 'coaching'])) open @endif>
             <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-[20px]">people</span>
@@ -120,18 +120,12 @@
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.idp.daftar') }}">Daftar IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'penetapan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.idp.penetapan') }}">Penetapan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.idp.pemantauan') }}">Pemantauan IDP</a>
+              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.coaching.index') }}">Coaching Bawahan</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
           </details>
-          <details class="open:group" @if(($activeSection ?? '') === 'coaching') open @endif>
-            <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">forum</span><span class="text-[15px]">Coaching</span></div>
-              <span class="material-symbols-outlined text-[16px] text-slate-300 group-open:rotate-90">chevron_right</span>
-            </summary>
-            <nav class="pl-10 space-y-1 mt-1"><a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('atasan.coaching.index') }}">Coaching Bawahan</a></nav>
-          </details>
         @elseif(auth()->user()->role === 'bawahan')
-          <details class="open:group" @if(($activeSection ?? '') === 'idp') open @endif>
+          <details class="open:group" @if(in_array(($activeSection ?? ''), ['idp', 'coaching'])) open @endif>
             <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-[20px]">people</span>
@@ -143,15 +137,9 @@
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'daftar' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.idp.daftar') }}">IDP Saya</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'penetapan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.idp.penetapan') }}">Penetapan IDP</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'pemantauan' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.idp.pemantauan') }}">Pemantauan IDP</a>
+              <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.coaching.index') }}">Coaching Saya</a>
               <a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'evaluasi' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.idp.evaluasi') }}">Evaluasi IDP</a>
             </nav>
-          </details>
-          <details class="open:group" @if(($activeSection ?? '') === 'coaching') open @endif>
-            <summary class="flex items-center justify-between gap-3 px-4 py-3 text-[#0a192f]/80 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group">
-              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">forum</span><span class="text-[15px]">Coaching</span></div>
-              <span class="material-symbols-outlined text-[16px] text-slate-300 group-open:rotate-90">chevron_right</span>
-            </summary>
-            <nav class="pl-10 space-y-1 mt-1"><a class="flex items-center gap-3 px-4 py-2.5 text-[14px] {{ ($activePage ?? '') === 'coaching' ? 'font-semibold text-[#0a192f] bg-slate-50' : 'text-[#0a192f]/70' }} hover:bg-slate-50 rounded-lg transition-colors" href="{{ route('bawahan.coaching.index') }}">Coaching Saya</a></nav>
           </details>
         @endif
       </nav>
