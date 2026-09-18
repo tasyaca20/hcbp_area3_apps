@@ -2,12 +2,13 @@
 $pageTitle = 'Pemantauan IDP';
 $activeSection = 'idp';
 $activePage = 'pemantauan';
-$statuses = ['Draft', 'Diajukan', 'Revisi', 'Disetujui', 'Berjalan', 'Selesai'];
-$labels = ['Draft' => 'Belum Direncanakan', 'Diajukan' => 'Menunggu Persetujuan', 'Revisi' => 'Perlu Revisi', 'Disetujui' => 'Disetujui', 'Berjalan' => 'Berjalan', 'Selesai' => 'Selesai'];
-$colors = ['Draft' => '#94a3b8', 'Diajukan' => '#f59e0b', 'Revisi' => '#ef4444', 'Disetujui' => '#22c55e', 'Berjalan' => '#31599b', 'Selesai' => '#8b5cf6'];
+$statuses = ['Draft', 'Diajukan', 'Disetujui'];
+$labels = ['Draft' => 'Belum Direncanakan', 'Diajukan' => 'Diajukan', 'Disetujui' => 'Disetujui'];
+$colors = ['Draft' => '#94a3b8', 'Diajukan' => '#f59e0b', 'Disetujui' => '#22c55e'];
 $classes = ['Draft' => 'bg-slate-100 text-slate-700', 'Diajukan' => 'bg-amber-100 text-amber-700', 'Revisi' => 'bg-red-100 text-red-700', 'Disetujui' => 'bg-green-100 text-green-700', 'Berjalan' => 'bg-blue-100 text-blue-700', 'Selesai' => 'bg-violet-100 text-violet-700'];
 $units = $summaryRows->pluck('bawahan.unit_induk')->filter()->unique()->values();
-$counts = collect($statuses)->mapWithKeys(fn ($status) => [$status => $summaryRows->filter(fn ($row) => ($row->monitoring?->status_perencanaan ?? 'Draft') === $status)->count()]);
+$statusOf = fn ($row) => $row->rencanaPengembangan->contains('status', 'Disetujui') ? 'Disetujui' : ($row->rencanaPengembangan->contains('status', 'Diajukan') ? 'Diajukan' : 'Draft');
+$counts = collect($statuses)->mapWithKeys(fn ($status) => [$status => $summaryRows->filter(fn ($row) => $statusOf($row) === $status)->count()]);
 $total = $counts->sum();
 $chartMax = max($counts->max(), 1);
 @endphp
@@ -21,26 +22,22 @@ $chartMax = max($counts->max(), 1);
 </div>
 
 <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-  <div class="border-b border-slate-200 px-6 py-5"><h2 class="text-lg font-bold">Status Pemantauan IDP per Unit Area</h2><p class="mt-1 text-sm text-slate-500">Data aktual berdasarkan status pemantauan IDP.</p></div>
-  <div class="grid grid-cols-12 gap-8 p-6">
-    <div class="col-span-6 space-y-5">
-      <div class="flex flex-wrap gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs">@foreach ($statuses as $status)<span class="flex items-center gap-2"><i class="h-3 w-3 rounded" style="background-color: {{ $colors[$status] }};"></i>{{ $labels[$status] }}</span>@endforeach</div>
-      <h3 class="text-sm font-semibold text-slate-800">Total Pemantauan IDP</h3>
-      @foreach ($statuses as $status)
-        @php($jumlah = $counts[$status])
-        <div class="grid grid-cols-[170px_1fr_55px] items-center gap-3"><span class="text-sm font-medium text-slate-600">{{ $labels[$status] }}</span><div class="h-8 overflow-hidden rounded-md bg-slate-100"><div class="flex h-full items-center justify-end rounded-md pr-3 text-sm font-bold text-white" style="width: {{ $jumlah ? max(($jumlah / $chartMax) * 100, 10) : 0 }}%; background-color: {{ $colors[$status] }};">{{ $jumlah }}</div></div><span class="text-right text-sm font-bold text-slate-700">{{ $total ? round(($jumlah / $total) * 100, 1) : 0 }}%</span></div>
-      @endforeach
+  <div class="border-b border-slate-200 px-6 py-5"><h2 class="text-lg font-bold">Status Pemantauan IDP per Unit Area</h2><p class="mt-1 text-sm text-slate-500">Status rencana kompetensi yang diajukan bawahan.</p></div>
+  <div class="grid grid-cols-1 gap-8 p-6 xl:grid-cols-12 xl:items-stretch">
+    <div class="flex flex-col justify-between space-y-6 xl:col-span-6">
+      <div class="flex flex-wrap gap-4 rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs">@foreach ($statuses as $status)<div class="flex items-center gap-2"><span class="h-3 w-3 rounded" style="background-color: {{ $colors[$status] }};"></span>{{ $labels[$status] }}</div>@endforeach</div>
+      <div class="flex flex-grow flex-col justify-center space-y-5 pt-2"><h3 class="text-sm font-semibold text-slate-800">Total Pemantauan IDP</h3><div class="space-y-4">@foreach ($statuses as $status)@php($jumlah = $counts[$status])<div class="grid grid-cols-[180px_1fr_55px] items-center gap-3"><span class="text-sm font-medium text-slate-600">{{ $labels[$status] }}</span><div class="relative flex h-8 items-center overflow-hidden rounded-md bg-slate-100"><div class="flex h-full items-center justify-end rounded-md pr-3 text-sm font-bold text-white" style="width: {{ $jumlah ? max(($jumlah / $chartMax) * 100, 10) : 0 }}%; background-color: {{ $colors[$status] }};">{{ $jumlah }}</div></div><span class="text-right text-sm font-bold text-slate-700">{{ $total ? round(($jumlah / $total) * 100, 1) : 0 }}%</span></div>@endforeach</div></div>
     </div>
-    <div class="col-span-6 overflow-x-auto rounded-xl border border-slate-200">
-      <table class="w-full text-xs"><thead class="bg-slate-50 text-slate-700"><tr><th class="px-4 py-3 text-left">Unit Area</th>@foreach ($statuses as $status)<th class="px-3 py-3 text-center">{{ $labels[$status] }}</th>@endforeach<th class="bg-slate-100 px-4 py-3 text-center">Total</th></tr></thead><tbody class="divide-y divide-slate-100">
+    <div class="h-full xl:col-span-6"><div class="h-full overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+      <table data-table-search="false" data-table-scroll="false" class="h-full w-full border-collapse text-xs"><thead class="border-b border-slate-200 bg-slate-50 text-slate-700"><tr><th class="px-4 py-3 text-left font-bold">Unit Area</th>@foreach ($statuses as $status)<th class="px-3 py-3 text-center font-semibold">{{ $labels[$status] }}</th>@endforeach<th class="border-l border-slate-200 bg-slate-100 px-4 py-3 text-center font-bold text-slate-800">Total</th></tr></thead><tbody class="divide-y divide-slate-100 bg-white">
       @forelse ($units as $unit)
-        @php($unitCounts = collect($statuses)->mapWithKeys(fn ($status) => [$status => $summaryRows->filter(fn ($row) => $row->bawahan?->unit_induk === $unit && ($row->monitoring?->status_perencanaan ?? 'Draft') === $status)->count()]))
-        <tr><td class="px-4 py-3 font-semibold">{{ $unit }}</td>@foreach ($statuses as $status)<td class="px-3 py-3 text-center" style="color: {{ $colors[$status] }};">{{ $unitCounts[$status] }}</td>@endforeach<td class="bg-slate-50 px-4 py-3 text-center font-bold">{{ $unitCounts->sum() }}</td></tr>
+        @php($unitCounts = collect($statuses)->mapWithKeys(fn ($status) => [$status => $summaryRows->filter(fn ($row) => $row->bawahan?->unit_induk === $unit && $statusOf($row) === $status)->count()]))
+        <tr class="transition-colors hover:bg-slate-50/80"><td class="px-4 py-3 font-semibold text-slate-800">{{ $unit }}</td>@foreach ($statuses as $status)<td class="px-3 py-3 text-center font-semibold" style="color: {{ $colors[$status] }};">{{ $unitCounts[$status] }}</td>@endforeach<td class="border-l border-slate-200 bg-slate-50 px-4 py-3 text-center font-bold text-slate-900">{{ $unitCounts->sum() }}</td></tr>
       @empty
         <tr><td colspan="8" class="px-4 py-6 text-center text-slate-500">Belum ada data unit.</td></tr>
       @endforelse
-      </tbody><tfoot class="bg-slate-100 font-bold"><tr><td class="px-4 py-3">Total</td>@foreach ($statuses as $status)<td class="px-3 py-3 text-center">{{ $counts[$status] }}</td>@endforeach<td class="px-4 py-3 text-center">{{ $total }}</td></tr></tfoot></table>
-    </div>
+      </tbody><tfoot class="border-t-2 border-slate-200 bg-slate-100/80 font-bold"><tr><td class="px-4 py-3 font-bold text-slate-800">Total All</td>@foreach ($statuses as $status)<td class="px-3 py-3 text-center text-slate-700">{{ $counts[$status] }}</td>@endforeach<td class="border-l border-slate-200 bg-slate-200/60 px-4 py-3 text-center font-extrabold text-slate-900">{{ $total }}</td></tr></tfoot></table>
+    </div></div>
   </div>
 </div>
 

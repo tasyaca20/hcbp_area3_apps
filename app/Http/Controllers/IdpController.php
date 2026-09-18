@@ -113,9 +113,10 @@ class IdpController extends Controller
 
     public function penetapan()
     {
-        $rows = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
-
-        return view('admin-master.idp.penetapan', compact('rows'));
+        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp');
+        $summaryRows = IDP::query()->with(['bawahan', 'rencanaPengembangan' => fn ($q) => $q->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+ 
+        return view('admin-master.idp.penetapan', ['rows' => $query->get(), 'summaryRows' => $summaryRows]);
     }
 
     public function daftarArea()
@@ -260,6 +261,8 @@ class IdpController extends Controller
             ]);
         }
 
+        $this->syncStatusRencanaKeMonitoring($idp->id_daftar_idp);
+
         return back()->with('success', $data['submit_action'] === 'kirim' ? 'Rencana IDP dikirim ke atasan.' : 'Rencana IDP disimpan.');
     }
 
@@ -283,7 +286,7 @@ class IdpController extends Controller
 
         return view('admin-master.idp.pemantauan', [
             'rows' => $query->paginate(10),
-            'summaryRows' => (clone $query)->get(),
+            'summaryRows' => IDP::query()->with(['bawahan.jabatan', 'rencanaPengembangan'])->orderBy('id_daftar_idp')->get(),
         ]);
     }
 
