@@ -31,7 +31,7 @@
           <th class="px-4 py-4 font-semibold">Adaptation Check (Tingkat)</th>
           <th class="px-4 py-4 font-semibold">Adaptation Check (Nilai)</th>
           <th class="px-4 py-4 font-semibold">KOMPETENSI</th>
-          <th class="px-4 py-4 font-semibold">Mid Term Check</th>
+          <th class="px-4 py-4 font-semibold">Evaluasi</th>
           <th class="px-4 py-4 font-semibold">Catatan Atasan</th>
           <th class="px-4 py-4 font-semibold">Final Evaluation</th>
           <th class="px-4 py-4 font-semibold">Final Autonomy Level</th>

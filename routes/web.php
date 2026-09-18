@@ -44,9 +44,11 @@ Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->g
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanAtasan'])->name('idp.penetapan');
     Route::put('/idp/penetapan/{rencana}', [IdpController::class, 'reviewRencanaAtasan'])->name('idp.penetapan.review');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanAtasan'])->name('idp.pemantauan');
-    Route::get('/idp/evaluasi', [EvaluasiController::class, 'evaluasiAtasan'])->name('idp.evaluasi');
+    Route::get('/idp/evaluasi', [EvaluasiController::class, 'indexAtasan'])->name('idp.evaluasi');
+    Route::post('/idp/evaluasi/{idp}/nilai', [EvaluasiController::class, 'storeNilai'])->name('idp.evaluasi.nilai');
+    Route::put('/idp/evaluasi/{idp}/bukti/{bukti}/review', [EvaluasiController::class, 'reviewAtasan'])->name('idp.evaluasi.review');
+    Route::get('/idp/evaluasi/{idp}/download/{type}', [EvaluasiController::class, 'download'])->name('idp.evaluasi.download');
     Route::get('/coaching', [IdpController::class, 'coachingAtasan'])->name('coaching.index');
-    Route::post('/idp/evaluasi/{idp}', [EvaluasiController::class, 'storeEvaluasi'])->name('idp.evaluasi.store');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
     Route::put('/coaching/{idp}/bukti/{coachingBukti}/review', [IdpController::class, 'reviewCoachingAtasan'])->name('coaching.review');
 });
@@ -56,7 +58,9 @@ Route::middleware(['auth', 'role:bawahan'])->prefix('bawahan')->name('bawahan.')
     Route::post('/idp/daftar/{idp}/rencana', [IdpController::class, 'storeRencanaBawahan'])->name('idp.rencana.store');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanBawahan'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanBawahan'])->name('idp.pemantauan');
-    Route::get('/idp/evaluasi', [IdpController::class, 'evaluasiBawahan'])->name('idp.evaluasi');
+    Route::get('/idp/evaluasi', [EvaluasiController::class, 'indexBawahan'])->name('idp.evaluasi');
+    Route::post('/idp/evaluasi/{idp}/bukti', [EvaluasiController::class, 'store'])->name('idp.evaluasi.store');
+    Route::get('/idp/evaluasi/{idp}/download/{type}', [EvaluasiController::class, 'download'])->name('idp.evaluasi.download');
     Route::get('/coaching', [IdpController::class, 'coachingBawahan'])->name('coaching.index');
     Route::post('/coaching/{idp}/bukti', [IdpController::class, 'uploadBuktiCoaching'])->name('coaching.bukti');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');

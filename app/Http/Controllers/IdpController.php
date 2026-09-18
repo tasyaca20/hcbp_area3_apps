@@ -272,9 +272,19 @@ class IdpController extends Controller
 
     public function pemantauan()
     {
-        $rows = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+        $query = IDP::query()
+            ->with([
+                'bawahan.jabatan',
+                'atasan.jabatan',
+                'monitoring',
+                'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi'),
+            ])
+            ->orderBy('id_daftar_idp');
 
-        return view('admin-master.idp.pemantauan', compact('rows'));
+        return view('admin-master.idp.pemantauan', [
+            'rows' => $query->paginate(10),
+            'summaryRows' => (clone $query)->get(),
+        ]);
     }
 
     public function pemantauanArea()
@@ -340,8 +350,18 @@ class IdpController extends Controller
         abort_if($planId && ! RencanaPengembanganIDP::where('id_rencana', $planId)->where('id_daftar_idp', $idp->id_daftar_idp)->exists(), 403);
 
         $rencana = RencanaPengembanganIDP::findOrFail($planId);
+        $lockedJenis = [];
         foreach ([10, 20, 70] as $jenis) {
             $field = "deskripsi_realisasi_{$jenis}";
+            $existingBukti = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+                ->where('id_rencana', $planId)
+                ->where('jenis', $jenis)
+                ->first();
+            $isApproved = $existingBukti && ($existingBukti->status_atasan ?? 'pending') === 'setuju';
+            if ($isApproved) {
+                $lockedJenis[] = $jenis;
+                continue;
+            }
             if ($request->has($field) && $rencana->$field !== $validated[$field]) {
                 $rencana->update([$field => $validated[$field]]);
                 CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
@@ -359,6 +379,18 @@ class IdpController extends Controller
 
         foreach ($fields as $input => $jenis) {
             if ($request->hasFile($input)) {
+                $existingBukti = CoachingBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+                    ->where('jenis', $jenis);
+                if ($planId) {
+                    $existingBukti->where('id_rencana', $planId);
+                } else {
+                    $existingBukti->whereNull('id_rencana');
+                }
+                $existing = $existingBukti->first();
+                if ($existing && ($existing->status_atasan ?? 'pending') === 'setuju') {
+                    $lockedJenis[] = $jenis;
+                    continue;
+                }
                 $file = $request->file($input);
                 $path = $file->store("coaching-evidence/{$idp->id_daftar_idp}", 'public');
                 $originalName = $file->getClientOriginalName();
@@ -372,7 +404,6 @@ class IdpController extends Controller
                     $query->whereNull('id_rencana');
                 }
 
-                $existing = $query->first();
                 if ($existing) {
                     Storage::disk('public')->delete($existing->file_path);
                     $existing->delete();
@@ -388,7 +419,13 @@ class IdpController extends Controller
             }
         }
 
-        return back()->with('success', 'Realisasi coaching berhasil disimpan.');
+        $message = 'Realisasi coaching berhasil disimpan.';
+        if (! empty($lockedJenis)) {
+            $daftar = implode('%, ', array_unique($lockedJenis)) . '%';
+            $message = "Sebagian realisasi tidak disimpan (sudah disetujui atasan): {$daftar}.";
+        }
+
+        return back()->with('success', $message);
     }
 
     private function syncStatusRencanaKeMonitoring(int $idDaftarIdp): void

@@ -34,7 +34,7 @@ class IDP extends Model
         return $this->hasOne(MonitoringIDP::class, 'id_daftar_idp', 'id_daftar_idp');
     }
 
-    public function evaluasi()
+    public function evaluasiIDP()
     {
         return $this->hasMany(EvaluasiIDP::class, 'id_daftar_idp', 'id_daftar_idp');
     }
@@ -52,5 +52,10 @@ class IDP extends Model
     public function coachingBukti()
     {
         return $this->hasMany(CoachingBukti::class, 'id_daftar_idp', 'id_daftar_idp');
+    }
+
+    public function evaluasi()
+    {
+        return $this->hasMany(Evaluasi::class, 'id_daftar_idp', 'id_daftar_idp');
     }
 }
