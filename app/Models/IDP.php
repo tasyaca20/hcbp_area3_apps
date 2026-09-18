@@ -34,6 +34,11 @@ class IDP extends Model
         return $this->hasOne(MonitoringIDP::class, 'id_daftar_idp', 'id_daftar_idp');
     }
 
+    public function monitoringCoaching()
+    {
+        return $this->hasOne(MonitoringCoaching::class, 'id_daftar_idp', 'id_daftar_idp');
+    }
+
     public function evaluasiIDP()
     {
         return $this->hasMany(EvaluasiIDP::class, 'id_daftar_idp', 'id_daftar_idp');

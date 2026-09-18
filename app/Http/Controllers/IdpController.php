@@ -7,6 +7,7 @@ use App\Models\CoachingBukti;
 use App\Models\EvaluasiIDP;
 use App\Models\IDP;
 use App\Models\Jabatan;
+use App\Models\MonitoringCoaching;
 use App\Models\Pengguna;
 use App\Models\RencanaPengembanganIDP;
 use Illuminate\Http\Request;
@@ -305,7 +306,7 @@ class IdpController extends Controller
 
     public function pemantauanCoachingArea()
     {
-        return $this->coachingMonitoringView('admin-master.coaching.pemantauan', auth()->user()->unit_induk);
+        return $this->coachingMonitoringView('admin-area.coaching.pemantauan', auth()->user()->unit_induk);
     }
 
     public function coachingAtasan()
@@ -330,6 +331,7 @@ class IdpController extends Controller
             'status_atasan' => $data['status_atasan'],
             'catatan_revisi' => $data['status_atasan'] === 'revisi' ? $data['catatan_revisi'] : null,
         ]);
+        $this->syncStatusCoaching($idp->id_daftar_idp);
 
         return back()->with('success', 'Status coaching berhasil diperbarui.');
     }
@@ -422,6 +424,8 @@ class IdpController extends Controller
             }
         }
 
+        $this->syncStatusCoaching($idp->id_daftar_idp);
+
         $message = 'Realisasi coaching berhasil disimpan.';
         if (! empty($lockedJenis)) {
             $daftar = implode('%, ', array_unique($lockedJenis)) . '%';
@@ -429,6 +433,18 @@ class IdpController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    private function syncStatusCoaching(int $idDaftarIdp): void
+    {
+        $planIds = RencanaPengembanganIDP::where('id_daftar_idp', $idDaftarIdp)->where('status', 'Disetujui')->pluck('id_rencana');
+        $required = $planIds->count() * 3;
+        $bukti = $required ? CoachingBukti::whereIn('id_rencana', $planIds)->get(['jenis', 'status_atasan']) : collect();
+        $status = ! $required || $bukti->count() < $required
+            ? 'Belum Mengisi Sesi Coaching'
+            : ($bukti->every(fn ($item) => $item->status_atasan === 'setuju') ? 'Disetujui' : 'Menunggu Persetujuan');
+
+        MonitoringCoaching::updateOrCreate(['id_daftar_idp' => $idDaftarIdp], ['status' => $status]);
     }
 
     private function syncStatusRencanaKeMonitoring(int $idDaftarIdp): void
@@ -454,7 +470,7 @@ class IdpController extends Controller
 
     private function coachingMonitoringView(string $view, ?string $unitInduk = null)
     {
-        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])])->orderBy('id_daftar_idp');
+        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoringCoaching', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])])->orderBy('id_daftar_idp');
         if ($unitInduk) {
             $query->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $unitInduk));
         }
@@ -501,12 +517,14 @@ class IdpController extends Controller
                 }
                 RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)->whereIn('status', ['Diajukan', 'Revisi'])->whereNotIn('id_rencana', $revisedIds)->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
                 $this->syncStatusRencanaKeMonitoring($rencana->id_daftar_idp);
+                $this->syncStatusCoaching($rencana->id_daftar_idp);
 
                 return back()->with('success', 'Rencana IDP berhasil ditinjau.');
             }
         }
         RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)->whereIn('status', ['Diajukan', 'Revisi'])->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
         $this->syncStatusRencanaKeMonitoring($rencana->id_daftar_idp);
+                $this->syncStatusCoaching($rencana->id_daftar_idp);
 
         return back()->with('success', 'Rencana IDP berhasil ditinjau.');
     }

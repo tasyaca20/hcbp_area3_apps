@@ -2,12 +2,12 @@
 $pageTitle = 'Pemantauan IDP';
 $activeSection = 'idp';
 $activePage = 'pemantauan';
-$statuses = ['Draft', 'Diajukan', 'Disetujui'];
-$labels = ['Draft' => 'Belum Direncanakan', 'Diajukan' => 'Diajukan', 'Disetujui' => 'Disetujui'];
-$colors = ['Draft' => '#94a3b8', 'Diajukan' => '#f59e0b', 'Disetujui' => '#22c55e'];
+$statuses = ['Draft', 'Diajukan', 'Revisi', 'Disetujui'];
+$labels = ['Draft' => 'Belum Direncanakan', 'Diajukan' => 'Diajukan', 'Revisi' => 'Revisi', 'Disetujui' => 'Disetujui'];
+$colors = ['Draft' => '#94a3b8', 'Diajukan' => '#f59e0b', 'Revisi' => '#ef4444', 'Disetujui' => '#22c55e'];
 $classes = ['Draft' => 'bg-slate-100 text-slate-700', 'Diajukan' => 'bg-amber-100 text-amber-700', 'Revisi' => 'bg-red-100 text-red-700', 'Disetujui' => 'bg-green-100 text-green-700', 'Berjalan' => 'bg-blue-100 text-blue-700', 'Selesai' => 'bg-violet-100 text-violet-700'];
 $units = $summaryRows->pluck('bawahan.unit_induk')->filter()->unique()->values();
-$statusOf = fn ($row) => $row->rencanaPengembangan->contains('status', 'Disetujui') ? 'Disetujui' : ($row->rencanaPengembangan->contains('status', 'Diajukan') ? 'Diajukan' : 'Draft');
+$statusOf = fn ($row) => $row->rencanaPengembangan->contains('status', 'Disetujui') ? 'Disetujui' : ($row->rencanaPengembangan->contains('status', 'Revisi') ? 'Revisi' : ($row->rencanaPengembangan->contains('status', 'Diajukan') ? 'Diajukan' : 'Draft'));
 $counts = collect($statuses)->mapWithKeys(fn ($status) => [$status => $summaryRows->filter(fn ($row) => $statusOf($row) === $status)->count()]);
 $total = $counts->sum();
 $chartMax = max($counts->max(), 1);

@@ -256,9 +256,19 @@
         container.parentElement.insertBefore(searchRow, container);
 
         if (table.dataset.tablePagination === 'false') {
+          const groups = rows.some((row) => row.querySelector('td[rowspan]'))
+            ? rows.reduce((items, row) => {
+              if (row.querySelector('td[rowspan]') || !items.length) items.push([row]);
+              else items[items.length - 1].push(row);
+              return items;
+            }, [])
+            : rows.map((row) => [row]);
           search.addEventListener('input', () => {
             const keyword = search.value.toLowerCase();
-            rows.forEach((row) => row.hidden = !row.textContent.toLowerCase().includes(keyword));
+            groups.forEach((group) => {
+              const hidden = !group.some((row) => row.textContent.toLowerCase().includes(keyword));
+              group.forEach((row) => row.hidden = hidden);
+            });
           });
           return;
         }
