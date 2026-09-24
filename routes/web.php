@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EvaluasiController;
 use App\Http\Controllers\IdpController;
 use App\Http\Controllers\SettingRoleController;
@@ -11,7 +12,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('admin-master.')->group(function () {
-    Route::view('/dashboard', 'admin-master.dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/idp/daftar', [IdpController::class, 'daftar'])->name('idp.daftar');
     Route::get('/idp/daftar/template', [IdpController::class, 'downloadTemplateImportMaster'])->name('idp.template');
     Route::post('/idp/daftar/import', [IdpController::class, 'importMaster'])->name('idp.import');
