@@ -31,7 +31,7 @@ Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('
 });
 
 Route::middleware(['auth', 'role:admin_area'])->prefix('admin-area')->name('admin-area.')->group(function () {
-    Route::view('/dashboard', 'admin-area.dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'indexArea'])->name('dashboard');
     Route::get('/idp/daftar', [IdpController::class, 'daftarArea'])->name('idp.daftar');
     Route::get('/idp/penetapan', [IdpController::class, 'penetapanArea'])->name('idp.penetapan');
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanArea'])->name('idp.pemantauan');
