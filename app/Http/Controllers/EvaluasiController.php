@@ -10,6 +10,43 @@ use Illuminate\Support\Facades\Storage;
 
 class EvaluasiController extends Controller
 {
+    public function indexAdminMaster()
+    {
+        $query = IDP::query()
+            ->whereHas('evaluasi')
+            ->with([
+                'bawahan.jabatan',
+                'atasan.jabatan',
+                'evaluasi' => fn ($query) => $query->with(['kompetensi', 'bukti']),
+            ])
+            ->orderBy('id_daftar_idp');
+        $summaryRows = (clone $query)->get();
+
+        return view('admin-master.idp.evaluasi', [
+            'rows' => $query->paginate(10),
+            'summaryRows' => $summaryRows,
+        ]);
+    }
+
+    public function indexAdminArea()
+    {
+        $query = IDP::query()
+            ->whereHas('evaluasi')
+            ->whereHas('bawahan', fn ($query) => $query->where('unit_induk', auth()->user()->unit_induk))
+            ->with([
+                'bawahan.jabatan',
+                'atasan.jabatan',
+                'evaluasi' => fn ($query) => $query->with(['kompetensi', 'bukti']),
+            ])
+            ->orderBy('id_daftar_idp');
+        $summaryRows = (clone $query)->get();
+
+        return view('admin-area.idp.evaluasi', [
+            'rows' => $query->paginate(10),
+            'summaryRows' => $summaryRows,
+        ]);
+    }
+
     public function indexBawahan()
     {
         $rows = IDP::query()->where('id_bawahan', auth()->id())
@@ -88,9 +125,10 @@ class EvaluasiController extends Controller
             $isApproved = $existingBukti && ($existingBukti->status_atasan ?? 'pending') === 'setuju';
             if ($isApproved) {
                 $lockedJenis[] = $jenis;
+
                 continue;
             }
-            if ($request->has($field) && $evaluasi->$field !== $validated[$field]) {
+            if ($request->has($field) && $validated[$field] !== $evaluasi->$field) {
                 $evaluasi->update([$field => $validated[$field]]);
                 EvaluasiBukti::where('id_evaluasi', $evalId)
                     ->where('jenis', $jenis)
@@ -111,6 +149,7 @@ class EvaluasiController extends Controller
                     ->first();
                 if ($existingBukti && ($existingBukti->status_atasan ?? 'pending') === 'setuju') {
                     $lockedJenis[] = $jenis;
+
                     continue;
                 }
                 $file = $request->file($input);
@@ -134,8 +173,12 @@ class EvaluasiController extends Controller
 
         $message = 'Realisasi evaluasi berhasil disimpan.';
         if (! empty($lockedJenis)) {
-            $daftar = implode('%, ', array_unique($lockedJenis)) . '%';
+            $daftar = implode('%, ', array_unique($lockedJenis)).'%';
             $message = "Sebagian realisasi tidak disimpan (sudah disetujui atasan): {$daftar}.";
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message]);
         }
 
         return back()->with('success', $message);
@@ -191,7 +234,7 @@ class EvaluasiController extends Controller
         return back()->with('success', 'Nilai evaluasi berhasil disimpan.');
     }
 
-    public function download(IDP $idp, $type)
+    public function download(IDP $idp, $type, ?Evaluasi $evaluasi = null)
     {
         $user = auth()->user();
 
@@ -199,11 +242,16 @@ class EvaluasiController extends Controller
             abort_unless($idp->id_atasan === $user->id_pengguna, 403);
         } elseif ($user->role === 'bawahan') {
             abort_unless($idp->id_bawahan === $user->id_pengguna, 403);
+        } elseif ($user->role === 'admin_area') {
+            abort_unless($idp->bawahan && $idp->bawahan->unit_induk === $user->unit_induk, 403);
         }
 
         abort_unless(in_array((int) $type, [10, 20, 70], true), 404);
 
+        abort_if($evaluasi && $evaluasi->id_daftar_idp !== $idp->id_daftar_idp, 404);
+
         $bukti = EvaluasiBukti::where('id_daftar_idp', $idp->id_daftar_idp)
+            ->when($evaluasi, fn ($query) => $query->where('id_evaluasi', $evaluasi->id_evaluasi))
             ->where('jenis', $type)
             ->latest('id_evaluasi_bukti')
             ->first();

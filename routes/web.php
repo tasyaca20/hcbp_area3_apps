@@ -23,7 +23,8 @@ Route::middleware(['auth', 'role:admin_master'])->prefix('admin-master')->name('
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauan'])->name('idp.pemantauan');
     Route::get('/coaching/pemantauan', [IdpController::class, 'pemantauanCoaching'])->name('coaching.pemantauan');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
-    Route::view('/idp/evaluasi', 'admin-master.idp.evaluasi')->name('idp.evaluasi');
+    Route::get('/idp/evaluasi', [EvaluasiController::class, 'indexAdminMaster'])->name('idp.evaluasi');
+    Route::get('/idp/evaluasi/{idp}/download/{type}/{evaluasi?}', [EvaluasiController::class, 'download'])->name('idp.evaluasi.download');
     Route::get('/setting-role', [SettingRoleController::class, 'index'])->name('setting-role');
     Route::post('/setting-role', [SettingRoleController::class, 'store'])->name('setting-role.store');
     Route::put('/setting-role/{pengguna}', [SettingRoleController::class, 'update'])->name('setting-role.update');
@@ -37,7 +38,8 @@ Route::middleware(['auth', 'role:admin_area'])->prefix('admin-area')->name('admi
     Route::get('/idp/pemantauan', [IdpController::class, 'pemantauanArea'])->name('idp.pemantauan');
     Route::get('/coaching/pemantauan', [IdpController::class, 'pemantauanCoachingArea'])->name('coaching.pemantauan');
     Route::get('/coaching/{idp}/download/{type}/{idRencana?}', [IdpController::class, 'downloadCoachingBukti'])->name('coaching.download');
-    Route::view('/idp/evaluasi', 'admin-area.idp.evaluasi')->name('idp.evaluasi');
+    Route::get('/idp/evaluasi', [EvaluasiController::class, 'indexAdminArea'])->name('idp.evaluasi');
+    Route::get('/idp/evaluasi/{idp}/download/{type}/{evaluasi?}', [EvaluasiController::class, 'download'])->name('idp.evaluasi.download');
 });
 
 Route::middleware(['auth', 'role:atasan'])->prefix('atasan')->name('atasan.')->group(function () {

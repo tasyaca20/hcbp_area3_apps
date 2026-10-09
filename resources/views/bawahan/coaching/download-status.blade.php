@@ -12,7 +12,7 @@
       <p class="whitespace-pre-line text-sm text-slate-600">{{ $plan->$deskripsiField ?: 'Belum ada deskripsi' }}</p>
       <p class="text-xs font-semibold text-green-700">Disetujui atasan — tidak dapat diubah.</p>
     @else
-      <form action="{{ route('bawahan.coaching.bukti', $row) }}" method="POST" enctype="multipart/form-data" class="space-y-2">
+      <form action="{{ route('bawahan.coaching.bukti', $row) }}" method="POST" enctype="multipart/form-data" class="space-y-2" data-async-upload>
         @csrf
         <input type="hidden" name="plan_id" value="{{ $plan->id_rencana }}">
         <textarea name="{{ $deskripsiField }}" rows="3" maxlength="2000" placeholder="Deskripsi realisasi" class="w-full rounded border-slate-300 text-sm">{{ $plan->$deskripsiField }}</textarea>
@@ -24,7 +24,7 @@
     @endif
   </div>
 @else
-  <form action="{{ route('bawahan.coaching.bukti', $row) }}" method="POST" enctype="multipart/form-data" class="space-y-2">
+  <form action="{{ route('bawahan.coaching.bukti', $row) }}" method="POST" enctype="multipart/form-data" class="space-y-2" data-async-upload>
     @csrf
     <input type="hidden" name="plan_id" value="{{ $plan->id_rencana }}">
     <textarea name="{{ $deskripsiField }}" rows="3" maxlength="2000" placeholder="Deskripsi realisasi" class="w-full rounded border-slate-300 text-sm">{{ $plan->$deskripsiField }}</textarea>

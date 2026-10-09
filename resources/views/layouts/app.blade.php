@@ -199,9 +199,42 @@
         if (event.key !== 'Escape') return;
         modals.forEach((modal) => modal.classList.replace('flex', 'hidden'));
       });
+      document.addEventListener('submit', async (event) => {
+        const form = event.target;
+        if (!form.matches('form[data-async-upload]')) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+              Accept: 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(Object.values(data.errors || {})[0]?.[0] || data.message || 'Upload gagal.');
+          }
+          form.querySelector('input[type="file"]').value = '';
+          Swal.fire({ icon: 'success', text: data.message });
+        } catch (error) {
+          Swal.fire({ icon: 'error', text: error.message || 'Upload gagal.' });
+        } finally {
+          button.disabled = false;
+        }
+      });
       document.addEventListener('submit', (event) => {
         const form = event.target;
-        if (form.dataset.confirmed || form.action.endsWith('/logout')) return;
+        if (form.matches('form[data-async-upload]') || form.dataset.confirmed || form.action.endsWith('/logout')) return;
         event.preventDefault();
         if (!form.checkValidity()) {
           form.reportValidity();

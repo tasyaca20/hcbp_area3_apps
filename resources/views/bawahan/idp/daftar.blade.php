@@ -29,6 +29,7 @@
   @forelse($rows as $row)
     @php($kompetensiList = $row->bawahan?->jabatan?->kompetensi ?? collect())
     @php($kompetensiTeknis = $kompetensiList->whereIn('jenis', ['teknis_core', 'teknis_enabler']))
+    @php($idpLocked = $row->rencanaPengembangan->contains('status', 'Disetujui'))
     <form action="{{ route('bawahan.idp.rencana.store', $row) }}" method="POST" class="space-y-6">
       @csrf
       <input type="hidden" name="submit_action" value="simpan" id="submitAction{{ $row->id_daftar_idp }}">
@@ -154,6 +155,10 @@
         <h2 class="text-lg font-semibold">Form Usulan IDP</h2>
       </div>
 
+      @if($idpLocked)
+        <p class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">IDP telah disetujui atasan dan tidak dapat diubah.</p>
+      @endif
+
       <div class="overflow-x-auto border border-slate-200 rounded-xl">
         <table data-table-search="false" data-table-pagination="false" class="w-full text-sm">
           <thead class="bg-slate-50">
@@ -187,13 +192,15 @@
         </table>
       </div>
 
-      <div class="flex justify-end gap-3 mt-4">
-        <button type="button" id="btnEdit{{ $row->id_daftar_idp }}" class="rounded-lg bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors" onclick="enableEdit({{ $row->id_daftar_idp }})">Edit IDP</button>
-        <div id="actionButtons{{ $row->id_daftar_idp }}" class="flex gap-3" style="display: none;">
-          <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" onclick="setActionAndSubmit(this, 'simpan')">Simpan</button>
-          <button type="button" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white" onclick="setActionAndSubmit(this, 'kirim')">Kirim</button>
+      @unless($idpLocked)
+        <div class="flex justify-end gap-3 mt-4">
+          <button type="button" id="btnEdit{{ $row->id_daftar_idp }}" class="rounded-lg bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors" onclick="enableEdit({{ $row->id_daftar_idp }})">Edit IDP</button>
+          <div id="actionButtons{{ $row->id_daftar_idp }}" class="flex gap-3" style="display: none;">
+            <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" onclick="setActionAndSubmit(this, 'simpan')">Simpan</button>
+            <button type="button" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white" onclick="setActionAndSubmit(this, 'kirim')">Kirim</button>
+          </div>
         </div>
-      </div>
+      @endunless
     </form>
   @empty
     <p class="text-slate-400">Belum ada IDP.</p>
