@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-# Production deployment trigger: Laravel reads the Railway MySQL settings from
-# Vercel Production Environment Variables / vercel.json at runtime.
+# Database connection settings are provided by Vercel environment variables.
+# Supabase PostgreSQL settings are configured separately for the preview environment.
 # Keep bootstrap/cache available during Composer package discovery.
 mkdir -p bootstrap/cache
 chmod 775 bootstrap/cache 2>/dev/null || true
