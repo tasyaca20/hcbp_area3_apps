@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Str;
-use Pdo\Mysql;
+use Illuminate\\Support\\Str;
+use Pdo\\Mysql;
 
 return [
 
-    'default' => env('DB_CONNECTION', env('APP_ENV') === 'production' ? 'mysql' : 'sqlite'),
+    'default' => env('DB_CONNECTION', env('APP_ENV') === 'production' ? 'pgsql' : 'sqlite'),
 
     'connections' => [
         'sqlite' => [
@@ -17,9 +17,6 @@ return [
         ],
 
         'mysql' => [
-            'driver' => 'mysql',
-            // Do not use DB_URL here: a stale/auto-generated URL can override
-            // the Railway TCP proxy host/port supplied by DB_HOST/DB_PORT.
             'driver' => 'mysql',
             'host' => env('DB_HOST', env('MYSQLHOST', 'sakura.proxy.rlwy.net')),
             'port' => env('DB_PORT', env('MYSQLPORT', '10132')),
@@ -51,7 +48,8 @@ return [
             'port' => env('DB_PORT', '5432'), 'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'), 'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8', 'prefix' => '', 'prefix_indexes' => true, 'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'sslmode' => env('DB_SSLMODE', 'require'),
+            'options' => extension_loaded('pdo_pgsql') ? [\\PDO::ATTR_EMULATE_PREPARES => true] : [],
         ],
         'sqlsrv' => [
             'driver' => 'sqlsrv', 'host' => env('DB_HOST', 'localhost'),
