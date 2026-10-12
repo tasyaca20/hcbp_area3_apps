@@ -52,6 +52,8 @@ return [
             'username' => env('DB_USERNAME', 'root'), 'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8', 'prefix' => '', 'prefix_indexes' => true, 'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Supabase transaction pooling (port 6543) requires emulated prepares.
+            'options' => extension_loaded('pdo_pgsql') ? [\\PDO::ATTR_EMULATE_PREPARES => true] : [],
         ],
         'sqlsrv' => [
             'driver' => 'sqlsrv', 'host' => env('DB_HOST', 'localhost'),
