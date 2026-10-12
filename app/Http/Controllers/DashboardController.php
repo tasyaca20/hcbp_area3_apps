@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $totalCoaching = MonitoringCoaching::count();
 
         // 4. Total Pegawai Aktif
-        $totalPegawai = Pengguna::where('status_aktif', true)->count();
+        $totalPegawai = Pengguna::where('status_aktif', 1)->count();
         $totalPegawaiAll = Pengguna::count();
 
         // ---- DISTRIBUSI PEGAWAI PER UNIT INDUK ----
