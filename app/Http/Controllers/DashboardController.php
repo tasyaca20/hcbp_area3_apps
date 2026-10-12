@@ -40,7 +40,7 @@ class DashboardController extends Controller
         // ---- DISTRIBUSI PEGAWAI PER UNIT INDUK ----
         $distribusiUnit = Pengguna::select('unit_induk', DB::raw('count(*) as total'))
             ->whereNotNull('unit_induk')
-            ->where('status_aktif', true)
+            ->where('status_aktif', 1)
             ->groupBy('unit_induk')
             ->orderBy('unit_induk')
             ->get()
@@ -51,7 +51,7 @@ class DashboardController extends Controller
 
         // ---- DISTRIBUSI ROLE ----
         $distribusiRole = Pengguna::select('role', DB::raw('count(*) as total'))
-            ->where('status_aktif', true)
+            ->where('status_aktif', 1)
             ->groupBy('role')
             ->orderBy('role')
             ->get();
@@ -179,7 +179,7 @@ class DashboardController extends Controller
             ->count();
 
         // 4. Total Pegawai Aktif di area ini
-        $totalPegawai = Pengguna::where('unit_induk', $unitInduk)->where('status_aktif', true)->count();
+        $totalPegawai = Pengguna::where('unit_induk', $unitInduk)->where('status_aktif', 1)->count();
         $totalPegawaiAll = Pengguna::where('unit_induk', $unitInduk)->count();
 
         // ---- DISTRIBUSI PEGAWAI PER ROLE (di area ini) ----
@@ -190,7 +190,7 @@ class DashboardController extends Controller
         ];
         $distribusiUnit = Pengguna::select('role', DB::raw('count(*) as total'))
             ->where('unit_induk', $unitInduk)
-            ->where('status_aktif', true)
+            ->where('status_aktif', 1)
             ->groupBy('role')
             ->orderBy('role')
             ->get()
