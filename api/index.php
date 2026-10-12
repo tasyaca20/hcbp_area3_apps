@@ -11,20 +11,10 @@ if (! getenv('VIEW_COMPILED_PATH')) {
     putenv('VIEW_COMPILED_PATH='.$runtimeViewPath);
 }
 
-// Production connection settings belong in Vercel environment variables.
-// Do not keep APP_KEY or database credentials in source control.
+// Production database credentials are managed in Vercel Environment Variables.
 if (getenv('VERCEL')) {
     putenv('APP_ENV=production');
-    putenv('DB_CONNECTION=mysql');
-}
-
-// Support the common Railway secret names when DB_PASSWORD is not present.
-if (! getenv('DB_PASSWORD')) {
-    if (getenv('MYSQLPASSWORD')) {
-        putenv('DB_PASSWORD='.getenv('MYSQLPASSWORD'));
-    } elseif (getenv('MYSQL_ROOT_PASSWORD')) {
-        putenv('DB_PASSWORD='.getenv('MYSQL_ROOT_PASSWORD'));
-    }
+    putenv('DB_CONNECTION=pgsql');
 }
 
 require dirname(__DIR__) . '/public/index.php';
