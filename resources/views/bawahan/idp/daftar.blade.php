@@ -33,7 +33,7 @@
     <form action="{{ route('bawahan.idp.rencana.store', $row) }}" method="POST" class="space-y-6">
       @csrf
       <input type="hidden" name="submit_action" value="simpan" id="submitAction{{ $row->id_daftar_idp }}">
-      <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+      <div class="mb-4 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
         <div><strong>Nama:</strong> {{ $row->bawahan->nama ?? '-' }}</div>
         <div><strong>Nama Atasan:</strong> {{ $row->atasan->nama ?? '-' }}</div>
         <div><strong>NIP:</strong> {{ $row->bawahan->nip ?? '-' }}</div>
@@ -151,7 +151,7 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-lg font-semibold">Form Usulan IDP</h2>
       </div>
 
@@ -193,13 +193,13 @@
       </div>
 
       @unless($idpLocked)
-        <div class="flex justify-end gap-3 mt-4">
-          <button type="button" id="btnEdit{{ $row->id_daftar_idp }}" class="rounded-lg bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors" onclick="enableEdit({{ $row->id_daftar_idp }})">Edit IDP</button>
-          <div id="actionButtons{{ $row->id_daftar_idp }}" class="flex gap-3" style="display: none;">
-            <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" onclick="setActionAndSubmit(this, 'simpan')">Simpan</button>
-            <button type="button" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white" onclick="setActionAndSubmit(this, 'kirim')">Kirim</button>
-          </div>
-        </div>
+         <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+           <button type="button" id="btnEdit{{ $row->id_daftar_idp }}" class="w-full rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600 sm:w-auto" onclick="enableEdit({{ $row->id_daftar_idp }})">Edit IDP</button>
+           <div id="actionButtons{{ $row->id_daftar_idp }}" class="flex flex-col gap-3 sm:flex-row" style="display: none;">
+             <button type="button" class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold sm:w-auto" onclick="setActionAndSubmit(this, 'simpan')">Simpan</button>
+             <button type="button" class="w-full rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white sm:w-auto" onclick="setActionAndSubmit(this, 'kirim')">Kirim</button>
+           </div>
+         </div>
       @endunless
     </form>
   @empty

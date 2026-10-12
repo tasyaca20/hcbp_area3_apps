@@ -51,10 +51,51 @@
       td {
         border: 1px solid #cbd5e1;
       }
+      @media (max-width: 767px) {
+        .h-\[220px\] {
+          height: auto;
+          min-height: 160px;
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+        .px-8.max-w-xl {
+          padding-left: 1.25rem;
+          padding-right: 1.25rem;
+        }
+        .rounded-\[2rem\].p-8 {
+          padding: 1.25rem;
+          border-radius: 1rem;
+        }
+        table {
+          font-size: 0.8125rem;
+        }
+        table th,
+        table td {
+          padding: 0.625rem !important;
+          white-space: normal !important;
+          overflow-wrap: anywhere;
+        }
+        table.min-w-\[1850px\],
+        table.min-w-\[1550px\],
+        table.min-w-\[1400px\],
+        table.min-w-\[1200px\],
+        table.min-w-\[900px\],
+        table.min-w-\[760px\] {
+          min-width: 680px;
+        }
+        .flex.justify-between {
+          flex-wrap: wrap;
+          gap: 0.75rem;
+        }
+        .flex.justify-between > :last-child:not(:first-child) {
+          max-width: 100%;
+        }
+      }
     </style>
   </head>
-  <body class="flex h-screen overflow-hidden antialiased">
-    <aside class="w-[300px] flex-shrink-0 flex flex-col h-full bg-white border-r border-slate-200 hidden md:flex">
+  <body class="flex min-h-dvh overflow-hidden antialiased">
+    <div data-mobile-nav-backdrop class="fixed inset-0 z-40 hidden bg-slate-950/40 md:hidden"></div>
+    <aside data-mobile-nav class="fixed inset-y-0 left-0 z-50 hidden w-[min(300px,calc(100vw-2rem))] flex-shrink-0 flex-col bg-white border-r border-slate-200 shadow-xl md:static md:flex md:h-full md:w-[300px] md:shadow-none">
       <div class="px-6 pt-7 pb-4">
         <h2 class="text-[22px] font-bold tracking-tight text-[#0a192f]">HCBP Area 3 Apps</h2>
         <p class="text-xs text-slate-400 mt-1">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
@@ -144,15 +185,18 @@
         @endif
       </nav>
      </aside>
-    <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fafc]">
+    <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f8fafc]">
       <header class="w-full sticky top-0 bg-white border-b border-slate-200 z-50">
-        <div class="flex justify-between items-center px-8 py-3 h-[76px]">
-          <div class="flex items-center gap-4">
-            <img class="h-5 object-contain" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.png') }}" alt="Danantara Indonesia logo" />
-            <div class="w-px h-7 bg-slate-200"></div>
-            <img class="h-6 object-contain" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
+        <div class="flex h-[64px] items-center justify-between px-4 py-3 sm:h-[76px] sm:px-6 lg:px-8">
+          <div class="flex min-w-0 items-center gap-2 sm:gap-4">
+            <button data-mobile-nav-toggle class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden" type="button" aria-label="Buka navigasi" aria-expanded="false">
+              <span class="material-symbols-outlined">menu</span>
+            </button>
+            <img class="h-4 max-w-[120px] object-contain sm:h-5 sm:max-w-none" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.png') }}" alt="Danantara Indonesia logo" />
+            <div class="h-6 w-px flex-shrink-0 bg-slate-200 sm:h-7"></div>
+            <img class="h-5 max-w-[70px] object-contain sm:h-6 sm:max-w-none" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex flex-shrink-0 items-center gap-1 sm:gap-4">
             <button class="relative p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500" type="button">
               <span class="material-symbols-outlined">notifications</span>
               <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] text-white flex items-center justify-center font-bold">3</span>
@@ -179,11 +223,28 @@
           </div>
         </div>
       </header>
-<div class="relative flex-1 overflow-y-auto px-8 py-6 space-y-6">
+<div class="relative flex-1 space-y-6 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
          @yield('content')
        </div>
     </main>
     <script>
+      const mobileNav = document.querySelector('[data-mobile-nav]');
+      const mobileNavBackdrop = document.querySelector('[data-mobile-nav-backdrop]');
+      const mobileNavToggle = document.querySelector('[data-mobile-nav-toggle]');
+      const closeMobileNav = () => {
+        mobileNav.classList.add('hidden');
+        mobileNavBackdrop.classList.add('hidden');
+        mobileNavToggle?.setAttribute('aria-expanded', 'false');
+      };
+      const openMobileNav = () => {
+        mobileNav.classList.remove('hidden');
+        mobileNav.classList.add('flex');
+        mobileNavBackdrop.classList.remove('hidden');
+        mobileNavToggle?.setAttribute('aria-expanded', 'true');
+      };
+      mobileNavToggle?.addEventListener('click', openMobileNav);
+      mobileNavBackdrop?.addEventListener('click', closeMobileNav);
+      mobileNav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobileNav));
       const modals = Array.from(document.querySelectorAll('[data-modal]'));
       const mountModal = (modal) => {
         if (modal.parentElement === document.body) return;
@@ -197,6 +258,7 @@
       });
       document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
+        closeMobileNav();
         modals.forEach((modal) => modal.classList.replace('flex', 'hidden'));
       });
       document.addEventListener('submit', async (event) => {
