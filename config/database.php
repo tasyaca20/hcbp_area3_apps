@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\\Support\\Str;
-use Pdo\\Mysql;
+use Illuminate\Support\Str;
+use Pdo\Mysql;
 
 return [
 
@@ -49,7 +49,7 @@ return [
             'username' => env('DB_USERNAME', 'root'), 'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8', 'prefix' => '', 'prefix_indexes' => true, 'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'require'),
-            'options' => extension_loaded('pdo_pgsql') ? [\\PDO::ATTR_EMULATE_PREPARES => true] : [],
+            'options' => extension_loaded('pdo_pgsql') ? [\PDO::ATTR_EMULATE_PREPARES => true] : [],
         ],
         'sqlsrv' => [
             'driver' => 'sqlsrv', 'host' => env('DB_HOST', 'localhost'),
