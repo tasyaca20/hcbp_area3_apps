@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         try {
             $pengguna = Pengguna::where('username', $credentials['username'])
-                ->where('status_aktif', true)
+                ->where('status_aktif', 1)
                 ->first();
 
             if (!$pengguna || !Hash::check($credentials['password'], $pengguna->password_hash)) {
