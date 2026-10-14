@@ -6,7 +6,7 @@
     <title>{{ $title ?? 'HCBP Area 3 Apps' }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo_pln.png') }}"/>
+    <link rel="icon" type="image/webp" href="{{ asset('images/logo_pln.webp') }}"/>
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
@@ -93,7 +93,7 @@
       }
     </style>
   </head>
-  <body class="flex min-h-dvh overflow-hidden antialiased">
+  <body class="flex min-h-dvh antialiased">
     <div data-mobile-nav-backdrop class="fixed inset-0 z-40 hidden bg-slate-950/40 md:hidden"></div>
     <aside data-mobile-nav class="fixed inset-y-0 left-0 z-50 hidden w-[min(300px,calc(100vw-2rem))] flex-shrink-0 flex-col bg-white border-r border-slate-200 shadow-xl md:static md:flex md:h-full md:w-[300px] md:shadow-none">
       <div class="px-6 pt-7 pb-4">
@@ -185,14 +185,14 @@
         @endif
       </nav>
      </aside>
-    <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f8fafc]">
+    <main class="flex min-w-0 flex-1 flex-col bg-[#f8fafc]">
       <header class="w-full sticky top-0 bg-white border-b border-slate-200 z-50">
         <div class="flex h-[64px] items-center justify-between px-4 py-3 sm:h-[76px] sm:px-6 lg:px-8">
           <div class="flex min-w-0 items-center gap-2 sm:gap-4">
             <button data-mobile-nav-toggle class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden" type="button" aria-label="Buka navigasi" aria-expanded="false">
               <span class="material-symbols-outlined">menu</span>
             </button>
-            <img class="h-4 max-w-[120px] object-contain sm:h-5 sm:max-w-none" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.png') }}" alt="Danantara Indonesia logo" />
+            <img class="h-4 max-w-[120px] object-contain sm:h-5 sm:max-w-none" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.webp') }}" alt="Danantara Indonesia logo" />
             <div class="h-6 w-px flex-shrink-0 bg-slate-200 sm:h-7"></div>
             <img class="h-5 max-w-[70px] object-contain sm:h-6 sm:max-w-none" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
           </div>

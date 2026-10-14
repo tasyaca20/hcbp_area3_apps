@@ -6,7 +6,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>HCBP Area 3 Apps - Login</title>
   <link href="https://fonts.googleapis.com" rel="preconnect" />
-  <link rel="icon" type="image/png" href="{{ asset('images/logo_pln.png') }}"/>
+  <link rel="icon" type="image/webp" href="{{ asset('images/logo_pln.webp') }}"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
@@ -151,7 +151,7 @@
 <body class="bg-surface-container-low min-h-screen flex flex-col relative overflow-x-hidden">
   <header class="w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop py-lg z-20 relative">
     <div class="flex items-center gap-md">
-      <img class="h-6 md:h-27 w-auto object-contain" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.png') }}" alt="Danantara Indonesia logo" />
+      <img class="h-6 md:h-27 w-auto object-contain" src="{{ asset('logo/main-danantara-indonesia-horizontal-logo.webp') }}" alt="Danantara Indonesia logo" />
       <div class="w-[1px] h-12 md:h-14 bg-outline-variant"></div>
       <img class="h-6 md:h-8 w-auto object-contain" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
     </div>
