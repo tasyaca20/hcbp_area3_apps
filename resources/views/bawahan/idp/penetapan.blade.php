@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Penetapan IDP - Bawahan'])
+﻿@extends('layouts.app', ['title' => 'Penetapan IDP - Bawahan'])
 
 @section('content')
 <div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 h-[220px] flex items-center">
@@ -20,17 +20,17 @@
     @if($row->rencanaPengembangan->isNotEmpty())
     <div class="border border-emerald-200 rounded-xl p-5 mb-5">
       <h2 class="font-semibold mb-3">Hasil IDP Disetujui Atasan</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="bg-emerald-50"><tr><th class="px-3 py-3 text-left w-12">NO</th><th class="px-3 py-3 text-left">KOMPETENSI TEKNIS</th><th class="px-3 py-3 text-left">10% PEMBELAJARAN</th><th class="px-3 py-3 text-left">20% SOCIAL LEARNING</th><th class="px-3 py-3 text-left">70% ACTION LEARNING</th></tr></thead>
-          <tbody>
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-sm tbl">
+          <thead><tr><th>NO</th><th>KOMPETENSI TEKNIS</th><th>10% PEMBELAJARAN</th><th>20% SOCIAL LEARNING</th><th>70% ACTION LEARNING</th></tr></thead>
+          <tbody class="divide-y divide-slate-100">
             @foreach($row->rencanaPengembangan as $rencana)
-            <tr class="border-t border-slate-200">
-              <td class="px-3 py-2">{{ $loop->iteration }}</td>
-              <td class="px-3 py-2"><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td>
-              <td class="px-3 py-2 whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td>
-              <td class="px-3 py-2 whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td>
-              <td class="px-3 py-2 whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td>
+            <tr>
+              <td>{{ $loop->iteration }}</td>
+              <td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td>
+              <td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td>
+              <td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td>
+              <td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td>
             </tr>
             @endforeach
           </tbody>

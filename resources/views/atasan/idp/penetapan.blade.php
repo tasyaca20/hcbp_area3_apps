@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Penetapan IDP - Atasan'])
+﻿@extends('layouts.app', ['title' => 'Penetapan IDP - Atasan'])
 
 @section('content')
 @if(session('success'))
@@ -20,15 +20,15 @@
     <h1 class="text-xl font-bold">Penetapan IDP</h1>
     <p class="text-sm text-slate-500 mt-1">Usulan kompetensi bawahan yang menunggu persetujuan.</p>
   </div>
-  <div class="overflow-x-auto">
-    <table class="w-full min-w-[760px] text-sm">
-      <thead class="bg-slate-50 text-slate-700">
+  <div class="overflow-x-auto rounded-xl border border-slate-200">
+    <table class="w-full min-w-[760px] text-sm tbl">
+      <thead>
         <tr>
-          <th class="px-4 py-3 text-left">No</th>
-          <th class="px-4 py-3 text-left">Bawahan</th>
-          <th class="px-4 py-3 text-left">NIP</th>
-          <th class="px-4 py-3 text-left">Status</th>
-          <th class="px-4 py-3 text-center">Aksi</th>
+          <th>No</th>
+          <th>Bawahan</th>
+          <th>NIP</th>
+          <th>Status</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -53,19 +53,22 @@
             ];
           @endphp
           <tr class="hover:bg-slate-50">
-            <td class="px-4 py-3 align-top">{{ $loop->iteration }}</td>
-            <td class="px-4 py-3 font-medium align-top">{{ $first->daftarIdp->bawahan->nama ?? '-' }}</td>
-            <td class="px-4 py-3 align-top">{{ $first->daftarIdp->bawahan->nip ?? '-' }}</td>
-            <td class="px-4 py-3"><span class="rounded px-2 py-1 text-xs font-medium {{ $first->status === 'Diajukan' ? 'bg-yellow-100 text-yellow-700' : 'bg-amber-100 text-amber-700' }}">{{ $first->status }}</span></td>
-            <td class="px-4 py-3 text-center">
+            <td>{{ $loop->iteration }}</td>
+            <td class="font-medium">{{ $first->daftarIdp->bawahan->nama ?? '-' }}</td>
+            <td>{{ $first->daftarIdp->bawahan->nip ?? '-' }}</td>
+            <td><span class="rounded px-2 py-1 text-xs font-medium {{ $first->status === 'Diajukan' ? 'bg-yellow-100 text-yellow-700' : 'bg-amber-100 text-amber-700' }}">{{ $first->status }}</span></td>
+            <td>
               <button type="button" class="rounded-lg border border-[#31599b] px-3 py-1.5 text-xs font-semibold text-[#31599b] hover:bg-blue-50" data-group='@json($groupData)' data-komp='@json($kompData)' onclick="openReview(this)">Review</button>
             </td>
           </tr>
         @empty
-        <tr><td colspan="5" class="px-4 py-10 text-center text-slate-400">Tidak ada usulan yang menunggu persetujuan.</td></tr>
+        <tr><td colspan="5" class="py-10 text-slate-400">Tidak ada usulan yang menunggu persetujuan.</td></tr>
         @endforelse
       </tbody>
     </table>
+  </div>
+  <div class="mt-1">
+    @include('components.pagination', ['paginator' => $rencana])
   </div>
 </div>
 
@@ -84,17 +87,17 @@
           <section>
             <h2 class="font-bold">SOFT COMPETENCY</h2>
             <h3 class="font-semibold mt-2">Kompetensi Utama</h3>
-            <table class="w-full border border-slate-400 mt-1"><tbody id="reviewSoftMain"></tbody></table>
+            <table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewSoftMain"></tbody></table>
           </section>
-          <section class="pt-5"><h3 class="font-semibold">Kompetensi Peran</h3><table class="w-full border border-slate-400 mt-1"><tbody id="reviewSoftRole"></tbody></table></section>
-          <section><h2 class="font-bold">HARD COMPETENCY</h2><h3 class="font-semibold mt-2">Kompetensi Teknis (Core)</h3><table class="w-full border border-slate-400 mt-1"><tbody id="reviewHardCore"></tbody></table></section>
-          <section class="pt-5"><h3 class="font-semibold">Kompetensi Teknis (Enabler)</h3><table class="w-full border border-slate-400 mt-1"><tbody id="reviewHardEnabler"></tbody></table></section>
+          <section class="pt-5"><h3 class="font-semibold">Kompetensi Peran</h3><table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewSoftRole"></tbody></table></section>
+          <section><h2 class="font-bold">HARD COMPETENCY</h2><h3 class="font-semibold mt-2">Kompetensi Teknis (Core)</h3><table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewHardCore"></tbody></table></section>
+          <section class="pt-5"><h3 class="font-semibold">Kompetensi Teknis (Enabler)</h3><table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewHardEnabler"></tbody></table></section>
         </div>
       </div>
       <div class="overflow-x-auto border border-slate-200 rounded-xl">
-        <table class="w-full text-sm">
-          <thead class="bg-slate-50"><tr><th class="px-3 py-3 text-left w-12">NO</th><th class="px-3 py-3 text-left w-[220px]">KOMPETENSI TEKNIS</th><th class="px-3 py-3 text-left">10% PEMBELAJARAN</th><th class="px-3 py-3 text-left">20% SOCIAL LEARNING</th><th class="px-3 py-3 text-left">70% ACTION LEARNING</th></tr></thead>
-          <tbody id="reviewPlanRows"></tbody>
+        <table data-table-search="false" data-table-pagination="false" class="w-full text-sm tbl">
+          <thead><tr><th>NO</th><th class="w-[220px]">KOMPETENSI TEKNIS</th><th>10% PEMBELAJARAN</th><th>20% SOCIAL LEARNING</th><th>70% ACTION LEARNING</th></tr></thead>
+          <tbody id="reviewPlanRows" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
       <input id="reviewStatus" type="hidden" name="status" value="" />
@@ -118,26 +121,26 @@
   function renderRows(items, editable) {
     return items.map((item, index) => {
       if (editable) {
-        return `<tr class="border-t border-slate-200">
-          <td class="px-3 py-2">${index + 1}</td>
-          <td class="px-3 py-2"><strong>${item.kode}</strong><br><span class="text-xs text-slate-500">${item.kompetensi}</span></td>
-          <td class="px-3 py-2"><textarea name="p10_${item.id}" class="w-full rounded-lg border-slate-300 text-sm bg-amber-50" rows="2">${item.p10 || ''}</textarea></td>
-          <td class="px-3 py-2"><textarea name="s20_${item.id}" class="w-full rounded-lg border-slate-300 text-sm bg-amber-50" rows="2">${item.s20 || ''}</textarea></td>
-          <td class="px-3 py-2"><textarea name="a70_${item.id}" class="w-full rounded-lg border-slate-300 text-sm bg-amber-50" rows="2">${item.a70 || ''}</textarea></td>
+        return `<tr>
+          <td>${index + 1}</td>
+          <td><strong>${item.kode}</strong><br><span class="text-xs text-slate-500">${item.kompetensi}</span></td>
+          <td><textarea name="p10_${item.id}" class="w-full rounded-lg border-slate-300 text-sm bg-amber-50" rows="2">${item.p10 || ''}</textarea></td>
+          <td><textarea name="s20_${item.id}" class="w-full rounded-lg border-slate-300 text-sm bg-amber-50" rows="2">${item.s20 || ''}</textarea></td>
+          <td><textarea name="a70_${item.id}" class="w-full rounded-lg border-slate-300 text-sm bg-amber-50" rows="2">${item.a70 || ''}</textarea></td>
         </tr>`;
       }
-      return `<tr class="border-t border-slate-200">
-        <td class="px-3 py-2">${index + 1}</td>
-        <td class="px-3 py-2"><strong>${item.kode}</strong><br><span class="text-xs text-slate-500">${item.kompetensi}</span></td>
-        <td class="px-3 py-2 whitespace-pre-line">${item.p10 || '-'}</td>
-        <td class="px-3 py-2 whitespace-pre-line">${item.s20 || '-'}</td>
-        <td class="px-3 py-2 whitespace-pre-line">${item.a70 || '-'}</td>
+      return `<tr>
+        <td>${index + 1}</td>
+        <td><strong>${item.kode}</strong><br><span class="text-xs text-slate-500">${item.kompetensi}</span></td>
+        <td class="whitespace-pre-line">${item.p10 || '-'}</td>
+        <td class="whitespace-pre-line">${item.s20 || '-'}</td>
+        <td class="whitespace-pre-line">${item.a70 || '-'}</td>
       </tr>`;
     }).join('');
   }
 
   function renderCompetencyTable(items) {
-    return items.length ? items.map((item) => `<tr><td class="border border-slate-400 px-2 py-1 w-28">${item.kode}</td><td class="border border-slate-400 px-2 py-1">${item.kompetensi}</td></tr>`).join('') : '<tr><td class="border border-slate-400 px-2 py-1 text-slate-400" colspan="2">Tidak ada data</td></tr>';
+    return items.length ? items.map((item) => `<tr><td class="w-28">${item.kode}</td><td >${item.kompetensi}</td></tr>`).join('') : '<tr><td class="text-slate-400" colspan="2">Tidak ada data</td></tr>';
   }
 
   function openReview(button) {

@@ -8,6 +8,7 @@ use App\Models\EvaluasiIDP;
 use App\Models\IDP;
 use App\Models\Jabatan;
 use App\Models\MonitoringCoaching;
+use App\Models\Notifikasi;
 use App\Models\Pengguna;
 use App\Models\RencanaPengembanganIDP;
 use Illuminate\Http\Request;
@@ -117,13 +118,13 @@ class IdpController extends Controller
         $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp');
         $summaryRows = IDP::query()->with(['bawahan', 'rencanaPengembangan' => fn ($q) => $q->with('kompetensi')])->orderBy('id_daftar_idp')->get();
 
-        return view('admin-master.idp.penetapan', ['rows' => $query->get(), 'summaryRows' => $summaryRows]);
+        return view('admin-master.idp.penetapan', ['rows' => $query->paginate(10), 'summaryRows' => $summaryRows]);
     }
 
     public function daftarArea()
     {
         $user = auth()->user();
-        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
 
         return view('admin-area.idp.daftar', compact('rows', 'jabatan'));
@@ -213,14 +214,14 @@ class IdpController extends Controller
     public function penetapanArea()
     {
         $user = auth()->user();
-        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
 
         return view('admin-area.idp.penetapan', compact('rows'));
     }
 
     public function daftarAtasan()
     {
-        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
 
         return view('atasan.idp.daftar', compact('rows', 'jabatan'));
@@ -266,7 +267,31 @@ class IdpController extends Controller
 
         $this->syncStatusRencanaKeMonitoring($idp->id_daftar_idp);
 
+        if ($data['submit_action'] === 'kirim') {
+            $this->notifRencanaDiajukan($idp);
+        }
+
         return back()->with('success', $data['submit_action'] === 'kirim' ? 'Rencana IDP dikirim ke atasan.' : 'Rencana IDP disimpan.');
+    }
+
+    private function notifRencanaDiajukan(IDP $idp): void
+    {
+        Notifikasi::kirim(
+            $idp->id_atasan,
+            'rencana_diajukan',
+            'Rencana IDP baru',
+            auth()->user()->nama.' mengirim rencana IDP untuk ditinjau.',
+            route('atasan.idp.penetapan', absolute: false),
+            $idp->id_daftar_idp
+        );
+    }
+
+    private function notifKeBawahanDanAdminArea(IDP $idp, string $tipe, string $judul, string $pesan, string $url): void
+    {
+        Notifikasi::kirim($idp->id_bawahan, $tipe, $judul, $pesan, $url, $idp->id_daftar_idp);
+        foreach (Notifikasi::keAdminAreaUnit($idp->bawahan?->unit_induk) as $admin) {
+            Notifikasi::kirim($admin->id_pengguna, $tipe, $judul, ($idp->bawahan?->nama ?? 'Bawahan').': '.$pesan, $url, $idp->id_daftar_idp);
+        }
     }
 
     public function evaluasiBawahan()
@@ -296,7 +321,7 @@ class IdpController extends Controller
     public function pemantauanArea()
     {
         $user = auth()->user();
-        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
 
         return view('admin-area.idp.pemantauan', compact('rows'));
     }
@@ -334,6 +359,15 @@ class IdpController extends Controller
             'catatan_revisi' => $data['status_atasan'] === 'revisi' ? $data['catatan_revisi'] : null,
         ]);
         $this->syncStatusCoaching($idp->id_daftar_idp);
+
+        $setuju = $data['status_atasan'] === 'setuju';
+        $this->notifKeBawahanDanAdminArea(
+            $idp,
+            'coaching_review',
+            $setuju ? 'Bukti coaching disetujui' : 'Bukti coaching perlu revisi',
+            $setuju ? 'Atasan menyetujui bukti coaching kamu.' : 'Atasan meminta revisi bukti coaching: '.$data['catatan_revisi'],
+            route('bawahan.coaching.index', absolute: false)
+        );
 
         return back()->with('success', 'Status coaching berhasil diperbarui.');
     }
@@ -471,7 +505,7 @@ class IdpController extends Controller
                 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti']),
             ])
             ->orderBy('id_daftar_idp')
-            ->get();
+            ->paginate(10);
 
         return view($view, compact('rows'));
     }
@@ -496,7 +530,7 @@ class IdpController extends Controller
 
     public function penetapanAtasan()
     {
-        $rencana = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])->whereHas('daftarIdp', fn ($q) => $q->where('id_atasan', auth()->id()))->with(['kompetensi', 'daftarIdp.bawahan.jabatan.kompetensi'])->get();
+        $rencana = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])->whereHas('daftarIdp', fn ($q) => $q->where('id_atasan', auth()->id()))->with(['kompetensi', 'daftarIdp.bawahan.jabatan.kompetensi'])->paginate(10);
 
         return view('atasan.idp.penetapan', compact('rencana'));
     }
@@ -526,6 +560,7 @@ class IdpController extends Controller
                 RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)->whereIn('status', ['Diajukan', 'Revisi'])->whereNotIn('id_rencana', $revisedIds)->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
                 $this->syncStatusRencanaKeMonitoring($rencana->id_daftar_idp);
                 $this->syncStatusCoaching($rencana->id_daftar_idp);
+                $this->notifReviewRencana($rencana, $data['status']);
 
                 return back()->with('success', 'Rencana IDP berhasil ditinjau.');
             }
@@ -533,13 +568,32 @@ class IdpController extends Controller
         RencanaPengembanganIDP::where('id_daftar_idp', $rencana->id_daftar_idp)->whereIn('status', ['Diajukan', 'Revisi'])->update(['status' => $data['status'], 'direvisi_oleh_atasan' => false]);
         $this->syncStatusRencanaKeMonitoring($rencana->id_daftar_idp);
         $this->syncStatusCoaching($rencana->id_daftar_idp);
+        $this->notifReviewRencana($rencana, $data['status']);
 
         return back()->with('success', 'Rencana IDP berhasil ditinjau.');
     }
 
+    private function notifReviewRencana(RencanaPengembanganIDP $rencana, string $status): void
+    {
+        $idp = $rencana->daftarIdp;
+        if (! $idp) {
+            return;
+        }
+
+        $disetujui = $status === 'Disetujui';
+
+        $this->notifKeBawahanDanAdminArea(
+            $idp,
+            $disetujui ? 'rencana_disetujui' : 'rencana_revisi',
+            $disetujui ? 'Rencana IDP disetujui' : 'Rencana IDP perlu revisi',
+            $disetujui ? 'Rencana IDP kamu disetujui atasan.' : 'Atasan meminta revisi rencana IDP kamu.',
+            route('bawahan.idp.penetapan', absolute: false)
+        );
+    }
+
     public function pemantauanAtasan()
     {
-        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
 
         return view('atasan.idp.pemantauan', compact('rows'));
     }
@@ -625,7 +679,7 @@ class IdpController extends Controller
 
     public function pemantauanBawahan()
     {
-        $rows = IDP::query()->where('id_bawahan', auth()->id())->with(['bawahan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->get();
+        $rows = IDP::query()->where('id_bawahan', auth()->id())->with(['bawahan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
 
         return view('bawahan.idp.pemantauan', compact('rows'));
     }

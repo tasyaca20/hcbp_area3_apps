@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'HCBP Area 3 Apps - Dashboard'])
+﻿@extends('layouts.app', ['title' => 'HCBP Area 3 Apps - Dashboard'])
 
 @section('content')
 {{-- Hero Banner --}}
@@ -190,41 +190,7 @@
         <span class="material-symbols-outlined text-[16px]">chevron_right</span>
       </a>
     </div>
-    @php
-      $warnaStatus = [
-        'Draft' => 'bg-slate-400',
-        'Diajukan' => 'bg-amber-400',
-        'Revisi' => 'bg-rose-400',
-        'Disetujui' => 'bg-indigo-500',
-        'Berjalan' => 'bg-emerald-500',
-        'Selesai' => 'bg-teal-500',
-      ];
-      $totalStatusIdp = $statusIdp->sum('total') ?: 1;
-    @endphp
-    @if($statusIdp->count() > 0)
-      <div class="flex items-end gap-2 h-40 mb-4 px-2">
-        @foreach($statusIdp as $status)
-          @php $tinggi = ($status->total / $totalStatusIdp) * 100; @endphp
-          <div class="flex-1 flex flex-col items-center justify-end gap-1.5 group">
-            <span class="text-[11px] font-bold text-[#0a192f] opacity-0 group-hover:opacity-100 transition-opacity">{{ $status->total }}</span>
-            <div class="w-full rounded-t-md {{ $warnaStatus[$status->status_perencanaan] ?? 'bg-slate-300' }} transition-all duration-500 hover:opacity-80" style="height: {{ max($tinggi, 4) }}%"></div>
-          </div>
-        @endforeach
-      </div>
-      <div class="flex flex-wrap gap-x-4 gap-y-2 px-2">
-        @foreach($statusIdp as $status)
-          <div class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full {{ $warnaStatus[$status->status_perencanaan] ?? 'bg-slate-300' }}"></span>
-            <span class="text-[11px] text-slate-500">{{ $status->status_perencanaan }} ({{ $status->total }})</span>
-          </div>
-        @endforeach
-      </div>
-    @else
-      <div class="flex flex-col items-center justify-center py-10 text-center">
-        <span class="material-symbols-outlined text-[40px] text-slate-300 mb-2">inbox</span>
-        <p class="text-[13px] text-slate-400">Belum ada data IDP</p>
-      </div>
-    @endif
+    @include('components.status-idp-chart', ['statusIdp' => $statusIdp])
   </div>
 
   {{-- Aktivitas Terbaru --}}

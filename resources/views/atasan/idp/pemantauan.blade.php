@@ -1,4 +1,4 @@
-@php($pageTitle = 'Pemantauan IDP')
+﻿@php($pageTitle = 'Pemantauan IDP')
 @php($activeSection = 'idp')
 @php($activePage = 'pemantauan')
 
@@ -19,7 +19,7 @@
   </div>
 </div>
 
-<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+<div class="bg-white border border-slate-200 rounded-2xl p-6">
   <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
     <h2 class="text-lg font-bold">Progres IDP</h2>
   </div>
@@ -28,12 +28,12 @@
       @if($row->rencanaPengembangan->isNotEmpty())
       <div class="border border-slate-200 rounded-xl p-5">
         <div class="mb-3 flex items-center justify-between"><h3 class="font-semibold">{{ $row->bawahan->nama ?? '-' }} <span class="font-normal text-slate-500">({{ $row->bawahan->nip ?? '-' }})</span></h3></div>
-        <div class="overflow-x-auto">
-          <table class="min-w-[900px] w-full text-sm">
-            <thead class="bg-slate-50"><tr><th class="px-3 py-3 text-left w-12">NO</th><th class="px-3 py-3 text-left w-[220px]">KOMPETENSI TEKNIS</th><th class="px-3 py-3 text-left">10% PEMBELAJARAN</th><th class="px-3 py-3 text-left">20% SOCIAL LEARNING</th><th class="px-3 py-3 text-left">70% ACTION LEARNING</th><th class="px-3 py-3 text-left">STATUS</th></tr></thead>
-            <tbody>
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="min-w-[900px] w-full text-sm tbl">
+            <thead><tr><th>NO</th><th class="w-[220px]">KOMPETENSI TEKNIS</th><th>10% PEMBELAJARAN</th><th>20% SOCIAL LEARNING</th><th>70% ACTION LEARNING</th><th>STATUS</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
               @foreach($row->rencanaPengembangan as $rencana)
-              <tr class="border-t border-slate-200"><td class="px-3 py-2">{{ $loop->iteration }}</td><td class="px-3 py-2"><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td><td class="px-3 py-2 whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td><td class="px-3 py-2 whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td><td class="px-3 py-2 whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td><td class="px-3 py-2"><span class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700">{{ $rencana->status }}</span></td></tr>
+              <tr><td>{{ $loop->iteration }}</td><td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td><td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td><td><span class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700">{{ $rencana->status }}</span></td></tr>
               @endforeach
             </tbody>
           </table>
@@ -43,6 +43,7 @@
     @empty
       <p class="py-4 text-center text-slate-400">Belum ada data IDP.</p>
     @endforelse
+    @include('components.pagination', ['paginator' => $rows])
   </div>
 </div>
 @endsection

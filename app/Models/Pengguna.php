@@ -42,6 +42,11 @@ class Pengguna extends Authenticatable
         return $this->hasMany(IDP::class, 'id_bawahan', 'id_pengguna');
     }
 
+    public function notifikasi()
+    {
+        return $this->hasMany(Notifikasi::class, 'id_pengguna', 'id_pengguna');
+    }
+
     protected function casts(): array
     {
         return [

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'IDP Saya - Bawahan'])
+﻿@extends('layouts.app', ['title' => 'IDP Saya - Bawahan'])
 
 @section('content')
 @if(session('success'))
@@ -47,17 +47,17 @@
       @if($row->rencanaPengembangan->where('status', 'Disetujui')->isNotEmpty())
       <div class="border border-emerald-200 rounded-xl p-5">
         <h2 class="font-semibold mb-3">Hasil IDP Disetujui Atasan</h2>
-        <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead class="bg-emerald-50"><tr><th class="px-3 py-3 text-left w-12">NO</th><th class="px-3 py-3 text-left">KOMPETENSI TEKNIS</th><th class="px-3 py-3 text-left">10% PEMBELAJARAN</th><th class="px-3 py-3 text-left">20% SOCIAL LEARNING</th><th class="px-3 py-3 text-left">70% ACTION LEARNING</th></tr></thead>
-            <tbody>
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table data-table-search="false" data-table-pagination="false" class="w-full text-sm tbl">
+            <thead><tr><th>NO</th><th>KOMPETENSI TEKNIS</th><th>10% PEMBELAJARAN</th><th>20% SOCIAL LEARNING</th><th>70% ACTION LEARNING</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
               @foreach($row->rencanaPengembangan->where('status', 'Disetujui') as $rencana)
-              <tr class="border-t border-slate-200">
-                <td class="px-3 py-2">{{ $loop->iteration }}</td>
-                <td class="px-3 py-2"><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td>
-                <td class="px-3 py-2 whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td>
-                <td class="px-3 py-2 whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td>
-                <td class="px-3 py-2 whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td>
+              <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td>
+                <td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td>
+                <td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td>
+                <td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td>
               </tr>
               @endforeach
             </tbody>
@@ -75,7 +75,7 @@
           @foreach($revisiItems as $rencana)
           <div class="rounded-lg border border-amber-200 bg-white p-3 text-sm">
             <div class="flex justify-between gap-3">
-              <strong>{{ $rencana->kompetensi->kode_kompetensi }} — {{ $rencana->kompetensi->nama_kompetensi }}</strong>
+              <strong>{{ $rencana->kompetensi->kode_kompetensi }} â€” {{ $rencana->kompetensi->nama_kompetensi }}</strong>
               <span class="rounded px-2 py-1 text-xs bg-amber-100 text-amber-700 font-semibold">Status: Revisi</span>
             </div>
             <div class="mt-2 space-y-1 text-xs text-slate-700">
@@ -101,24 +101,24 @@
           <section>
             <h2 class="font-bold">SOFT COMPETENCY</h2>
             <h3 class="font-semibold mt-2">Kompetensi Utama</h3>
-            <table class="w-full border border-slate-400 mt-1">
-              <tbody>
+            <table data-table-search="false" class="w-full mt-1 tbl-plain">
+              <tbody class="divide-y divide-slate-100">
                 @forelse($kompetensiList->where('jenis', 'umum') as $kom)
-                <tr><td class="border border-slate-400 px-2 py-1 w-28">{{ $kom->kode_kompetensi }}</td><td class="border border-slate-400 px-2 py-1">{{ $kom->nama_kompetensi }}</td></tr>
+                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
                 @empty
-                <tr><td class="border border-slate-400 px-2 py-1 text-slate-400" colspan="2">Tidak ada kompetensi utama</td></tr>
+                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi utama</td></tr>
                 @endforelse
               </tbody>
             </table>
           </section>
           <section class="pt-5">
             <h3 class="font-semibold">Kompetensi Peran</h3>
-            <table class="w-full border border-slate-400 mt-1">
-              <tbody>
+            <table data-table-search="false" class="w-full mt-1 tbl-plain">
+              <tbody class="divide-y divide-slate-100">
                 @forelse($kompetensiList->where('jenis', 'peran') as $kom)
-                <tr><td class="border border-slate-400 px-2 py-1 w-28">{{ $kom->kode_kompetensi }}</td><td class="border border-slate-400 px-2 py-1">{{ $kom->nama_kompetensi }}</td></tr>
+                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
                 @empty
-                <tr><td class="border border-slate-400 px-2 py-1 text-slate-400" colspan="2">Tidak ada kompetensi peran</td></tr>
+                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi peran</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -126,24 +126,24 @@
           <section>
             <h2 class="font-bold">HARD COMPETENCY</h2>
             <h3 class="font-semibold mt-2">Kompetensi Teknis (Core)</h3>
-            <table class="w-full border border-slate-400 mt-1">
-              <tbody>
+            <table data-table-search="false" class="w-full mt-1 tbl-plain">
+              <tbody class="divide-y divide-slate-100">
                 @forelse($kompetensiList->where('jenis', 'teknis_core') as $kom)
-                <tr><td class="border border-slate-400 px-2 py-1 w-28">{{ $kom->kode_kompetensi }}</td><td class="border border-slate-400 px-2 py-1">{{ $kom->nama_kompetensi }}</td></tr>
+                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
                 @empty
-                <tr><td class="border border-slate-400 px-2 py-1 text-slate-400" colspan="2">Tidak ada kompetensi teknis core</td></tr>
+                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi teknis core</td></tr>
                 @endforelse
               </tbody>
             </table>
           </section>
           <section class="pt-5">
             <h3 class="font-semibold">Kompetensi Teknis (Enabler)</h3>
-            <table class="w-full border border-slate-400 mt-1">
-              <tbody>
+            <table data-table-search="false" class="w-full mt-1 tbl-plain">
+              <tbody class="divide-y divide-slate-100">
                 @forelse($kompetensiList->where('jenis', 'teknis_enabler') as $kom)
-                <tr><td class="border border-slate-400 px-2 py-1 w-28">{{ $kom->kode_kompetensi }}</td><td class="border border-slate-400 px-2 py-1">{{ $kom->nama_kompetensi }}</td></tr>
+                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
                 @empty
-                <tr><td class="border border-slate-400 px-2 py-1 text-slate-400" colspan="2">Tidak ada kompetensi teknis enabler</td></tr>
+                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi teknis enabler</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -160,22 +160,22 @@
       @endif
 
       <div class="overflow-x-auto border border-slate-200 rounded-xl">
-        <table data-table-search="false" data-table-pagination="false" class="w-full text-sm">
-          <thead class="bg-slate-50">
+        <table data-table-search="false" data-table-pagination="false" class="w-full text-sm tbl">
+          <thead>
             <tr>
-              <th class="px-3 py-3 text-left w-12">NO</th>
-              <th class="px-3 py-3 text-left w-[220px]">KOMPETENSI TEKNIS</th>
-              <th class="px-3 py-3 text-left">10% PEMBELAJARAN</th>
-              <th class="px-3 py-3 text-left">20% SOCIAL LEARNING</th>
-              <th class="px-3 py-3 text-left">70% ACTION LEARNING</th>
+              <th>NO</th>
+              <th class="w-[220px]">KOMPETENSI TEKNIS</th>
+              <th>10% PEMBELAJARAN</th>
+              <th>20% SOCIAL LEARNING</th>
+              <th>70% ACTION LEARNING</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="divide-y divide-slate-100">
             @for($i = 0; $i < 5; $i++)
             @php($selected = $row->rencanaPengembangan[$i] ?? null)
-            <tr class="border-t border-slate-200">
-              <td class="px-3 py-2">{{ $i + 1 }}</td>
-              <td class="px-3 py-2">
+            <tr>
+              <td>{{ $i + 1 }}</td>
+              <td>
                 <select name="kompetensi[{{ $i }}][id_kompetensi]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" {{ $i < 3 ? 'required' : '' }} disabled>
                   <option value="">Pilih kompetensi</option>
                   @foreach($kompetensiTeknis as $kom)
@@ -183,9 +183,9 @@
                   @endforeach
                 </select>
               </td>
-              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][pembelajaran_10_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->pembelajaran_10_persen ?? '' }}</textarea></td>
-              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][social_learning_20_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->social_learning_20_persen ?? '' }}</textarea></td>
-              <td class="px-3 py-2"><textarea name="kompetensi[{{ $i }}][action_learning_70_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->action_learning_70_persen ?? '' }}</textarea></td>
+              <td><textarea name="kompetensi[{{ $i }}][pembelajaran_10_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->pembelajaran_10_persen ?? '' }}</textarea></td>
+              <td><textarea name="kompetensi[{{ $i }}][social_learning_20_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->social_learning_20_persen ?? '' }}</textarea></td>
+              <td><textarea name="kompetensi[{{ $i }}][action_learning_70_persen]" class="w-full rounded-lg border-slate-300 text-sm field-idp-{{ $row->id_daftar_idp }}" disabled>{{ $selected->action_learning_70_persen ?? '' }}</textarea></td>
             </tr>
             @endfor
           </tbody>

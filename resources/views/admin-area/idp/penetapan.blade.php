@@ -1,4 +1,4 @@
-@php($pageTitle = 'Penetapan IDP')
+﻿@php($pageTitle = 'Penetapan IDP')
 @php($heroTitle = 'Penetapan IDP')
 @php($heroSubtitle = 'Pantau rencana pengembangan pegawai pada area Anda.')
 @php($cardTitle = 'Penetapan IDP')
@@ -18,16 +18,16 @@
     <p class="text-slate-500 text-[15px]">{{ $heroSubtitle }}</p>
   </div>
 </div>
-<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-  <div class="flex items-center justify-between gap-4 px-6 py-5 border-b border-slate-200">
+<div class="bg-white border border-slate-200 rounded-2xl p-6">
+  <div class="mb-4 flex items-center justify-between gap-4">
     <h2 class="text-lg font-bold">{{ $cardTitle }}</h2>
     <span class="text-xs text-slate-400">View Only - Tidak bisa aksi</span>
   </div>
-  <div class="overflow-x-auto">
-    <table class="min-w-[1200px] w-full text-left text-xs">
-      <thead class="bg-[#31599b] text-white">
+  <div class="overflow-x-auto rounded-xl border border-slate-200">
+    <table class="min-w-[1200px] w-full text-left text-xs tbl">
+      <thead>
         <tr>
-          <th class="px-4 py-4 font-semibold">No.</th><th class="px-4 py-4 font-semibold">Nama Pegawai</th><th class="px-4 py-4 font-semibold">Jabatan</th><th class="px-4 py-4 font-semibold">Nama Atasan</th><th class="px-4 py-4 font-semibold">NIP Atasan</th><th class="px-4 py-4 font-semibold">Jabatan Atasan</th><th class="px-4 py-4 font-semibold">Unit Induk</th><th class="px-4 py-4 font-semibold">Status</th><th class="px-4 py-4 font-semibold">Kompetensi</th><th class="px-4 py-4 font-semibold">10% Pembelajaran</th><th class="px-4 py-4 font-semibold">20% Social</th><th class="px-4 py-4 font-semibold">70% Action Learning</th>
+          <th>No.</th><th>Nama Pegawai</th><th>Jabatan</th><th>Nama Atasan</th><th>NIP Atasan</th><th>Jabatan Atasan</th><th>Unit Induk</th><th>Status</th><th>Kompetensi</th><th>10% Pembelajaran</th><th>20% Social</th><th>70% Action Learning</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -37,20 +37,22 @@
             @foreach($penetapan as $rencana)
             <tr class="hover:bg-slate-50">
               @if($loop->first)
-              <td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $index + 1 }}</td><td class="px-4 py-4 font-medium align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->nama ?? '-' }}</td><td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td><td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nama ?? '-' }}</td><td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nip ?? '-' }}</td><td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td><td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->unit_induk ?? '-' }}</td><td class="px-4 py-4 align-top" rowspan="{{ $penetapan->count() }}"><span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">Disetujui</span></td>
+              <td  rowspan="{{ $penetapan->count() }}">{{ $rows->firstItem() + $index }}</td><td class="font-medium" rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->nama ?? '-' }}</td><td  rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td><td  rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nama ?? '-' }}</td><td  rowspan="{{ $penetapan->count() }}">{{ $row->atasan->nip ?? '-' }}</td><td  rowspan="{{ $penetapan->count() }}">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td><td  rowspan="{{ $penetapan->count() }}">{{ $row->bawahan->unit_induk ?? '-' }}</td><td  rowspan="{{ $penetapan->count() }}"><span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">Disetujui</span></td>
               @endif
-              <td class="px-4 py-4"><div class="font-medium">{{ $rencana->kompetensi->kode_kompetensi ?? '-' }}</div><div class="text-slate-500">{{ $rencana->kompetensi->nama_kompetensi ?? '-' }}</div></td><td class="px-4 py-4">{{ $rencana->pembelajaran_10_persen ?? '-' }}</td><td class="px-4 py-4">{{ $rencana->social_learning_20_persen ?? '-' }}</td><td class="px-4 py-4">{{ $rencana->action_learning_70_persen ?? '-' }}</td>
+              <td><div class="font-medium">{{ $rencana->kompetensi->kode_kompetensi ?? '-' }}</div><div class="text-slate-500">{{ $rencana->kompetensi->nama_kompetensi ?? '-' }}</div></td><td>{{ $rencana->pembelajaran_10_persen ?? '-' }}</td><td>{{ $rencana->social_learning_20_persen ?? '-' }}</td><td>{{ $rencana->action_learning_70_persen ?? '-' }}</td>
             </tr>
             @endforeach
           @else
-            <tr class="hover:bg-slate-50"><td class="px-4 py-4">{{ $index + 1 }}</td><td class="px-4 py-4 font-medium">{{ $row->bawahan->nama ?? '-' }}</td><td class="px-4 py-4">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td><td class="px-4 py-4">{{ $row->atasan->nama ?? '-' }}</td><td class="px-4 py-4">{{ $row->atasan->nip ?? '-' }}</td><td class="px-4 py-4">{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td><td class="px-4 py-4">{{ $row->bawahan->unit_induk ?? '-' }}</td><td class="px-4 py-4"><span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">Belum Disetujui</span></td><td class="px-4 py-4 text-slate-400" colspan="4">Belum ada penetapan IDP</td></tr>
+            <tr class="hover:bg-slate-50"><td>{{ $rows->firstItem() + $index }}</td><td class="font-medium">{{ $row->bawahan->nama ?? '-' }}</td><td>{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td><td>{{ $row->atasan->nama ?? '-' }}</td><td>{{ $row->atasan->nip ?? '-' }}</td><td>{{ $row->atasan->jabatan->sebutan_jabatan ?? '-' }}</td><td>{{ $row->bawahan->unit_induk ?? '-' }}</td><td><span class="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-700">Belum Disetujui</span></td><td class="text-slate-400" colspan="4">Belum ada penetapan IDP</td></tr>
           @endif
         @empty
-          <tr><td colspan="12" class="px-4 py-8 text-center text-slate-500">Belum ada data IDP.</td></tr>
+          <tr><td colspan="12" class="py-8 text-slate-500">Belum ada data IDP.</td></tr>
         @endforelse
       </tbody>
     </table>
   </div>
-  <div class="border-t border-slate-200 px-6 py-4 text-xs text-slate-500"><p>Data penetapan Individual Development Plan pada area Anda.</p></div>
+  <div class="mt-1">
+    @include('components.pagination', ['paginator' => $rows])
+  </div>
 </div>
 @endsection

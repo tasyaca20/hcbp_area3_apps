@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Daftar IDP - Admin Area'])
+﻿@extends('layouts.app', ['title' => 'Daftar IDP - Admin Area'])
 
 @section('content')
 @if(session('success') || session('warning') || session('error'))
@@ -15,38 +15,45 @@
   </div>
 </div>
 
-<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-  <div class="overflow-x-auto rounded-xl border border-slate-200">
-    <table data-table-search="false" data-table-pagination="false" class="w-full text-sm">
-      <thead class="bg-slate-50 text-slate-600">
+<div class="bg-white border border-slate-200 rounded-2xl p-6">
+  <div class="mb-4 flex items-center justify-between">
+    <h2 class="text-[15px] font-bold text-[#0a192f]">Data IDP Pegawai</h2>
+    <span class="text-[12px] text-slate-400">{{ $rows->count() }} pegawai</span>
+  </div>
+  <div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200">
+    <table class="w-full text-sm tbl">
+      <thead>
         <tr>
-          <th class="px-4 py-3 text-left font-semibold">No</th>
-          <th class="px-4 py-3 text-left font-semibold">Nama Bawahan</th>
-          <th class="px-4 py-3 text-left font-semibold">NIP</th>
-          <th class="px-4 py-3 text-left font-semibold">Jabatan</th>
-          <th class="px-4 py-3 text-left font-semibold">Nama Atasan</th>
-          <th class="px-4 py-3 text-left font-semibold">NIP Atasan</th>
-          <th class="px-4 py-3 text-left font-semibold">Periode</th>
-          <th class="px-4 py-3 text-left font-semibold">Business Area</th>
+          <th>No</th>
+          <th>Nama Bawahan</th>
+          <th>NIP</th>
+          <th>Jabatan</th>
+          <th>Nama Atasan</th>
+          <th>NIP Atasan</th>
+          <th>Periode</th>
+          <th>Business Area</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
         @forelse($rows as $i => $row)
         <tr class="hover:bg-slate-50/60">
-          <td class="px-4 py-3 text-slate-500">{{ $i + 1 }}</td>
-          <td class="px-4 py-3 font-medium text-slate-800">{{ $row->bawahan->nama ?? '-' }}</td>
-          <td class="px-4 py-3 text-slate-600">{{ $row->bawahan->nip ?? '-' }}</td>
-          <td class="px-4 py-3 text-slate-600">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
-          <td class="px-4 py-3 text-slate-600">{{ $row->atasan->nama ?? '-' }}</td>
-          <td class="px-4 py-3 text-slate-600">{{ $row->atasan->nip ?? '-' }}</td>
-          <td class="px-4 py-3"><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#31599b]">{{ $row->periode_idp }}</span></td>
-          <td class="px-4 py-3 text-slate-600">{{ $row->business_area ?? '-' }}</td>
+          <td class="text-slate-500">{{ $rows->firstItem() + $i }}</td>
+          <td class="font-medium text-slate-800">{{ $row->bawahan->nama ?? '-' }}</td>
+          <td class="text-slate-600">{{ $row->bawahan->nip ?? '-' }}</td>
+          <td class="text-slate-600">{{ $row->bawahan->jabatan->sebutan_jabatan ?? '-' }}</td>
+          <td class="text-slate-600">{{ $row->atasan->nama ?? '-' }}</td>
+          <td class="text-slate-600">{{ $row->atasan->nip ?? '-' }}</td>
+          <td><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#31599b]">{{ $row->periode_idp }}</span></td>
+          <td class="text-slate-600">{{ $row->business_area ?? '-' }}</td>
         </tr>
         @empty
-        <tr><td colspan="8" class="px-4 py-10 text-center text-slate-400">Tidak ada data</td></tr>
+        <tr><td colspan="8" class="py-10 text-slate-400">Tidak ada data</td></tr>
         @endforelse
       </tbody>
     </table>
+  </div>
+  <div class="mt-1">
+    @include('components.pagination', ['paginator' => $rows])
   </div>
 </div>
 @endsection

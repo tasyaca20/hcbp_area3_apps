@@ -8,7 +8,6 @@ use App\Models\MonitoringCoaching;
 use App\Models\MonitoringIDP;
 use App\Models\Pengguna;
 use App\Models\RencanaPengembanganIDP;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -46,6 +45,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($item) use ($totalPegawai) {
                 $item->persentase = $totalPegawai > 0 ? round(($item->total / $totalPegawai) * 100, 1) : 0;
+
                 return $item;
             });
 
@@ -57,10 +57,7 @@ class DashboardController extends Controller
             ->get();
 
         // ---- STATUS IDP BREAKDOWN (untuk chart) ----
-        $statusIdp = MonitoringIDP::select('status_perencanaan', DB::raw('count(*) as total'))
-            ->groupBy('status_perencanaan')
-            ->orderBy('status_perencanaan')
-            ->get();
+        $statusIdp = $this->rekapStatusIdp(MonitoringIDP::query());
 
         // ---- QUICK ACTION / TODO ----
         $todoRencanaReview = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])->count();
@@ -83,7 +80,7 @@ class DashboardController extends Controller
                     : 'Pegawai';
                 $aktivitas->push([
                     'tipe' => 'Rencana IDP',
-                    'deskripsi' => $nama . ' mengajukan rencana pengembangan IDP',
+                    'deskripsi' => $nama.' mengajukan rencana pengembangan IDP',
                     'status' => $rencana->status,
                     'waktu' => $rencana->updated_at,
                     'url' => route('admin-master.idp.penetapan'),
@@ -102,7 +99,7 @@ class DashboardController extends Controller
                     : 'Pegawai';
                 $aktivitas->push([
                     'tipe' => 'Bukti Coaching',
-                    'deskripsi' => $nama . ' mengunggah bukti coaching',
+                    'deskripsi' => $nama.' mengunggah bukti coaching',
                     'status' => 'Menunggu Review',
                     'waktu' => $bukti->updated_at,
                     'url' => route('admin-master.coaching.pemantauan'),
@@ -121,7 +118,7 @@ class DashboardController extends Controller
                     : 'Pegawai';
                 $aktivitas->push([
                     'tipe' => 'Coaching',
-                    'deskripsi' => $nama . ' menyelesaikan sesi coaching',
+                    'deskripsi' => $nama.' menyelesaikan sesi coaching',
                     'status' => 'Disetujui',
                     'waktu' => $monitoring->updated_at,
                     'url' => route('admin-master.coaching.pemantauan'),
@@ -197,6 +194,7 @@ class DashboardController extends Controller
             ->map(function ($item) use ($totalPegawai, $labelRole) {
                 $item->unit_induk = $labelRole[$item->role] ?? ucfirst($item->role);
                 $item->persentase = $totalPegawai > 0 ? round(($item->total / $totalPegawai) * 100, 1) : 0;
+
                 return $item;
             });
 
@@ -208,11 +206,9 @@ class DashboardController extends Controller
             ->get();
 
         // ---- STATUS IDP BREAKDOWN (di area ini, untuk chart) ----
-        $statusIdp = MonitoringIDP::select('status_perencanaan', DB::raw('count(*) as total'))
-            ->whereHas('daftarIdp.bawahan', fn ($q) => $q->where('unit_induk', $unitInduk))
-            ->groupBy('status_perencanaan')
-            ->orderBy('status_perencanaan')
-            ->get();
+        $statusIdp = $this->rekapStatusIdp(
+            MonitoringIDP::query()->whereHas('daftarIdp.bawahan', fn ($q) => $q->where('unit_induk', $unitInduk))
+        );
 
         // ---- QUICK ACTION / TODO (hanya untuk area ini) ----
         $todoRencanaReview = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])
@@ -240,7 +236,7 @@ class DashboardController extends Controller
                     : 'Pegawai';
                 $aktivitas->push([
                     'tipe' => 'Rencana IDP',
-                    'deskripsi' => $nama . ' mengajukan rencana pengembangan IDP',
+                    'deskripsi' => $nama.' mengajukan rencana pengembangan IDP',
                     'status' => $rencana->status,
                     'waktu' => $rencana->updated_at,
                     'url' => route('admin-area.idp.penetapan'),
@@ -259,7 +255,7 @@ class DashboardController extends Controller
                     : 'Pegawai';
                 $aktivitas->push([
                     'tipe' => 'Bukti Coaching',
-                    'deskripsi' => $nama . ' mengunggah bukti coaching',
+                    'deskripsi' => $nama.' mengunggah bukti coaching',
                     'status' => 'Menunggu Review',
                     'waktu' => $bukti->updated_at,
                     'url' => route('admin-area.coaching.pemantauan'),
@@ -278,7 +274,7 @@ class DashboardController extends Controller
                     : 'Pegawai';
                 $aktivitas->push([
                     'tipe' => 'Coaching',
-                    'deskripsi' => $nama . ' menyelesaikan sesi coaching',
+                    'deskripsi' => $nama.' menyelesaikan sesi coaching',
                     'status' => 'Disetujui',
                     'waktu' => $monitoring->updated_at,
                     'url' => route('admin-area.coaching.pemantauan'),
@@ -303,5 +299,30 @@ class DashboardController extends Controller
             'todoCoachingMenunggu',
             'aktivitas'
         ));
+    }
+
+    /**
+     * Rekap status IDP dengan semua status selalu hadir (nilai 0 jika kosong)
+     * supaya chart tidak tampak kosong saat hanya ada satu status terisi.
+     */
+    private function rekapStatusIdp($query)
+    {
+        $urutan = ['Draft', 'Diajukan', 'Revisi', 'Disetujui', 'Berjalan', 'Selesai'];
+        $hitung = (clone $query)
+            ->select('status_perencanaan', DB::raw('count(*) as total'))
+            ->groupBy('status_perencanaan')
+            ->pluck('total', 'status_perencanaan');
+
+        $hasil = collect($urutan)->map(fn ($status) => (object) [
+            'status_perencanaan' => $status,
+            'total' => (int) ($hitung[$status] ?? 0),
+        ]);
+
+        $lainnya = $hitung->reject(fn ($total, $status) => in_array($status, $urutan, true));
+        foreach ($lainnya as $status => $total) {
+            $hasil->push((object) ['status_perencanaan' => $status ?: 'Belum Direncanakan', 'total' => (int) $total]);
+        }
+
+        return $hasil;
     }
 }

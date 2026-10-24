@@ -11,7 +11,7 @@ class SettingRoleController extends Controller
 {
     public function index()
     {
-        $pengguna = Pengguna::with('jabatan')->get();
+        $pengguna = Pengguna::with('jabatan')->orderBy('id_pengguna')->paginate(10);
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
 
         return view('admin-master.setting-role', compact('pengguna', 'jabatan'));

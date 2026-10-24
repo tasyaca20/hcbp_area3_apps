@@ -1,4 +1,4 @@
-@php($pageTitle = 'Coaching Bawahan')
+﻿@php($pageTitle = 'Coaching Bawahan')
 @php($activeSection = 'coaching')
 @php($activePage = 'coaching')
 
@@ -18,15 +18,17 @@
     <div class="space-y-2"><p>Nama Bawahan: <span class="font-normal">{{ $row->bawahan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->bawahan?->nip ?? '-' }}</span></p><p>Jabatan: <span class="font-normal">{{ $row->bawahan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p></div>
     <div class="space-y-2"><p>Nama Atasan: <span class="font-normal">{{ $row->atasan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->atasan?->nip ?? '-' }}</span></p><p>Jabatan Atasan: <span class="font-normal">{{ $row->atasan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p></div>
   </div>
-  <div class="mt-6 overflow-x-auto"><table class="min-w-[1400px] w-full text-left text-sm"><thead class="bg-[#31599b] text-white"><tr><th class="px-4 py-4">No</th><th class="px-4 py-4">Kompetensi Teknis</th><th class="px-4 py-4">10% Pembelajaran<br>(Perencanaan)</th><th class="px-4 py-4">10% Pembelajaran<br>(Realisasi)</th><th class="px-4 py-4">20% Social Learning<br>(Perencanaan)</th><th class="px-4 py-4">20% Social Learning<br>(Realisasi)</th><th class="px-4 py-4">70% Action Learning<br>(Perencanaan)</th><th class="px-4 py-4">70% Action Learning<br>(Realisasi)</th><th class="px-4 py-4">Status Atasan</th></tr></thead><tbody class="divide-y divide-slate-100">
+  <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200"><table class="min-w-[1400px] w-full text-left text-sm tbl"><thead><tr><th>No</th><th>Kompetensi Teknis</th><th>10% Pembelajaran<br>(Perencanaan)</th><th>10% Pembelajaran<br>(Realisasi)</th><th>20% Social Learning<br>(Perencanaan)</th><th>20% Social Learning<br>(Realisasi)</th><th>70% Action Learning<br>(Perencanaan)</th><th>70% Action Learning<br>(Realisasi)</th><th>Status Atasan</th></tr></thead><tbody class="divide-y divide-slate-100">
   @forelse($row->rencanaPengembangan as $index => $plan)
-  <tr class="align-top"><td class="border border-slate-700 px-3 py-2 text-center">{{ $index + 1 }}</td><td class="border border-slate-700 px-3 py-2"><div class="font-semibold">{{ $plan->kompetensi?->kode_kompetensi ?? '-' }}</div><div>{{ $plan->kompetensi?->nama_kompetensi ?? '-' }}</div></td><td class="border border-slate-700 px-3 py-2">{{ $plan->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">@include('atasan.coaching.realisasi', ['bukti' => $plan->coachingBukti->where('jenis', 10)->first(), 'jenis' => 10])</td><td class="border border-slate-700 px-3 py-2">{{ $plan->social_learning_20_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">@include('atasan.coaching.realisasi', ['bukti' => $plan->coachingBukti->where('jenis', 20)->first(), 'jenis' => 20])</td><td class="border border-slate-700 px-3 py-2">{{ $plan->action_learning_70_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">@include('atasan.coaching.realisasi', ['bukti' => $plan->coachingBukti->where('jenis', 70)->first(), 'jenis' => 70])</td><td class="border border-slate-700 px-3 py-2">@foreach([10, 20, 70] as $jenis) @php($bukti = $plan->coachingBukti->where('jenis', $jenis)->first()) <div class="mb-3 last:mb-0"><span class="font-semibold">{{ $jenis }}%:</span> @if($bukti) @include('atasan.coaching.review', ['bukti' => $bukti]) @else <span class="text-slate-500">Belum ada bukti</span> @endif</div> @endforeach</td></tr>
+  <tr class="align-top"><td>{{ $index + 1 }}</td><td><div class="font-semibold">{{ $plan->kompetensi?->kode_kompetensi ?? '-' }}</div><div>{{ $plan->kompetensi?->nama_kompetensi ?? '-' }}</div></td><td>{{ $plan->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.coaching.realisasi', ['bukti' => $plan->coachingBukti->where('jenis', 10)->first(), 'jenis' => 10])</td><td>{{ $plan->social_learning_20_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.coaching.realisasi', ['bukti' => $plan->coachingBukti->where('jenis', 20)->first(), 'jenis' => 20])</td><td>{{ $plan->action_learning_70_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.coaching.realisasi', ['bukti' => $plan->coachingBukti->where('jenis', 70)->first(), 'jenis' => 70])</td><td>@foreach([10, 20, 70] as $jenis) @php($bukti = $plan->coachingBukti->where('jenis', $jenis)->first()) <div class="mb-3 last:mb-0"><span class="font-semibold">{{ $jenis }}%:</span> @if($bukti) @include('atasan.coaching.review', ['bukti' => $bukti]) @else <span class="text-slate-500">Belum ada bukti</span> @endif</div> @endforeach</td></tr>
   @empty
-  <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">Belum ada rencana coaching.</td></tr>
+  <tr><td colspan="9" class="py-8 text-slate-500">Belum ada rencana coaching.</td></tr>
   @endforelse
-  </tbody></table></div>
+  </tbody></table></div></div>
 </div>
 @empty
 <div class="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center text-slate-500">Belum ada data coaching bawahan.</div>
 @endforelse
+
+@include('components.pagination', ['paginator' => $rows])
 @endsection

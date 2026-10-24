@@ -1,4 +1,4 @@
-@php($pageTitle = 'Evaluasi IDP')
+﻿@php($pageTitle = 'Evaluasi IDP')
 @php($activeSection = 'idp')
 @php($activePage = 'evaluasi')
 
@@ -24,13 +24,13 @@
   @if(! $row->coaching_disetujui)
   <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Evaluasi belum tersedia. Setujui seluruh bukti coaching 10%, 20%, dan 70% untuk setiap kompetensi.</p>
   @else
-  <div class="mt-6 overflow-x-auto"><table class="min-w-[1400px] w-full text-left text-sm"><thead class="bg-[#31599b] text-white"><tr><th class="px-4 py-4">No</th><th class="px-4 py-4">Kompetensi Teknis</th><th class="px-4 py-4">10% Pembelajaran<br>(Perencanaan)</th><th class="px-4 py-4">10% Pembelajaran<br>(Realisasi)</th><th class="px-4 py-4">20% Social Learning<br>(Perencanaan)</th><th class="px-4 py-4">20% Social Learning<br>(Realisasi)</th><th class="px-4 py-4">70% Action Learning<br>(Perencanaan)</th><th class="px-4 py-4">70% Action Learning<br>(Realisasi)</th><th class="px-4 py-4">Status Atasan</th></tr></thead><tbody class="divide-y divide-slate-100">
+  <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200"><table class="min-w-[1400px] w-full text-left text-sm tbl"><thead><tr><th>No</th><th>Kompetensi Teknis</th><th>10% Pembelajaran<br>(Perencanaan)</th><th>10% Pembelajaran<br>(Realisasi)</th><th>20% Social Learning<br>(Perencanaan)</th><th>20% Social Learning<br>(Realisasi)</th><th>70% Action Learning<br>(Perencanaan)</th><th>70% Action Learning<br>(Realisasi)</th><th>Status Atasan</th></tr></thead><tbody class="divide-y divide-slate-100">
   @forelse($row->evaluasi as $index => $evaluasi)
-  <tr class="align-top"><td class="border border-slate-700 px-3 py-2 text-center">{{ $index + 1 }}</td><td class="border border-slate-700 px-3 py-2"><div class="font-semibold">{{ $evaluasi->kompetensi?->kode_kompetensi ?? '-' }}</div><div>{{ $evaluasi->kompetensi?->nama_kompetensi ?? '-' }}</div></td><td class="border border-slate-700 px-3 py-2">{{ $evaluasi->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 10)->first(), 'jenis' => 10])</td><td class="border border-slate-700 px-3 py-2">{{ $evaluasi->social_learning_20_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 20)->first(), 'jenis' => 20])</td><td class="border border-slate-700 px-3 py-2">{{ $evaluasi->action_learning_70_persen ?? 'Belum dibuat' }}</td><td class="border border-slate-700 px-3 py-2">@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 70)->first(), 'jenis' => 70])</td><td class="border border-slate-700 px-3 py-2">@foreach([10, 20, 70] as $jenis) @php($bukti = $evaluasi->bukti->where('jenis', $jenis)->first()) <div class="mb-3 last:mb-0"><span class="font-semibold">{{ $jenis }}%:</span> @if($bukti) @include('atasan.idp.evaluasi-review-form', ['bukti' => $bukti]) @else <span class="text-slate-500">Belum ada bukti</span> @endif</div> @endforeach</td></tr>
+  <tr class="align-top"><td>{{ $index + 1 }}</td><td><div class="font-semibold">{{ $evaluasi->kompetensi?->kode_kompetensi ?? '-' }}</div><div>{{ $evaluasi->kompetensi?->nama_kompetensi ?? '-' }}</div></td><td>{{ $evaluasi->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 10)->first(), 'jenis' => 10])</td><td>{{ $evaluasi->social_learning_20_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 20)->first(), 'jenis' => 20])</td><td>{{ $evaluasi->action_learning_70_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 70)->first(), 'jenis' => 70])</td><td>@foreach([10, 20, 70] as $jenis) @php($bukti = $evaluasi->bukti->where('jenis', $jenis)->first()) <div class="mb-3 last:mb-0"><span class="font-semibold">{{ $jenis }}%:</span> @if($bukti) @include('atasan.idp.evaluasi-review-form', ['bukti' => $bukti]) @else <span class="text-slate-500">Belum ada bukti</span> @endif</div> @endforeach</td></tr>
   @empty
-  <tr><td colspan="9" class="px-4 py-8 text-center text-slate-500">Belum ada evaluasi.</td></tr>
+  <tr><td colspan="9" class="py-8 text-slate-500">Belum ada evaluasi.</td></tr>
   @endforelse
-  </tbody></table></div>
+  </tbody></table></div></div>
 
   @php($jenisWajib = [10, 20, 70])
   @php($semuaDisetujui = $row->evaluasi->isNotEmpty() && $row->evaluasi->every(fn ($evaluasi) => collect($jenisWajib)->every(fn ($jenis) => $evaluasi->bukti->contains(fn ($bukti) => (int) $bukti->jenis === $jenis && $bukti->status_atasan === 'setuju'))))
@@ -90,4 +90,6 @@
 @empty
 <div class="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center text-slate-500">Belum ada data evaluasi bawahan.</div>
 @endforelse
+
+@include('components.pagination', ['paginator' => $rows])
 @endsection

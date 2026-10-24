@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="id">
   <head>
     <meta charset="utf-8" />
@@ -51,6 +51,37 @@
       td {
         border: 1px solid #cbd5e1;
       }
+      table.tbl {
+        border-collapse: collapse;
+      }
+      table.tbl th,
+      table.tbl td {
+        border: 0;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      table.tbl thead th {
+        background-color: #31599b;
+        color: #fff;
+        font-weight: 600;
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 0;
+      }
+      table.tbl tbody td {
+        padding: 0.75rem 1rem;
+      }
+      table.tbl tbody tr:hover {
+        background-color: #f8fafc;
+      }
+      table.tbl tfoot td {
+        background-color: #f1f5f9;
+        font-weight: 700;
+      }
+      table.tbl-plain th,
+      table.tbl-plain td {
+        border: 1px solid #cbd5e1;
+        padding: 0.5rem 0.75rem;
+      }
       @media (max-width: 767px) {
         .h-\[220px\] {
           height: auto;
@@ -93,14 +124,14 @@
       }
     </style>
   </head>
-  <body class="flex min-h-dvh antialiased">
+  <body class="flex h-dvh max-h-dvh overflow-hidden antialiased">
     <div data-mobile-nav-backdrop class="fixed inset-0 z-40 hidden bg-slate-950/40 md:hidden"></div>
-    <aside data-mobile-nav class="fixed inset-y-0 left-0 z-50 hidden w-[min(300px,calc(100vw-2rem))] flex-shrink-0 flex-col bg-white border-r border-slate-200 shadow-xl md:static md:flex md:h-full md:w-[300px] md:shadow-none">
-      <div class="px-6 pt-7 pb-4">
+    <aside data-mobile-nav class="fixed inset-y-0 left-0 z-50 hidden h-dvh w-[min(300px,calc(100vw-2rem))] flex-shrink-0 flex-col overflow-y-auto bg-white border-r border-slate-200 shadow-xl md:static md:flex md:w-[300px] md:overflow-hidden md:shadow-none">
+      <div class="px-6 pt-7 pb-4 flex-shrink-0">
         <h2 class="text-[22px] font-bold tracking-tight text-[#0a192f]">HCBP Area 3 Apps</h2>
         <p class="text-xs text-slate-400 mt-1">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
       </div>
-      <nav class="px-4 space-y-1 flex-1">
+      <nav class="px-4 space-y-1 flex-1 md:overflow-y-auto">
         @if(auth()->user()->role === 'admin_master')
           <a class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold {{ request()->routeIs('admin-master.dashboard') ? 'bg-slate-100' : '' }}" href="{{ route('admin-master.dashboard') }}">
             <span class="material-symbols-outlined filled text-[20px]">dashboard</span>
@@ -185,7 +216,7 @@
         @endif
       </nav>
      </aside>
-    <main class="flex min-w-0 flex-1 flex-col bg-[#f8fafc]">
+    <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f8fafc]">
       <header class="w-full sticky top-0 bg-white border-b border-slate-200 z-50">
         <div class="flex h-[64px] items-center justify-between px-4 py-3 sm:h-[76px] sm:px-6 lg:px-8">
           <div class="flex min-w-0 items-center gap-2 sm:gap-4">
@@ -197,10 +228,38 @@
             <img class="h-5 max-w-[70px] object-contain sm:h-6 sm:max-w-none" src="{{ asset('images/logo_pln_horizontal.svg') }}" alt="PLN logo" />
           </div>
           <div class="flex flex-shrink-0 items-center gap-1 sm:gap-4">
-            <button class="relative p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-500" type="button">
-              <span class="material-symbols-outlined">notifications</span>
-              <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] text-white flex items-center justify-center font-bold">3</span>
-            </button>
+            <details class="relative">
+              <summary class="relative flex list-none items-center rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100" aria-label="Notifikasi">
+                <span class="material-symbols-outlined">notifications</span>
+                @if (($notifBelumDibaca ?? 0) > 0)
+                  <span class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full border-2 border-white bg-red-500 px-1 text-[9px] font-bold text-white">{{ $notifBelumDibaca > 99 ? '99+' : $notifBelumDibaca }}</span>
+                @endif
+              </summary>
+              <div class="absolute right-0 z-[100] mt-2 max-h-[70vh] w-[min(360px,calc(100vw-2rem))] overflow-y-auto rounded-xl border border-slate-200 bg-white py-2 shadow-lg">
+                <div class="flex items-center justify-between px-4 pb-2">
+                  <form method="POST" action="{{ route('notifikasi.baca-semua') }}">
+                    @csrf
+                    <button type="submit" class="text-[12px] font-medium text-[#31599b] hover:underline">Tandai semua dibaca</button>
+                  </form>
+                </div>
+                @forelse (($notifTerbaru ?? collect()) as $item)
+                  <form method="POST" action="{{ route('notifikasi.baca', $item) }}">
+                    @csrf
+                    <button type="submit" class="flex w-full items-start gap-2 px-4 py-2.5 text-left hover:bg-slate-50">
+                      <span class="material-symbols-outlined mt-0.5 text-[18px] {{ $item->dibaca_pada ? 'text-slate-300' : 'text-[#31599b]' }}">notifications</span>
+                      <span class="min-w-0 flex-1">
+                        <span class="block truncate text-[13px] {{ $item->dibaca_pada ? 'font-medium text-slate-500' : 'font-semibold text-[#0a192f]' }}">{{ $item->judul }}</span>
+                        <span class="mt-0.5 line-clamp-2 block text-[12px] text-slate-500">{{ $item->pesan }}</span>
+                        <span class="mt-0.5 block text-[10px] text-slate-400">{{ $item->created_at?->diffForHumans() }}</span>
+                      </span>
+                    </button>
+                  </form>
+                @empty
+                  <p class="px-4 py-6 text-center text-[13px] text-slate-400">Belum ada notifikasi.</p>
+                @endforelse
+                <a href="{{ route('notifikasi.index') }}" class="mt-1 block border-t border-slate-100 px-4 pt-2 text-center text-[12px] font-medium text-[#31599b] hover:underline">Lihat semua</a>
+              </div>
+            </details>
             <details class="relative">
               <summary class="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-1 pr-3 rounded-full transition-colors list-none">
                 <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-semibold">{{ strtoupper(substr(auth()->user()->nama, 0, 2)) }}</div>
@@ -223,7 +282,7 @@
           </div>
         </div>
       </header>
-<div class="relative flex-1 space-y-6 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+<div class="relative min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
          @yield('content')
        </div>
     </main>
@@ -315,77 +374,47 @@
           }
         });
       });
-      // Skip search/pagination for bawahan pages (tables inside .bawahan-tables-only)
+      // Tabel bertanda data-table-search="false" hanya dirapikan, tanpa paginasi.
+      // Tabel di dalam .bawahan-section adalah form input, jadi dikecualikan.
       const isBawahan = document.querySelector('[data-role="bawahan"]');
-      document.querySelectorAll('table:not([data-table-search="false"])').forEach((table) => {
-        // Skip if inside bawahan section
-        if (isBawahan && table.closest('.bawahan-section')) return;
+      const tabelData = (table) => table.dataset.tableSearch !== 'false' && ! table.classList.contains('tbl-plain') && ! table.closest('.bawahan-section');
 
-        table.parentElement.classList.add('overflow-x-auto');
-        table.classList.add('min-w-full', 'w-max');
-        table.querySelectorAll('th, td').forEach((cell) => cell.classList.add('whitespace-nowrap'));
-      });
-      document.querySelectorAll('table:not([data-table-search="false"])').forEach((table) => {
-        // Skip if inside bawahan section
-        if (table.closest('.bawahan-section')) return;
-
-        const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
-        if (!rows.length) return;
-        const container = table.parentElement;
-        const searchRow = document.createElement('div');
-        searchRow.className = 'mb-6 mt-3 px-2 flex justify-end';
-        const searchWrapper = document.createElement('div');
-        searchWrapper.className = 'relative w-full sm:w-72';
-        searchWrapper.innerHTML = `
-          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          </div>
-        `;
-        const search = document.createElement('input');
-        search.type = 'search';
-        search.placeholder = 'Cari data...';
-        search.setAttribute('aria-label', 'Cari data tabel');
-        search.className = 'block w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm shadow-sm transition placeholder:text-slate-400 focus:border-[#31599b] focus:outline-none focus:ring-1 focus:ring-[#31599b]';
-        searchWrapper.appendChild(search);
-        searchRow.appendChild(searchWrapper);
-        container.parentElement.insertBefore(searchRow, container);
-
-        if (table.dataset.tablePagination === 'false') {
-          const groups = rows.some((row) => row.querySelector('td[rowspan]'))
-            ? rows.reduce((items, row) => {
-              if (row.querySelector('td[rowspan]') || !items.length) items.push([row]);
-              else items[items.length - 1].push(row);
-              return items;
-            }, [])
-            : rows.map((row) => [row]);
-          search.addEventListener('input', () => {
-            const keyword = search.value.toLowerCase();
-            groups.forEach((group) => {
-              const hidden = !group.some((row) => row.textContent.toLowerCase().includes(keyword));
-              group.forEach((row) => row.hidden = hidden);
-            });
-          });
+      document.querySelectorAll('table').forEach((table) => {
+        if (! tabelData(table)) {
+          table.querySelectorAll('th, td').forEach((cell) => cell.classList.add('whitespace-nowrap'));
           return;
         }
 
+        table.parentElement.classList.add('overflow-x-auto');
+        if (table.dataset.tableScroll !== 'false') {
+          table.classList.add('min-w-full', 'w-max');
+        }
+        table.querySelectorAll('th, td').forEach((cell) => cell.classList.add('whitespace-nowrap'));
+      });
+
+      document.querySelectorAll('table').forEach((table) => {
+        if (! tabelData(table) || table.dataset.tablePagination === 'false') return;
+
+        const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
+        if (rows.length <= 10) return;
+
+        const container = table.parentElement;
         const pageSize = 10;
         let page = 1;
         const pagination = document.createElement('div');
-        pagination.className = 'mt-5 mb-2 px-1 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 text-sm text-slate-500 border-t border-slate-100';
+        pagination.className = 'mt-5 mb-2 flex flex-col items-center justify-between gap-4 border-t border-slate-100 px-1 pt-4 text-sm text-slate-500 sm:flex-row';
         container.after(pagination);
+        const tombol = (label, target, aktif) => `<button type="button" data-page="${target}" ${aktif ? '' : 'disabled'} class="rounded border border-slate-300 bg-white px-3 py-1 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">${label}</button>`;
         const render = () => {
-          const keyword = search.value.toLowerCase();
-          const filtered = rows.filter((row) => row.textContent.toLowerCase().includes(keyword));
-          const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+          const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
           page = Math.min(page, totalPages);
           rows.forEach((row) => row.hidden = true);
-          filtered.slice((page - 1) * pageSize, page * pageSize).forEach((row) => row.hidden = false);
-          const pageOptions = Array.from({ length: totalPages }, (_, index) => `<option value="${index + 1}" ${page === index + 1 ? 'selected' : ''}>${index + 1}</option>`).join('');
-          pagination.innerHTML = `<span>Menampilkan ${filtered.length ? (page - 1) * pageSize + 1 : 0}–${Math.min(page * pageSize, filtered.length)} dari ${filtered.length} data</span><div class="flex flex-wrap items-center gap-2"><button type="button" data-page="1" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&lt;&lt;</button><button type="button" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&lt;</button><select aria-label="Pilih halaman" class="rounded border border-slate-300 py-1 text-sm bg-white focus:border-[#31599b] focus:ring-[#31599b] transition">${pageOptions}</select><button type="button" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&gt;</button><button type="button" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} class="rounded border border-slate-300 px-3 py-1 bg-white hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 transition">&gt;&gt;</button></div>`;
-          pagination.querySelectorAll('button:not([disabled])').forEach((button) => button.addEventListener('click', () => { page = Number(button.dataset.page); render(); }));
+          rows.slice((page - 1) * pageSize, page * pageSize).forEach((row) => row.hidden = false);
+          const opsi = Array.from({ length: totalPages }, (_, i) => `<option value="${i + 1}" ${page === i + 1 ? 'selected' : ''}>${i + 1}</option>`).join('');
+          pagination.innerHTML = `<span>Menampilkan ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, rows.length)} dari ${rows.length} data</span><div class="flex flex-wrap items-center gap-2">${tombol('&lt;&lt;', 1, page !== 1)}${tombol('&lt;', page - 1, page !== 1)}<select aria-label="Pilih halaman" class="rounded border border-slate-300 bg-white py-1 text-sm transition focus:border-[#31599b] focus:ring-[#31599b]">${opsi}</select>${tombol('&gt;', page + 1, page !== totalPages)}${tombol('&gt;&gt;', totalPages, page !== totalPages)}</div>`;
+          pagination.querySelectorAll('button:not([disabled])').forEach((btn) => btn.addEventListener('click', () => { page = Number(btn.dataset.page); render(); }));
           pagination.querySelector('select').addEventListener('change', (event) => { page = Number(event.target.value); render(); });
         };
-        search.addEventListener('input', () => { page = 1; render(); });
         render();
       });
     </script>

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Setting Role - Admin Master'])
+﻿@extends('layouts.app', ['title' => 'Setting Role - Admin Master'])
 
 @section('content')
 @if(session('success'))
@@ -15,46 +15,46 @@
   </div>
 </div>
 
-<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-  <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+<div class="bg-white border border-slate-200 rounded-2xl p-6">
+  <div class="mb-4 flex items-center justify-between">
     <h2 class="text-lg font-bold">Daftar Pengguna</h2>
     <button id="addButton" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#27487d]" type="button">Tambah Pengguna</button>
   </div>
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50">
+  <div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200">
+    <table class="w-full text-sm tbl">
+      <thead>
         <tr>
-          <th class="px-4 py-3 text-left">No</th>
-          <th class="px-4 py-3 text-left">Nama</th>
-          <th class="px-4 py-3 text-left">NIP</th>
-          <th class="px-4 py-3 text-left">Username</th>
-          <th class="px-4 py-3 text-left">Jabatan</th>
-          <th class="px-4 py-3 text-left">Role</th>
-          <th class="px-4 py-3 text-left">Unit Induk</th>
-          <th class="px-4 py-3 text-left">Status</th>
-          <th class="px-4 py-3 text-left">Aksi</th>
+          <th>No</th>
+          <th>Nama</th>
+          <th>NIP</th>
+          <th>Username</th>
+          <th>Jabatan</th>
+          <th>Role</th>
+          <th>Unit Induk</th>
+          <th>Status</th>
+          <th>Aksi</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-slate-100">
         @forelse($pengguna as $i => $p)
         <tr class="hover:bg-slate-50">
-          <td class="px-4 py-3">{{ $i + 1 }}</td>
-          <td class="px-4 py-3">{{ $p->nama }}</td>
-          <td class="px-4 py-3">{{ $p->nip }}</td>
-          <td class="px-4 py-3">{{ $p->username }}</td>
-          <td class="px-4 py-3">{{ $p->jabatan->sebutan_jabatan ?? '-' }}</td>
-          <td class="px-4 py-3">
+          <td>{{ $pengguna->firstItem() + $i }}</td>
+          <td>{{ $p->nama }}</td>
+          <td>{{ $p->nip }}</td>
+          <td>{{ $p->username }}</td>
+          <td>{{ $p->jabatan->sebutan_jabatan ?? '-' }}</td>
+          <td>
             <span class="px-2 py-1 rounded text-xs font-medium {{ $p->role === 'admin_master' ? 'bg-purple-100 text-purple-700' : ($p->role === 'admin_area' ? 'bg-blue-100 text-blue-700' : ($p->role === 'atasan' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700')) }}">
               {{ ucfirst(str_replace('_', ' ', $p->role)) }}
             </span>
           </td>
-          <td class="px-4 py-3">{{ $p->unit_induk ?? '-' }}</td>
-          <td class="px-4 py-3">
+          <td>{{ $p->unit_induk ?? '-' }}</td>
+          <td>
             <span class="px-2 py-1 rounded text-xs font-medium {{ $p->status_aktif ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
               {{ $p->status_aktif ? 'Aktif' : 'Nonaktif' }}
             </span>
           </td>
-          <td class="px-4 py-3">
+          <td>
             <button class="text-blue-600 hover:underline mr-2" data-id="{{ $p->id_pengguna }}" data-nama="{{ $p->nama }}" data-nip="{{ $p->nip }}" data-jabatan="{{ $p->id_jabatan }}" data-username="{{ $p->username }}" data-role="{{ $p->role }}" data-unit="{{ $p->unit_induk }}" data-status="{{ $p->status_aktif }}" onclick="editUser(this)">Edit</button>
             <form id="delete-{{ $p->id_pengguna }}" class="inline" action="{{ route('admin-master.setting-role.destroy', $p->id_pengguna) }}" method="POST" style="display: none;">
               @csrf
@@ -64,10 +64,13 @@
           </td>
         </tr>
         @empty
-        <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">Tidak ada data</td></tr>
+        <tr><td colspan="8" class="py-8 text-slate-400">Tidak ada data</td></tr>
         @endforelse
       </tbody>
     </table>
+  </div>
+  <div class="mt-1">
+    @include('components.pagination', ['paginator' => $pengguna])
   </div>
 </div>
 
@@ -85,7 +88,7 @@
         <select name="id_jabatan" class="mt-1 w-full rounded-lg border-slate-300">
           <option value="">Pilih Jabatan</option>
           @foreach($jabatan as $item)
-          <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }} — {{ $item->job_code }}</option>
+          <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }} â€” {{ $item->job_code }}</option>
           @endforeach
         </select>
       </label>
@@ -138,7 +141,7 @@
         <select id="editJabatan" name="id_jabatan" class="mt-1 w-full rounded-lg border-slate-300">
           <option value="">Pilih Jabatan</option>
           @foreach($jabatan as $item)
-          <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }} — {{ $item->job_code }}</option>
+          <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }} â€” {{ $item->job_code }}</option>
           @endforeach
         </select>
       </label>

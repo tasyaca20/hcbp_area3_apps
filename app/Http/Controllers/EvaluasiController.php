@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Evaluasi;
 use App\Models\EvaluasiBukti;
 use App\Models\IDP;
+use App\Models\Notifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -58,22 +59,10 @@ class EvaluasiController extends Controller
                 'evaluasi.bukti',
             ])
             ->orderBy('id_daftar_idp')
-            ->get();
-
-        $this->ensureEvaluasiCreated($rows->filter(fn ($row) => $this->coachingDisetujui($row)));
-
-        $rows = IDP::query()->where('id_bawahan', auth()->id())
-            ->with([
-                'bawahan.jabatan',
-                'atasan.jabatan',
-                'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti']),
-                'evaluasi.kompetensi',
-                'evaluasi.bukti',
-            ])
-            ->orderBy('id_daftar_idp')
-            ->get();
+            ->paginate(10);
 
         $rows->each(fn ($row) => $row->setAttribute('coaching_disetujui', $this->coachingDisetujui($row)));
+        $this->ensureEvaluasiCreated($rows->filter(fn ($row) => $row->coaching_disetujui));
 
         return view('bawahan.idp.evaluasi', compact('rows'));
     }
@@ -89,7 +78,7 @@ class EvaluasiController extends Controller
                 'evaluasi.bukti',
             ])
             ->orderBy('id_daftar_idp')
-            ->get();
+            ->paginate(10);
 
         $rows->each(fn ($row) => $row->setAttribute('coaching_disetujui', $this->coachingDisetujui($row)));
 
@@ -198,6 +187,15 @@ class EvaluasiController extends Controller
             'catatan_revisi' => $data['status_atasan'] === 'revisi' ? $data['catatan_revisi'] : null,
         ]);
 
+        $setuju = $data['status_atasan'] === 'setuju';
+        $this->notifKeBawahanDanAdminArea(
+            $idp,
+            'evaluasi_review',
+            $setuju ? 'Bukti evaluasi disetujui' : 'Bukti evaluasi perlu revisi',
+            $setuju ? 'Atasan menyetujui bukti evaluasi kamu.' : 'Atasan meminta revisi bukti evaluasi: '.$data['catatan_revisi'],
+            route('bawahan.idp.evaluasi', absolute: false)
+        );
+
         return back()->with('success', 'Status evaluasi berhasil diperbarui.');
     }
 
@@ -231,7 +229,23 @@ class EvaluasiController extends Controller
             'tanggal_penilaian' => now(),
         ]);
 
+        $this->notifKeBawahanDanAdminArea(
+            $idp,
+            'evaluasi_nilai',
+            'Nilai evaluasi keluar',
+            'Atasan memberi nilai evaluasi akhir: '.$data['skor'].'.',
+            route('bawahan.idp.evaluasi', absolute: false)
+        );
+
         return back()->with('success', 'Nilai evaluasi berhasil disimpan.');
+    }
+
+    private function notifKeBawahanDanAdminArea(IDP $idp, string $tipe, string $judul, string $pesan, string $url): void
+    {
+        Notifikasi::kirim($idp->id_bawahan, $tipe, $judul, $pesan, $url, $idp->id_daftar_idp);
+        foreach (Notifikasi::keAdminAreaUnit($idp->bawahan?->unit_induk) as $admin) {
+            Notifikasi::kirim($admin->id_pengguna, $tipe, $judul, ($idp->bawahan?->nama ?? 'Bawahan').': '.$pesan, $url, $idp->id_daftar_idp);
+        }
     }
 
     public function download(IDP $idp, $type, ?Evaluasi $evaluasi = null)
