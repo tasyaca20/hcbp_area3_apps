@@ -24,8 +24,9 @@ class IdpController extends Controller
     {
         $rows = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
+        $unitInduk = Pengguna::whereNotNull('unit_induk')->distinct()->orderBy('unit_induk')->pluck('unit_induk');
 
-        return view('admin-master.idp.daftar', compact('rows', 'jabatan'));
+        return view('admin-master.idp.daftar', compact('rows', 'jabatan', 'unitInduk'));
     }
 
     public function downloadTemplateImportMaster()
@@ -77,7 +78,7 @@ class IdpController extends Controller
 
     public function storeMaster(Request $request)
     {
-        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'nip_atasan' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'nip_atasan' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100', 'exists:pengguna,unit_induk'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
         $atasan = Pengguna::where('nip', $data['nip_atasan'])->where('role', 'atasan')->first();
         if (! $atasan) {
             return back()->withErrors(['nip_atasan' => 'NIP atasan tidak ditemukan.'])->withInput();
@@ -85,23 +86,25 @@ class IdpController extends Controller
         $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
         if (! $bawahan) {
             $request->validate(['nip' => ['unique:pengguna,nip'], 'username' => ['unique:pengguna,username']]);
-            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'status_aktif' => true]);
+            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => $data['unit_induk'], 'status_aktif' => true]);
+        } else {
+            $bawahan->update(['unit_induk' => $data['unit_induk']]);
         }
-        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => $atasan->id_pengguna, 'business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => $atasan->id_pengguna, 'business_area' => $data['unit_induk'], 'periode_idp' => $data['periode_idp']]);
 
         return back()->with('success', 'Bawahan berhasil ditambahkan.');
     }
 
     public function updateMaster(Request $request, IDP $idp)
     {
-        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100', 'exists:pengguna,unit_induk'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
         $bawahan = Pengguna::findOrFail($idp->id_bawahan);
-        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username']]);
+        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'unit_induk' => $data['unit_induk']]);
         if (! empty($data['password'])) {
             $bawahan->password_hash = Hash::make($data['password']);
         }
         $bawahan->save();
-        $idp->update(['business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        $idp->update(['business_area' => $data['unit_induk'], 'periode_idp' => $data['periode_idp']]);
 
         return back()->with('success', 'Bawahan berhasil diperbarui.');
     }

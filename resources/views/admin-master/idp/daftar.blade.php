@@ -39,7 +39,7 @@
           <th>Nama Atasan</th>
           <th>NIP Atasan</th>
           <th>Periode</th>
-          <th>Business Area</th>
+          <th>Unit Induk</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -53,10 +53,10 @@
           <td class="text-slate-600">{{ $row->atasan->nama ?? '-' }}</td>
           <td class="text-slate-600">{{ $row->atasan->nip ?? '-' }}</td>
           <td><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#31599b]">{{ $row->periode_idp }}</span></td>
-          <td class="text-slate-600">{{ $row->business_area ?? '-' }}</td>
+          <td class="text-slate-600">{{ $row->bawahan->unit_induk ?? '-' }}</td>
           <td>
             <div class="flex items-center gap-2">
-              <button class="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50" data-id="{{ $row->id_daftar_idp }}" data-nama="{{ $row->bawahan->nama ?? '' }}" data-nip="{{ $row->bawahan->nip ?? '' }}" data-jabatan="{{ $row->bawahan->id_jabatan ?? '' }}" data-username="{{ $row->bawahan->username ?? '' }}" data-business-area="{{ $row->business_area ?? '' }}" data-periode="{{ $row->periode_idp }}" onclick="editUser(this)">Edit</button>
+              <button class="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50" data-id="{{ $row->id_daftar_idp }}" data-nama="{{ $row->bawahan->nama ?? '' }}" data-nip="{{ $row->bawahan->nip ?? '' }}" data-jabatan="{{ $row->bawahan->id_jabatan ?? '' }}" data-username="{{ $row->bawahan->username ?? '' }}" data-unit-induk="{{ $row->bawahan->unit_induk ?? '' }}" data-periode="{{ $row->periode_idp }}" onclick="editUser(this)">Edit</button>
               <form id="delete-{{ $row->id_daftar_idp }}" class="inline" action="{{ route('admin-master.idp.destroy', $row) }}" method="POST" style="display:none;">
                 @csrf
                 @method('DELETE')
@@ -93,7 +93,14 @@
       </label>
       <label class="block text-sm font-medium">Username<input name="username" class="mt-1 w-full rounded-lg border-slate-300" required></label>
       <label class="block text-sm font-medium">Password<input name="password" type="password" class="mt-1 w-full rounded-lg border-slate-300" required></label>
-      <label class="block text-sm font-medium">Business Area<input name="business_area" class="mt-1 w-full rounded-lg border-slate-300"></label>
+       <label class="block text-sm font-medium">Unit Induk
+         <select name="unit_induk" class="mt-1 w-full rounded-lg border-slate-300" required>
+           <option value="">Pilih Unit Induk</option>
+           @foreach($unitInduk as $unit)
+           <option value="{{ $unit }}">{{ $unit }}</option>
+           @endforeach
+         </select>
+       </label>
       <label class="block text-sm font-medium">Periode<select name="periode_idp" class="mt-1 w-full rounded-lg border-slate-300" required><option>Batch-1</option><option>Batch-2</option></select></label>
     </div>
     <div class="mt-6 flex justify-end gap-3">
@@ -120,7 +127,14 @@
       </label>
       <label class="block text-sm font-medium">Username<input id="editUsername" name="username" class="mt-1 w-full rounded-lg border-slate-300" required></label>
       <label class="block text-sm font-medium">Password <span class="text-xs text-slate-400">(kosongkan jika tidak diubah)</span><input id="editPassword" name="password" type="password" class="mt-1 w-full rounded-lg border-slate-300"></label>
-      <label class="block text-sm font-medium">Business Area<input id="editBusinessArea" name="business_area" class="mt-1 w-full rounded-lg border-slate-300"></label>
+       <label class="block text-sm font-medium">Unit Induk
+         <select id="editUnitInduk" name="unit_induk" class="mt-1 w-full rounded-lg border-slate-300" required>
+           <option value="">Pilih Unit Induk</option>
+           @foreach($unitInduk as $unit)
+           <option value="{{ $unit }}">{{ $unit }}</option>
+           @endforeach
+         </select>
+       </label>
       <label class="block text-sm font-medium">Periode<select id="editPeriode" name="periode_idp" class="mt-1 w-full rounded-lg border-slate-300" required><option>Batch-1</option><option>Batch-2</option></select></label>
     </div>
     <div class="mt-6 flex justify-end gap-3">
@@ -150,7 +164,7 @@
     document.querySelector('#editJabatan').value = data.jabatan;
     document.querySelector('#editUsername').value = data.username;
     document.querySelector('#editPassword').value = '';
-    document.querySelector('#editBusinessArea').value = data.businessArea;
+    document.querySelector('#editUnitInduk').value = data.unitInduk;
     document.querySelector('#editPeriode').value = data.periode;
     editModal.classList.replace('hidden', 'flex');
   }
