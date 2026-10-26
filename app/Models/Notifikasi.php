@@ -17,7 +17,6 @@ class Notifikasi extends Model
         'tipe',
         'judul',
         'pesan',
-        'tautan',
         'url',
         'id_daftar_idp',
         'dibaca_pada',
@@ -40,7 +39,7 @@ class Notifikasi extends Model
 
     public function getTujuanAttribute(): ?string
     {
-        return $this->url ?: $this->tautan;
+        return $this->url;
     }
 
     public static function kirim(int $idPengguna, string $tipe, string $judul, string $pesan, ?string $url = null, ?int $idDaftarIdp = null): void
@@ -50,7 +49,6 @@ class Notifikasi extends Model
             'tipe' => $tipe,
             'judul' => $judul,
             'pesan' => $pesan,
-            'tautan' => $url,
             'url' => $url,
             'id_daftar_idp' => $idDaftarIdp,
         ]);
