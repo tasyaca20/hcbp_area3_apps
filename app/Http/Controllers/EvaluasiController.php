@@ -11,10 +11,21 @@ use Illuminate\Support\Facades\Storage;
 
 class EvaluasiController extends Controller
 {
-    public function indexAdminMaster()
+    public function indexAdminMaster(Request $request)
     {
+        $search = $request->string('search')->trim()->value();
         $query = IDP::query()
             ->whereHas('evaluasi')
+            ->when($search, function ($query) use ($search) {
+                $like = '%'.$search.'%';
+                $query->where(function ($query) use ($like) {
+                    $query->where('periode_idp', 'like', $like)
+                        ->orWhere('business_area', 'like', $like)
+                        ->orWhereHas('bawahan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhere('unit_induk', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                        ->orWhereHas('atasan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                        ->orWhereHas('evaluasi.kompetensi', fn ($query) => $query->where('kode_kompetensi', 'like', $like)->orWhere('nama_kompetensi', 'like', $like));
+                });
+            })
             ->with([
                 'bawahan.jabatan',
                 'atasan.jabatan',
@@ -24,16 +35,27 @@ class EvaluasiController extends Controller
         $summaryRows = (clone $query)->get();
 
         return view('admin-master.idp.evaluasi', [
-            'rows' => $query->paginate(10),
+            'rows' => $query->paginate(10)->withQueryString(),
             'summaryRows' => $summaryRows,
         ]);
     }
 
-    public function indexAdminArea()
+    public function indexAdminArea(Request $request)
     {
+        $search = $request->string('search')->trim()->value();
         $query = IDP::query()
             ->whereHas('evaluasi')
             ->whereHas('bawahan', fn ($query) => $query->where('unit_induk', auth()->user()->unit_induk))
+            ->when($search, function ($query) use ($search) {
+                $like = '%'.$search.'%';
+                $query->where(function ($query) use ($like) {
+                    $query->where('periode_idp', 'like', $like)
+                        ->orWhere('business_area', 'like', $like)
+                        ->orWhereHas('bawahan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhere('unit_induk', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                        ->orWhereHas('atasan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                        ->orWhereHas('evaluasi.kompetensi', fn ($query) => $query->where('kode_kompetensi', 'like', $like)->orWhere('nama_kompetensi', 'like', $like));
+                });
+            })
             ->with([
                 'bawahan.jabatan',
                 'atasan.jabatan',
@@ -43,7 +65,7 @@ class EvaluasiController extends Controller
         $summaryRows = (clone $query)->get();
 
         return view('admin-area.idp.evaluasi', [
-            'rows' => $query->paginate(10),
+            'rows' => $query->paginate(10)->withQueryString(),
             'summaryRows' => $summaryRows,
         ]);
     }
@@ -67,9 +89,20 @@ class EvaluasiController extends Controller
         return view('bawahan.idp.evaluasi', compact('rows'));
     }
 
-    public function indexAtasan()
+    public function indexAtasan(Request $request)
     {
+        $search = $request->string('search')->trim()->value();
         $rows = IDP::query()->where('id_atasan', auth()->id())
+            ->when($search, function ($query) use ($search) {
+                $like = '%'.$search.'%';
+                $query->where(function ($query) use ($like) {
+                    $query->where('periode_idp', 'like', $like)
+                        ->orWhere('business_area', 'like', $like)
+                        ->orWhereHas('bawahan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhere('unit_induk', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                        ->orWhereHas('atasan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                        ->orWhereHas('evaluasi', fn ($query) => $query->where('pembelajaran_10_persen', 'like', $like)->orWhere('social_learning_20_persen', 'like', $like)->orWhere('action_learning_70_persen', 'like', $like)->orWhereHas('kompetensi', fn ($query) => $query->where('kode_kompetensi', 'like', $like)->orWhere('nama_kompetensi', 'like', $like)));
+                });
+            })
             ->with([
                 'bawahan.jabatan',
                 'atasan.jabatan',
@@ -78,7 +111,8 @@ class EvaluasiController extends Controller
                 'evaluasi.bukti',
             ])
             ->orderBy('id_daftar_idp')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         $rows->each(fn ($row) => $row->setAttribute('coaching_disetujui', $this->coachingDisetujui($row)));
 

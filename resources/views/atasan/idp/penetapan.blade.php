@@ -20,6 +20,7 @@
     <h1 class="text-xl font-bold">Penetapan IDP</h1>
     <p class="text-sm text-slate-500 mt-1">Usulan kompetensi bawahan yang menunggu persetujuan.</p>
   </div>
+  <div class="m-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="overflow-x-auto rounded-xl border border-slate-200">
     <table class="w-full min-w-[760px] text-sm tbl">
       <thead>

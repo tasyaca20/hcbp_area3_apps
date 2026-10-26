@@ -13,6 +13,13 @@
   <div class="relative z-10 max-w-xl px-8"><h1 class="mb-2 text-[27px] font-bold leading-tight text-[#0a192f]">Evaluasi</h1><p class="text-[15px] text-slate-500">Tinjau realisasi evaluasi bawahan.</p></div>
 </div>
 
+<div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+  <div class="mb-5"><h2 class="text-lg font-bold text-slate-900">Pencarian Data Evaluasi</h2><p class="mt-1 text-sm text-slate-500">Cari identitas bawahan, atasan, kompetensi, atau data evaluasi.</p></div>
+  <form method="GET" data-search class="flex flex-col gap-3 sm:flex-row sm:items-center"><div class="relative flex-1"><svg aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" /></svg><input name="search" value="{{ request('search') }}" placeholder="Cari nama, NIP, jabatan, atau kompetensi..." class="w-full rounded-lg border-slate-300 py-2.5 pl-10 pr-3 text-sm focus:border-[#31599b] focus:ring-[#31599b]"></div><div class="flex gap-2"><button class="rounded-lg bg-[#31599b] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#27487d]">Cari</button>@if(request()->filled('search'))<a href="{{ route('atasan.idp.evaluasi') }}" class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">Reset</a>@endif</div></form>
+</div>
+
+@if($rows->total())<p class="mt-5 text-sm text-slate-500">Menampilkan {{ $rows->count() }} dari {{ $rows->total() }} data evaluasi.</p>@endif
+
 @forelse($rows as $row)
 <div class="mt-6 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8">
   <h1 class="text-lg font-bold text-slate-900">Individual Development Program (IDP) - <i>Talent Home Coming</i></h1>
@@ -24,13 +31,13 @@
   @if(! $row->coaching_disetujui)
   <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Evaluasi belum tersedia. Setujui seluruh bukti coaching 10%, 20%, dan 70% untuk setiap kompetensi.</p>
   @else
-  <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6"><div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200"><table class="min-w-[1400px] w-full text-left text-sm tbl"><thead><tr><th>No</th><th>Kompetensi Teknis</th><th>10% Pembelajaran<br>(Perencanaan)</th><th>10% Pembelajaran<br>(Realisasi)</th><th>20% Social Learning<br>(Perencanaan)</th><th>20% Social Learning<br>(Realisasi)</th><th>70% Action Learning<br>(Perencanaan)</th><th>70% Action Learning<br>(Realisasi)</th><th>Status Atasan</th></tr></thead><tbody class="divide-y divide-slate-100">
+  <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200"><table data-table-pagination="false" class="min-w-[1400px] w-full text-left text-sm tbl"><thead><tr><th>No</th><th>Kompetensi Teknis</th><th>10% Pembelajaran<br>(Perencanaan)</th><th>10% Pembelajaran<br>(Realisasi)</th><th>20% Social Learning<br>(Perencanaan)</th><th>20% Social Learning<br>(Realisasi)</th><th>70% Action Learning<br>(Perencanaan)</th><th>70% Action Learning<br>(Realisasi)</th><th>Status Atasan</th></tr></thead><tbody class="divide-y divide-slate-100">
   @forelse($row->evaluasi as $index => $evaluasi)
   <tr class="align-top"><td>{{ $index + 1 }}</td><td><div class="font-semibold">{{ $evaluasi->kompetensi?->kode_kompetensi ?? '-' }}</div><div>{{ $evaluasi->kompetensi?->nama_kompetensi ?? '-' }}</div></td><td>{{ $evaluasi->pembelajaran_10_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 10)->first(), 'jenis' => 10])</td><td>{{ $evaluasi->social_learning_20_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 20)->first(), 'jenis' => 20])</td><td>{{ $evaluasi->action_learning_70_persen ?? 'Belum dibuat' }}</td><td>@include('atasan.idp.evaluasi-realisasi', ['bukti' => $evaluasi->bukti->where('jenis', 70)->first(), 'jenis' => 70])</td><td>@foreach([10, 20, 70] as $jenis) @php($bukti = $evaluasi->bukti->where('jenis', $jenis)->first()) <div class="mb-3 last:mb-0"><span class="font-semibold">{{ $jenis }}%:</span> @if($bukti) @include('atasan.idp.evaluasi-review-form', ['bukti' => $bukti]) @else <span class="text-slate-500">Belum ada bukti</span> @endif</div> @endforeach</td></tr>
   @empty
   <tr><td colspan="9" class="py-8 text-slate-500">Belum ada evaluasi.</td></tr>
   @endforelse
-  </tbody></table></div></div>
+  </tbody></table></div>
 
   @php($jenisWajib = [10, 20, 70])
   @php($semuaDisetujui = $row->evaluasi->isNotEmpty() && $row->evaluasi->every(fn ($evaluasi) => collect($jenisWajib)->every(fn ($jenis) => $evaluasi->bukti->contains(fn ($bukti) => (int) $bukti->jenis === $jenis && $bukti->status_atasan === 'setuju'))))

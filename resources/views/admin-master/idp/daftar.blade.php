@@ -17,7 +17,7 @@
 
 <div class="bg-white border border-slate-200 rounded-2xl p-6">
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-[15px] font-bold text-[#0a192f]">Data Pegawai</h2>
+    <h2 class="text-[20px] font-bold text-[#0a192f]">Data Pegawai</h2>
     <div class="flex items-center gap-3">
       <form id="importForm" action="{{ route('admin-master.idp.import') }}" method="POST" enctype="multipart/form-data" class="hidden">
         @csrf
@@ -28,6 +28,7 @@
       <button id="addButton" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white">Tambah Bawahan</button>
     </div>
   </div>
+  <div class="mb-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200">
     <table data-table-search="false" data-table-pagination="false" class="min-w-[1200px] w-full text-sm tbl">
       <thead>

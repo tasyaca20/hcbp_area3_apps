@@ -42,8 +42,8 @@ $chartMax = max($counts->max(), 1);
 </div>
 
 <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-  <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5"><h2 class="text-lg font-bold">Data Pemantauan IDP</h2><span class="text-xs text-slate-400">View Only - Tidak bisa aksi</span></div>
-  <div class="overflow-x-auto rounded-xl border border-slate-200"><table class="min-w-[1550px] w-full text-left text-xs tbl"><thead><tr><th>No.</th><th>Nama Pegawai</th><th>Jabatan</th><th>Atasan</th><th>Unit</th><th>Periode</th><th>Status</th><th>Kompetensi</th><th>10% Pembelajaran</th><th>20% Social</th><th>70% Action Learning</th><th>Terakhir Diperbarui</th></tr></thead><tbody class="divide-y divide-slate-100">
+  <div class="mb-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
+  <div class="overflow-x-auto rounded-xl border border-slate-200"><table data-table-pagination="false" class="min-w-[1550px] w-full text-left text-xs tbl"><thead><tr><th>No.</th><th>Nama Pegawai</th><th>Jabatan</th><th>Atasan</th><th>Unit</th><th>Periode</th><th>Status</th><th>Kompetensi</th><th>10% Pembelajaran</th><th>20% Social</th><th>70% Action Learning</th><th>Terakhir Diperbarui</th></tr></thead><tbody class="divide-y divide-slate-100">
   @forelse ($rows as $index => $row)
     @php($plans = $row->rencanaPengembangan)
     @php($status = $row->monitoring?->status_perencanaan ?? 'Draft')

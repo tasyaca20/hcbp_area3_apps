@@ -20,6 +20,7 @@
     <h2 class="text-lg font-bold">Daftar Pengguna</h2>
     <button id="addButton" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#27487d]" type="button">Tambah Pengguna</button>
   </div>
+  <div class="mb-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200">
     <table class="w-full text-sm tbl">
       <thead>

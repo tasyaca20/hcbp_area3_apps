@@ -355,7 +355,7 @@
       });
       document.addEventListener('submit', (event) => {
         const form = event.target;
-        if (form.matches('form[data-async-upload]') || form.dataset.confirmed || form.action.endsWith('/logout')) return;
+        if (form.matches('form[data-async-upload], form[data-search]') || form.dataset.confirmed || form.action.endsWith('/logout')) return;
         event.preventDefault();
         if (!form.checkValidity()) {
           form.reportValidity();

@@ -9,9 +9,24 @@ use Illuminate\Support\Facades\Hash;
 
 class SettingRoleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pengguna = Pengguna::with('jabatan')->orderBy('id_pengguna')->paginate(10);
+        $search = $request->string('search')->trim()->value();
+        $pengguna = Pengguna::with('jabatan')
+            ->when($search, function ($query) use ($search) {
+                $like = '%'.$search.'%';
+                $query->where(function ($query) use ($like) {
+                    $query->where('nama', 'like', $like)
+                        ->orWhere('nip', 'like', $like)
+                        ->orWhere('username', 'like', $like)
+                        ->orWhere('role', 'like', $like)
+                        ->orWhere('unit_induk', 'like', $like)
+                        ->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like));
+                });
+            })
+            ->orderBy('id_pengguna')
+            ->paginate(10)
+            ->withQueryString();
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
 
         return view('admin-master.setting-role', compact('pengguna', 'jabatan'));

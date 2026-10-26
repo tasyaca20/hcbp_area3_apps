@@ -20,6 +20,7 @@
     <h2 class="text-[15px] font-bold text-[#0a192f]">Data IDP Pegawai</h2>
     <span class="text-[12px] text-slate-400">{{ $rows->count() }} pegawai</span>
   </div>
+  <div class="mb-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="max-h-[600px] overflow-auto rounded-xl border border-slate-200">
     <table class="w-full text-sm tbl">
       <thead>

@@ -20,9 +20,12 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class IdpController extends Controller
 {
-    public function daftar()
+    public function daftar(Request $request)
     {
-        $rows = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
+        $rows = $this->searchIdp(IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan']), $request->string('search')->trim()->value())
+            ->orderBy('id_daftar_idp')
+            ->paginate(10)
+            ->withQueryString();
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
         $unitInduk = Pengguna::whereNotNull('unit_induk')->distinct()->orderBy('unit_induk')->pluck('unit_induk');
 
@@ -116,18 +119,19 @@ class IdpController extends Controller
         return back()->with('success', 'Bawahan berhasil dihapus.');
     }
 
-    public function penetapan()
+    public function penetapan(Request $request)
     {
-        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp');
+        $search = $request->string('search')->trim()->value();
+        $query = $this->searchIdp(IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')]), $search)->orderBy('id_daftar_idp');
         $summaryRows = IDP::query()->with(['bawahan', 'rencanaPengembangan' => fn ($q) => $q->with('kompetensi')])->orderBy('id_daftar_idp')->get();
 
-        return view('admin-master.idp.penetapan', ['rows' => $query->paginate(10), 'summaryRows' => $summaryRows]);
+        return view('admin-master.idp.penetapan', ['rows' => $query->paginate(10)->withQueryString(), 'summaryRows' => $summaryRows]);
     }
 
-    public function daftarArea()
+    public function daftarArea(Request $request)
     {
         $user = auth()->user();
-        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
+        $rows = $this->searchIdp(IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan']), $request->string('search')->trim()->value())->orderBy('id_daftar_idp')->paginate(10)->withQueryString();
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
 
         return view('admin-area.idp.daftar', compact('rows', 'jabatan'));
@@ -214,17 +218,17 @@ class IdpController extends Controller
         return back()->with('success', 'Bawahan berhasil dihapus.');
     }
 
-    public function penetapanArea()
+    public function penetapanArea(Request $request)
     {
         $user = auth()->user();
-        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
+        $rows = $this->searchIdp(IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')]), $request->string('search')->trim()->value())->orderBy('id_daftar_idp')->paginate(10)->withQueryString();
 
         return view('admin-area.idp.penetapan', compact('rows'));
     }
 
-    public function daftarAtasan()
+    public function daftarAtasan(Request $request)
     {
-        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan.jabatan'])->orderBy('id_daftar_idp')->paginate(10);
+        $rows = $this->searchIdp(IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan.jabatan']), $request->string('search')->trim()->value())->orderBy('id_daftar_idp')->paginate(10)->withQueryString();
         $jabatan = Jabatan::orderBy('sebutan_jabatan')->get();
 
         return view('atasan.idp.daftar', compact('rows', 'jabatan'));
@@ -304,9 +308,10 @@ class IdpController extends Controller
         return view('bawahan.idp.evaluasi', compact('evaluasi'));
     }
 
-    public function pemantauan()
+    public function pemantauan(Request $request)
     {
-        $query = IDP::query()
+        $search = $request->string('search')->trim()->value();
+        $query = $this->searchIdp(IDP::query(), $search)
             ->with([
                 'bawahan.jabatan',
                 'atasan.jabatan',
@@ -316,32 +321,32 @@ class IdpController extends Controller
             ->orderBy('id_daftar_idp');
 
         return view('admin-master.idp.pemantauan', [
-            'rows' => $query->paginate(10),
+            'rows' => $query->paginate(10)->withQueryString(),
             'summaryRows' => IDP::query()->with(['bawahan.jabatan', 'rencanaPengembangan'])->orderBy('id_daftar_idp')->get(),
         ]);
     }
 
-    public function pemantauanArea()
+    public function pemantauanArea(Request $request)
     {
         $user = auth()->user();
-        $rows = IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
+        $rows = $this->searchIdp(IDP::query()->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $user->unit_induk))->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoring', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with('kompetensi')]), $request->string('search')->trim()->value())->orderBy('id_daftar_idp')->paginate(10)->withQueryString();
 
         return view('admin-area.idp.pemantauan', compact('rows'));
     }
 
-    public function pemantauanCoaching()
+    public function pemantauanCoaching(Request $request)
     {
-        return $this->coachingMonitoringView('admin-master.coaching.pemantauan');
+        return $this->coachingMonitoringView('admin-master.coaching.pemantauan', search: $request->string('search')->trim()->value());
     }
 
-    public function pemantauanCoachingArea()
+    public function pemantauanCoachingArea(Request $request)
     {
-        return $this->coachingMonitoringView('admin-area.coaching.pemantauan', auth()->user()->unit_induk);
+        return $this->coachingMonitoringView('admin-area.coaching.pemantauan', auth()->user()->unit_induk, $request->string('search')->trim()->value());
     }
 
-    public function coachingAtasan()
+    public function coachingAtasan(Request $request)
     {
-        return $this->coachingView('atasan.coaching.index', 'id_atasan');
+        return $this->coachingView('atasan.coaching.index', 'id_atasan', $request->string('search')->trim()->value());
     }
 
     public function coachingBawahan()
@@ -499,29 +504,47 @@ class IdpController extends Controller
         DB::table('monitoring_idp')->updateOrInsert(['id_daftar_idp' => $idDaftarIdp], ['status_perencanaan' => $status, 'updated_at' => now()]);
     }
 
-    private function coachingView(string $view, string $userColumn)
+    private function coachingView(string $view, string $userColumn, ?string $search = null)
     {
-        $rows = IDP::query()->where($userColumn, auth()->id())
+        $rows = $this->searchIdp(IDP::query()->where($userColumn, auth()->id()), $search)
             ->with([
                 'bawahan.jabatan',
                 'atasan.jabatan',
-                'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti']),
+                'rencanaPengembangan' => fn ($query) => $query->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti']),
             ])
             ->orderBy('id_daftar_idp')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view($view, compact('rows'));
     }
 
-    private function coachingMonitoringView(string $view, ?string $unitInduk = null)
+    private function coachingMonitoringView(string $view, ?string $unitInduk = null, ?string $search = null)
     {
-        $query = IDP::query()->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoringCoaching', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])])->orderBy('id_daftar_idp');
+        $query = $this->searchIdp(IDP::query(), $search)->with(['bawahan.jabatan', 'atasan.jabatan', 'monitoringCoaching', 'rencanaPengembangan' => fn ($q) => $q->where('status', 'Disetujui')->with(['kompetensi', 'coachingBukti'])])->orderBy('id_daftar_idp');
         if ($unitInduk) {
             $query->whereHas('bawahan', fn ($q) => $q->where('unit_induk', $unitInduk));
         }
         $summaryRows = (clone $query)->get();
 
-        return view($view, ['rows' => $query->paginate(10), 'summaryRows' => $summaryRows]);
+        return view($view, ['rows' => $query->paginate(10)->withQueryString(), 'summaryRows' => $summaryRows]);
+    }
+
+    private function searchIdp($query, ?string $search)
+    {
+        if ($search === null || $search === '') {
+            return $query;
+        }
+
+        $like = '%'.$search.'%';
+
+        return $query->where(function ($query) use ($like) {
+            $query->where('periode_idp', 'like', $like)
+                ->orWhere('business_area', 'like', $like)
+                ->orWhereHas('bawahan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhere('username', 'like', $like)->orWhere('unit_induk', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                ->orWhereHas('atasan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)->orWhereHas('jabatan', fn ($query) => $query->where('sebutan_jabatan', 'like', $like)->orWhere('job_code', 'like', $like)))
+                ->orWhereHas('rencanaPengembangan', fn ($query) => $query->where('pembelajaran_10_persen', 'like', $like)->orWhere('deskripsi_realisasi_10', 'like', $like)->orWhere('social_learning_20_persen', 'like', $like)->orWhere('deskripsi_realisasi_20', 'like', $like)->orWhere('action_learning_70_persen', 'like', $like)->orWhere('deskripsi_realisasi_70', 'like', $like)->orWhereHas('kompetensi', fn ($query) => $query->where('kode_kompetensi', 'like', $like)->orWhere('nama_kompetensi', 'like', $like)));
+        });
     }
 
     public function penetapanBawahan()
@@ -531,9 +554,18 @@ class IdpController extends Controller
         return view('bawahan.idp.penetapan', compact('rows'));
     }
 
-    public function penetapanAtasan()
+    public function penetapanAtasan(Request $request)
     {
-        $rencana = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])->whereHas('daftarIdp', fn ($q) => $q->where('id_atasan', auth()->id()))->with(['kompetensi', 'daftarIdp.bawahan.jabatan.kompetensi'])->paginate(10);
+        $search = $request->string('search')->trim()->value();
+        $rencana = RencanaPengembanganIDP::whereIn('status', ['Diajukan', 'Revisi'])
+            ->whereHas('daftarIdp', fn ($query) => $query->where('id_atasan', auth()->id()))
+            ->when($search, function ($query) use ($search) {
+                $like = '%'.$search.'%';
+                $query->where(fn ($query) => $query->where('pembelajaran_10_persen', 'like', $like)->orWhere('social_learning_20_persen', 'like', $like)->orWhere('action_learning_70_persen', 'like', $like)->orWhereHas('kompetensi', fn ($query) => $query->where('kode_kompetensi', 'like', $like)->orWhere('nama_kompetensi', 'like', $like))->orWhereHas('daftarIdp.bawahan', fn ($query) => $query->where('nama', 'like', $like)->orWhere('nip', 'like', $like)));
+            })
+            ->with(['kompetensi', 'daftarIdp.bawahan.jabatan.kompetensi'])
+            ->paginate(10)
+            ->withQueryString();
 
         return view('atasan.idp.penetapan', compact('rencana'));
     }
@@ -594,9 +626,9 @@ class IdpController extends Controller
         );
     }
 
-    public function pemantauanAtasan()
+    public function pemantauanAtasan(Request $request)
     {
-        $rows = IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')])->orderBy('id_daftar_idp')->paginate(10);
+        $rows = $this->searchIdp(IDP::query()->where('id_atasan', auth()->id())->with(['bawahan.jabatan', 'atasan', 'monitoring', 'rencanaPengembangan' => fn ($query) => $query->whereNot('status', 'Draft')->with('kompetensi')]), $request->string('search')->trim()->value())->orderBy('id_daftar_idp')->paginate(10)->withQueryString();
 
         return view('atasan.idp.pemantauan', compact('rows'));
     }

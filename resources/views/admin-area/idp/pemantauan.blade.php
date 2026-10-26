@@ -21,6 +21,7 @@
     <h2 class="text-lg font-bold">Progres IDP</h2>
     <span class="text-xs text-slate-400">View Only - Tidak bisa aksi</span>
   </div>
+  <div class="mb-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="overflow-x-auto rounded-xl border border-slate-200">
     <table class="min-w-[1200px] w-full text-left text-xs tbl">
       <thead>

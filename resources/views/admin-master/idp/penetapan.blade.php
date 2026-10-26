@@ -33,7 +33,8 @@
 
 <div class="mt-6 bg-white border border-slate-200 rounded-2xl p-6">
   <div class="mb-4 flex items-center justify-between gap-4"><h2 class="text-lg font-bold">{{ $cardTitle }}</h2><span class="text-xs text-slate-400">View Only - Tidak bisa aksi</span></div>
-  <div class="overflow-x-auto rounded-xl border border-slate-200"><table class="min-w-[1200px] w-full text-left text-xs tbl"><thead><tr><th>No.</th><th>Nama Pegawai</th><th>Jabatan</th><th>Nama Atasan</th><th>NIP Atasan</th><th>Jabatan Atasan</th><th>Unit Induk</th><th>Status</th><th>Kompetensi</th><th>10% Pembelajaran</th><th>20% Social</th><th>70% Action Learning</th></tr></thead><tbody class="divide-y divide-slate-100">
+  <div class="mb-4 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
+  <div class="overflow-x-auto rounded-xl border border-slate-200"><table data-table-pagination="false" class="min-w-[1200px] w-full text-left text-xs tbl"><thead><tr><th>No.</th><th>Nama Pegawai</th><th>Jabatan</th><th>Nama Atasan</th><th>NIP Atasan</th><th>Jabatan Atasan</th><th>Unit Induk</th><th>Status</th><th>Kompetensi</th><th>10% Pembelajaran</th><th>20% Social</th><th>70% Action Learning</th></tr></thead><tbody class="divide-y divide-slate-100">
   @forelse ($rows as $index => $row)
     @php($penetapan = $row->rencanaPengembangan)
     @if($penetapan->isNotEmpty())

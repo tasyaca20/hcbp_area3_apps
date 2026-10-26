@@ -23,6 +23,7 @@
   <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
     <h2 class="text-lg font-bold">Progres IDP</h2>
   </div>
+  <div class="px-6 pt-6 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="p-6 space-y-5">
     @forelse($rows as $row)
       @if($row->rencanaPengembangan->isNotEmpty())
