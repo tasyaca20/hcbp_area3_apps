@@ -82,6 +82,19 @@
         border: 1px solid #cbd5e1;
         padding: 0.5rem 0.75rem;
       }
+      /* Tabel KKJ: selalu muat di container, tanpa min-width & tanpa padding paksa */
+      table.tbl-kkj {
+        min-width: 0 !important;
+        table-layout: fixed;
+        width: 100%;
+      }
+      table.tbl-kkj th,
+      table.tbl-kkj td {
+        padding: 0.5rem 0.625rem !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
       @media (max-width: 767px) {
         .h-\[220px\] {
           height: auto;

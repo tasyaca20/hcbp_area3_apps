@@ -84,15 +84,35 @@
     <div class="p-6 space-y-5">
       <div class="border border-slate-200 rounded-xl p-5">
         <p class="text-sm font-semibold mb-4">Daftar Kebutuhan Kompetensi Jabatan (KKJ) sesuai jenjang jabatan saat ini:</p>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
-          <section>
-            <h2 class="font-bold">SOFT COMPETENCY</h2>
-            <h3 class="font-semibold mt-2">Kompetensi Utama</h3>
-            <table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewSoftMain"></tbody></table>
+        <div class="grid grid-cols-1 gap-4 text-xs md:grid-cols-2 md:gap-5">
+          <section class="flex min-w-0 flex-col">
+            <h2 class="mb-2 font-bold text-slate-800">SOFT COMPETENCY</h2>
+            <h3 class="mb-1 font-semibold text-slate-700">Kompetensi Utama</h3>
+            <div class="overflow-hidden rounded-lg border border-slate-300">
+              <table class="w-full table-fixed tbl-kkj"><colgroup><col class="w-[7.5rem]"><col></colgroup><tbody id="reviewSoftMain" class="divide-y divide-slate-200"></tbody></table>
+            </div>
           </section>
-          <section class="pt-5"><h3 class="font-semibold">Kompetensi Peran</h3><table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewSoftRole"></tbody></table></section>
-          <section><h2 class="font-bold">HARD COMPETENCY</h2><h3 class="font-semibold mt-2">Kompetensi Teknis (Core)</h3><table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewHardCore"></tbody></table></section>
-          <section class="pt-5"><h3 class="font-semibold">Kompetensi Teknis (Enabler)</h3><table data-table-search="false" class="w-full mt-1 tbl-plain"><tbody id="reviewHardEnabler"></tbody></table></section>
+          <section class="flex min-w-0 flex-col">
+            <h2 class="mb-2 hidden font-bold text-slate-800 md:block" aria-hidden="true">&nbsp;</h2>
+            <h3 class="mb-1 font-semibold text-slate-700">Kompetensi Peran</h3>
+            <div class="overflow-hidden rounded-lg border border-slate-300">
+              <table class="w-full table-fixed tbl-kkj"><colgroup><col class="w-[7.5rem]"><col></colgroup><tbody id="reviewSoftRole" class="divide-y divide-slate-200"></tbody></table>
+            </div>
+          </section>
+          <section class="flex min-w-0 flex-col">
+            <h2 class="mb-2 font-bold text-slate-800">HARD COMPETENCY</h2>
+            <h3 class="mb-1 font-semibold text-slate-700">Kompetensi Teknis (Core)</h3>
+            <div class="overflow-hidden rounded-lg border border-slate-300">
+              <table class="w-full table-fixed tbl-kkj"><colgroup><col class="w-[7.5rem]"><col></colgroup><tbody id="reviewHardCore" class="divide-y divide-slate-200"></tbody></table>
+            </div>
+          </section>
+          <section class="flex min-w-0 flex-col">
+            <h2 class="mb-2 hidden font-bold text-slate-800 md:block" aria-hidden="true">&nbsp;</h2>
+            <h3 class="mb-1 font-semibold text-slate-700">Kompetensi Teknis (Enabler)</h3>
+            <div class="overflow-hidden rounded-lg border border-slate-300">
+              <table class="w-full table-fixed tbl-kkj"><colgroup><col class="w-[7.5rem]"><col></colgroup><tbody id="reviewHardEnabler" class="divide-y divide-slate-200"></tbody></table>
+            </div>
+          </section>
         </div>
       </div>
       <div class="overflow-x-auto border border-slate-200 rounded-xl">
@@ -141,7 +161,9 @@
   }
 
   function renderCompetencyTable(items) {
-    return items.length ? items.map((item) => `<tr><td class="w-28">${item.kode}</td><td >${item.kompetensi}</td></tr>`).join('') : '<tr><td class="text-slate-400" colspan="2">Tidak ada data</td></tr>';
+    return items.length
+      ? items.map((item) => `<tr class="align-top"><td class="break-words px-2.5 py-2 font-mono text-[11px] leading-snug text-slate-600">${item.kode}</td><td class="break-words px-2.5 py-2 leading-relaxed text-slate-800">${item.kompetensi || '-'}</td></tr>`).join('')
+      : '<tr><td class="px-2.5 py-2 text-slate-400" colspan="2">Tidak ada data</td></tr>';
   }
 
   function openReview(button) {

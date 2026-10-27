@@ -95,59 +95,45 @@
       </div>
       @endif
 
+      @php($kkjGroups = [
+        ['kode' => 'umum',          'label' => 'SOFT COMPETENCY', 'sub' => 'Kompetensi Utama',            'empty' => 'Tidak ada kompetensi utama'],
+        ['kode' => 'peran',         'label' => null,              'sub' => 'Kompetensi Peran',            'empty' => 'Tidak ada kompetensi peran'],
+        ['kode' => 'teknis_core',   'label' => 'HARD COMPETENCY', 'sub' => 'Kompetensi Teknis (Core)',    'empty' => 'Tidak ada kompetensi teknis core'],
+        ['kode' => 'teknis_enabler', 'label' => null,             'sub' => 'Kompetensi Teknis (Enabler)', 'empty' => 'Tidak ada kompetensi teknis enabler'],
+      ])
       <div class="border border-slate-300 rounded-xl p-5">
         <p class="text-sm font-semibold mb-4">Daftar Kebutuhan Kompetensi Jabatan (KKJ) sesuai jenjang jabatan saat ini:</p>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
-          <section>
-            <h2 class="font-bold">SOFT COMPETENCY</h2>
-            <h3 class="font-semibold mt-2">Kompetensi Utama</h3>
-            <table data-table-search="false" class="w-full mt-1 tbl-plain">
-              <tbody class="divide-y divide-slate-100">
-                @forelse($kompetensiList->where('jenis', 'umum') as $kom)
-                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
-                @empty
-                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi utama</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </section>
-          <section class="pt-5">
-            <h3 class="font-semibold">Kompetensi Peran</h3>
-            <table data-table-search="false" class="w-full mt-1 tbl-plain">
-              <tbody class="divide-y divide-slate-100">
-                @forelse($kompetensiList->where('jenis', 'peran') as $kom)
-                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
-                @empty
-                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi peran</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </section>
-          <section>
-            <h2 class="font-bold">HARD COMPETENCY</h2>
-            <h3 class="font-semibold mt-2">Kompetensi Teknis (Core)</h3>
-            <table data-table-search="false" class="w-full mt-1 tbl-plain">
-              <tbody class="divide-y divide-slate-100">
-                @forelse($kompetensiList->where('jenis', 'teknis_core') as $kom)
-                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
-                @empty
-                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi teknis core</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </section>
-          <section class="pt-5">
-            <h3 class="font-semibold">Kompetensi Teknis (Enabler)</h3>
-            <table data-table-search="false" class="w-full mt-1 tbl-plain">
-              <tbody class="divide-y divide-slate-100">
-                @forelse($kompetensiList->where('jenis', 'teknis_enabler') as $kom)
-                <tr><td class="w-28">{{ $kom->kode_kompetensi }}</td><td >{{ $kom->nama_kompetensi }}</td></tr>
-                @empty
-                <tr><td class="text-slate-400" colspan="2">Tidak ada kompetensi teknis enabler</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </section>
+        <div class="grid grid-cols-1 gap-4 text-xs md:grid-cols-2 md:gap-5">
+          @foreach($kkjGroups as $group)
+            @php($items = $kompetensiList->where('jenis', $group['kode']))
+            <section class="flex min-w-0 flex-col">
+              @if($group['label'])
+                <h2 class="mb-2 font-bold text-slate-800">{{ $group['label'] }}</h2>
+              @else
+                {{-- penyeimbang tinggi judul grup di kolom sebelah --}}
+                <h2 class="mb-2 hidden font-bold text-slate-800 md:block" aria-hidden="true">&nbsp;</h2>
+              @endif
+              <h3 class="mb-1 font-semibold text-slate-700">{{ $group['sub'] }}</h3>
+              <div class="overflow-hidden rounded-lg border border-slate-300">
+                <table class="w-full table-fixed tbl-kkj">
+                  <colgroup>
+                    <col class="w-[7.5rem]">
+                    <col>
+                  </colgroup>
+                  <tbody class="divide-y divide-slate-200">
+                    @forelse($items as $kom)
+                    <tr class="align-top">
+                      <td class="break-words px-2.5 py-2 font-mono text-[11px] leading-snug text-slate-600">{{ $kom->kode_kompetensi }}</td>
+                      <td class="break-words px-2.5 py-2 leading-relaxed text-slate-800">{{ $kom->nama_kompetensi ?: '-' }}</td>
+                    </tr>
+                    @empty
+                    <tr><td class="px-2.5 py-2 text-slate-400" colspan="2">{{ $group['empty'] }}</td></tr>
+                    @endforelse
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          @endforeach
         </div>
       </div>
 
