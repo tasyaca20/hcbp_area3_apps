@@ -17,7 +17,7 @@
 
 <div class="bawahan-section bg-white border border-slate-200 rounded-2xl p-6">
   <div class="mb-6">
-    <h1 class="text-xl font-bold">Ketentuan IDP - Bawahan</h1>
+    <h1 class="text-xl font-bold">Ketentuan IDP</h1>
     <ol class="list-decimal ml-6 mt-2 text-sm space-y-1 text-slate-700">
       <li>Silahkan memilih 3 s.d 5 kompetensi teknis (core/enabler) yang akan dikembangkan.</li>
       <li>Tuliskan inisiatif / rencana aktivitas yang dalam pelaksanaan pengembangan diri.</li>

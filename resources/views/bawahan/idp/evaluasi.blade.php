@@ -15,7 +15,7 @@
 
 @forelse($rows as $row)
 <div class="mt-6 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8">
-  <h1 class="text-lg font-bold text-slate-900">Individual Development Program (IDP) - <i>Talent Home Coming</i></h1>
+  <h1 class="text-lg font-bold text-slate-900">Individual Development Program (IDP)</h1>
   <p class="mt-1 text-sm text-slate-600">Evaluasi</p>
   <div class="mt-4 grid gap-4 text-base font-semibold sm:grid-cols-2">
     <div class="space-y-2"><p>Nama Bawahan: <span class="font-normal">{{ $row->bawahan?->nama ?? '-' }}</span></p><p>NIP: <span class="font-normal">{{ $row->bawahan?->nip ?? '-' }}</span></p><p>Jabatan: <span class="font-normal">{{ $row->bawahan?->jabatan?->sebutan_jabatan ?? '-' }}</span></p></div>
