@@ -307,7 +307,7 @@ class DashboardController extends Controller
      */
     private function rekapStatusIdp($query)
     {
-        $urutan = ['Draft', 'Diajukan', 'Revisi', 'Disetujui', 'Berjalan', 'Selesai'];
+        $urutan = ['Draft', 'Diajukan', 'Revisi', 'Disetujui'];
         $hitung = (clone $query)
             ->select('status_perencanaan', DB::raw('count(*) as total'))
             ->groupBy('status_perencanaan')

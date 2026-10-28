@@ -4,8 +4,6 @@
     'Diajukan' => ['#fbbf24', 'bg-amber-400', 'text-amber-600'],
     'Revisi' => ['#fb7185', 'bg-rose-400', 'text-rose-600'],
     'Disetujui' => ['#6366f1', 'bg-indigo-500', 'text-indigo-600'],
-    'Berjalan' => ['#10b981', 'bg-emerald-500', 'text-emerald-600'],
-    'Selesai' => ['#14b8a6', 'bg-teal-500', 'text-teal-600'],
   ];
   $warnaDefault = ['#cbd5e1', 'bg-slate-300', 'text-slate-600'];
   $totalStatusIdp = $statusIdp->sum('total');
