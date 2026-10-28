@@ -1,51 +1,90 @@
-﻿@php($pageTitle = 'Pemantauan IDP')
+@php($pageTitle = 'Pemantauan IDP')
 @php($activeSection = 'idp')
 @php($activePage = 'pemantauan')
 
 @extends('layouts.app', ['title' => $pageTitle])
 
 @section('content')
-@if(session('success'))
-<script>Swal.fire({icon:'success',text:@json(session('success'))});</script>
-@endif
-<div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 h-[220px] flex items-center">
-  <div class="absolute inset-0 z-0">
-    <div class="w-full h-full" style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuCjz6BR9t1xAm_4yTRtjUFCuOHqIkeE5EKFN9IU8hG8k_u3B7psxquSS6Suk591TY9q_Y27C-c3_8Z_HW-o9T4mcs-BSs8NcCHUUxWxaIBP5fVyRf74hO-H-p4ikb76omJMmeg7ue3VDxPp1T-0X1MDCB76X944-1OQyLGojPYj3yPCpw1wjdFvEbWlt83s8VQfKiYaIR8j8f1RfVnP8NMKIKcRo4783TuNbljKJLkY62hs9DzkeU81TZVA3E9SyXdF3Ck'); background-size:cover; background-position:center right;"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent"></div>
-  </div>
-  <div class="relative z-10 px-8 max-w-xl">
-    <h1 class="text-[27px] font-bold text-[#0a192f] mb-2 leading-tight">Pemantauan IDP</h1>
-    <p class="text-slate-500 text-[15px]">Pantau progres rencana pengembangan bawahan Anda.</p>
-  </div>
-</div>
-
-<div class="bg-white border border-slate-200 rounded-2xl p-6">
-  <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
-    <h2 class="text-lg font-bold">Progres IDP</h2>
-  </div>
-  <div class="px-6 pt-6 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
-  <div class="p-6 space-y-5">
-    @php($statusClasses = ['Draft' => 'bg-slate-100 text-slate-700', 'Diajukan' => 'bg-yellow-100 text-yellow-700', 'Revisi' => 'bg-red-100 text-red-700', 'Disetujui' => 'bg-green-100 text-green-700', 'Berjalan' => 'bg-blue-100 text-blue-700', 'Selesai' => 'bg-violet-100 text-violet-700'])
-    @forelse($rows as $row)
-      @if($row->rencanaPengembangan->isNotEmpty())
-      <div class="border border-slate-200 rounded-xl p-5">
-        <div class="mb-3 flex items-center justify-between"><h3 class="font-semibold">{{ $row->bawahan->nama ?? '-' }} <span class="font-normal text-slate-500">({{ $row->bawahan->nip ?? '-' }})</span></h3></div>
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
-          <table class="min-w-[900px] w-full text-sm tbl">
-            <thead><tr><th>NO</th><th class="w-[220px]">KOMPETENSI TEKNIS</th><th>10% PEMBELAJARAN</th><th>20% SOCIAL LEARNING</th><th>70% ACTION LEARNING</th><th>STATUS</th></tr></thead>
-            <tbody class="divide-y divide-slate-100">
-              @foreach($row->rencanaPengembangan as $rencana)
-              <tr><td>{{ $loop->iteration }}</td><td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td><td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td><td><span class="rounded px-2 py-1 text-xs font-medium {{ $statusClasses[$rencana->status] ?? 'bg-slate-100 text-slate-700' }}">{{ $rencana->status }}</span></td></tr>
-              @endforeach
-            </tbody>
-          </table>
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                text: @json(session('success'))
+            });
+        </script>
+    @endif
+    <div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 h-[220px] flex items-center">
+        <div class="absolute inset-0 z-0">
+            <div class="w-full h-full"
+                style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuCjz6BR9t1xAm_4yTRtjUFCuOHqIkeE5EKFN9IU8hG8k_u3B7psxquSS6Suk591TY9q_Y27C-c3_8Z_HW-o9T4mcs-BSs8NcCHUUxWxaIBP5fVyRf74hO-H-p4ikb76omJMmeg7ue3VDxPp1T-0X1MDCB76X944-1OQyLGojPYj3yPCpw1wjdFvEbWlt83s8VQfKiYaIR8j8f1RfVnP8NMKIKcRo4783TuNbljKJLkY62hs9DzkeU81TZVA3E9SyXdF3Ck'); background-size:cover; background-position:center right;">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-transparent"></div>
         </div>
-      </div>
-      @endif
-    @empty
-      <p class="py-4 text-center text-slate-400">Belum ada data IDP.</p>
-    @endforelse
-    @include('components.pagination', ['paginator' => $rows])
-  </div>
-</div>
+        <div class="relative z-10 px-8 max-w-xl">
+            <h1 class="text-[27px] font-bold text-[#0a192f] mb-2 leading-tight">Pemantauan IDP</h1>
+            <p class="text-slate-500 text-[15px]">Pantau progres rencana pengembangan bawahan Anda.</p>
+        </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+            <h2 class="text-lg font-bold">Progres IDP</h2>
+        </div>
+        <div class="px-6 pt-6 flex justify-end">
+            <form method="GET" data-search class="flex items-center gap-2"><input name="search"
+                    value="{{ request('search') }}" placeholder="Cari semua data..."
+                    class="w-52 rounded-lg border-slate-300 text-sm"><button
+                    class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button>
+            </form>
+        </div>
+        <div class="p-6 space-y-5">
+            @php($statusClasses = ['Draft' => 'bg-slate-100 text-slate-700', 'Diajukan' => 'bg-yellow-100 text-yellow-700', 'Revisi' => 'bg-red-100 text-red-700', 'Disetujui' => 'bg-green-100 text-green-700', 'Berjalan' => 'bg-blue-100 text-blue-700', 'Selesai' => 'bg-violet-100 text-violet-700'])
+            @forelse($rows as $row)
+                @if ($row->rencanaPengembangan->isNotEmpty())
+                    <div class="border border-slate-200 rounded-xl p-5">
+                        <div class="mb-3 flex items-center justify-between">
+                            <h3 class="font-semibold">{{ $row->bawahan->nama ?? '-' }} <span
+                                    class="font-normal text-slate-500">({{ $row->bawahan->nip ?? '-' }})</span></h3>
+                        </div>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="min-w-[900px] w-full text-sm tbl">
+                                <thead>
+                                    <tr>
+                                        <th>NO</th>
+                                        <th class="w-[220px]">KOMPETENSI TEKNIS</th>
+                                        <th>10% PEMBELAJARAN</th>
+                                        <th>20% SOCIAL LEARNING</th>
+                                        <th>70% ACTION LEARNING</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach ($row->rencanaPengembangan as $rencana)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span
+                                                    class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span>
+                                            </td>
+                                            <td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}
+                                            </td>
+                                            <td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}
+                                            </td>
+                                            <td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}
+                                            </td>
+                                            <td><span
+                                                    class="rounded px-2 py-1 text-xs font-medium {{ $statusClasses[$rencana->status] ?? 'bg-slate-100 text-slate-700' }}">{{ $rencana->status }}</span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+            @empty
+                <p class="py-4 text-center text-slate-400">Belum ada data IDP.</p>
+            @endforelse
+            @include('components.pagination', ['paginator' => $rows])
+        </div>
+    </div>
 @endsection

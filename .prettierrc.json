@@ -1,0 +1,17 @@
+{
+    "plugins": ["./prettier-plugin-blade-lf.mjs"],
+    "overrides": [
+        {
+            "files": "*.blade.php",
+            "options": {
+                "parser": "blade"
+            }
+        }
+    ],
+    "tabWidth": 4,
+    "useTabs": false,
+    "endOfLine": "lf",
+    "printWidth": 120,
+    "htmlWhitespaceSensitivity": "css",
+    "singleQuote": true
+}
