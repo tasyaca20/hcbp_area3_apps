@@ -76,6 +76,7 @@
       table.tbl tfoot td {
         background-color: #f1f5f9;
         font-weight: 700;
+        padding: 0.75rem 1rem;
       }
       table.tbl-plain th,
       table.tbl-plain td {
