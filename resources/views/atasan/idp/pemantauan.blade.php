@@ -25,6 +25,7 @@
   </div>
   <div class="px-6 pt-6 flex justify-end"><form method="GET" data-search class="flex items-center gap-2"><input name="search" value="{{ request('search') }}" placeholder="Cari semua data..." class="w-52 rounded-lg border-slate-300 text-sm"><button class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cari</button></form></div>
   <div class="p-6 space-y-5">
+    @php($statusClasses = ['Draft' => 'bg-slate-100 text-slate-700', 'Diajukan' => 'bg-yellow-100 text-yellow-700', 'Revisi' => 'bg-red-100 text-red-700', 'Disetujui' => 'bg-green-100 text-green-700', 'Berjalan' => 'bg-blue-100 text-blue-700', 'Selesai' => 'bg-violet-100 text-violet-700'])
     @forelse($rows as $row)
       @if($row->rencanaPengembangan->isNotEmpty())
       <div class="border border-slate-200 rounded-xl p-5">
@@ -34,7 +35,7 @@
             <thead><tr><th>NO</th><th class="w-[220px]">KOMPETENSI TEKNIS</th><th>10% PEMBELAJARAN</th><th>20% SOCIAL LEARNING</th><th>70% ACTION LEARNING</th><th>STATUS</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
               @foreach($row->rencanaPengembangan as $rencana)
-              <tr><td>{{ $loop->iteration }}</td><td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td><td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td><td><span class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-700">{{ $rencana->status }}</span></td></tr>
+              <tr><td>{{ $loop->iteration }}</td><td><strong>{{ $rencana->kompetensi->kode_kompetensi }}</strong><br><span class="text-xs text-slate-500">{{ $rencana->kompetensi->nama_kompetensi }}</span></td><td class="whitespace-pre-line">{{ $rencana->pembelajaran_10_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->social_learning_20_persen ?: '-' }}</td><td class="whitespace-pre-line">{{ $rencana->action_learning_70_persen ?: '-' }}</td><td><span class="rounded px-2 py-1 text-xs font-medium {{ $statusClasses[$rencana->status] ?? 'bg-slate-100 text-slate-700' }}">{{ $rencana->status }}</span></td></tr>
               @endforeach
             </tbody>
           </table>
