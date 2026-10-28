@@ -127,8 +127,7 @@
                     <select name="id_jabatan" class="mt-1 w-full rounded-lg border-slate-300">
                         <option value="">Pilih Jabatan</option>
                         @foreach ($jabatan as $item)
-                            <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }} â€”
-                                {{ $item->job_code }}</option>
+                            <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }}</option>
                         @endforeach
                     </select>
                 </label>
@@ -173,8 +172,7 @@
                     <select id="editJabatan" name="id_jabatan" class="mt-1 w-full rounded-lg border-slate-300">
                         <option value="">Pilih Jabatan</option>
                         @foreach ($jabatan as $item)
-                            <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }} â€”
-                                {{ $item->job_code }}</option>
+                            <option value="{{ $item->id_jabatan }}">{{ $item->sebutan_jabatan }}</option>
                         @endforeach
                     </select>
                 </label>
