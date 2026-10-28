@@ -32,7 +32,7 @@
           <th>Nama Atasan</th>
           <th>NIP Atasan</th>
           <th>Periode</th>
-          <th>Business Area</th>
+          <th>Unit Induk</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -45,7 +45,7 @@
           <td class="text-slate-600">{{ $row->atasan->nama ?? '-' }}</td>
           <td class="text-slate-600">{{ $row->atasan->nip ?? '-' }}</td>
           <td><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-[#31599b]">{{ $row->periode_idp }}</span></td>
-          <td class="text-slate-600">{{ $row->business_area ?? '-' }}</td>
+          <td class="text-slate-600">{{ $row->bawahan->unit_induk ?? '-' }}</td>
         </tr>
         @empty
         <tr><td colspan="8" class="py-10 text-slate-400">Tidak ada data</td></tr>

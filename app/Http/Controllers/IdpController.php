@@ -42,7 +42,7 @@ class IdpController extends Controller
         $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
         $rows = Excel::toArray(new \stdClass, $request->file('file'))[0] ?? [];
         $headers = array_map(fn ($header) => strtolower(trim((string) $header)), array_shift($rows) ?? []);
-        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'nip_atasan', 'business_area', 'periode_idp'];
+        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'nip_atasan', 'unit_induk', 'periode_idp'];
         if ($headers !== $requiredHeaders) {
             return back()->with('error', 'Format Excel tidak sesuai. Unduh Template Excel terlebih dahulu.');
         }
@@ -53,7 +53,7 @@ class IdpController extends Controller
                         continue;
                     }
                     $data = array_map(fn ($value) => is_string($value) ? trim($value) : ($value === null ? null : (string) $value), array_combine($headers, array_pad($row, count($headers), null)));
-                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'nip_atasan' => ['required', 'string', 'max:50'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'nip_atasan' => ['required', 'string', 'max:50'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
                     if ($validator->fails()) {
                         throw new \InvalidArgumentException('Baris '.($index + 2).': '.implode(' ', $validator->errors()->all()));
                     }
@@ -67,9 +67,11 @@ class IdpController extends Controller
                         throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atau username sudah dipakai karyawan lain.');
                     }
                     if (! $bawahan) {
-                        $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'status_aktif' => true]);
+                        $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => $data['unit_induk'], 'status_aktif' => true]);
+                    } else {
+                        $bawahan->update(['unit_induk' => $data['unit_induk']]);
                     }
-                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => $atasan->id_pengguna, 'periode_idp' => $data['periode_idp']], ['business_area' => $data['business_area']]);
+                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => $atasan->id_pengguna, 'periode_idp' => $data['periode_idp']], ['business_area' => $data['unit_induk']]);
                 }
             });
         } catch (\InvalidArgumentException $exception) {
@@ -147,7 +149,7 @@ class IdpController extends Controller
         $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
         $rows = Excel::toArray(new \stdClass, $request->file('file'))[0] ?? [];
         $headers = array_map(fn ($header) => strtolower(trim((string) $header)), array_shift($rows) ?? []);
-        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'business_area', 'periode_idp'];
+        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'unit_induk', 'periode_idp'];
         if ($headers !== $requiredHeaders) {
             return back()->with('error', 'Format Excel tidak sesuai. Unduh Template Excel terlebih dahulu.');
         }
@@ -158,7 +160,7 @@ class IdpController extends Controller
                         continue;
                     }
                     $data = array_map(fn ($value) => is_string($value) ? trim($value) : ($value === null ? null : (string) $value), array_combine($headers, array_pad($row, count($headers), null)));
-                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
                     if ($validator->fails()) {
                         throw new \InvalidArgumentException('Baris '.($index + 2).': '.implode(' ', $validator->errors()->all()));
                     }
@@ -168,9 +170,11 @@ class IdpController extends Controller
                         throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atau username sudah dipakai karyawan lain.');
                     }
                     if (! $bawahan) {
-                        $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => auth()->user()->unit_induk, 'status_aktif' => true]);
+                        $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => $data['unit_induk'], 'status_aktif' => true]);
+                    } else {
+                        $bawahan->update(['unit_induk' => $data['unit_induk']]);
                     }
-                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'periode_idp' => $data['periode_idp']], ['business_area' => $data['business_area']]);
+                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'periode_idp' => $data['periode_idp']], ['business_area' => $data['unit_induk']]);
                 }
             });
         } catch (\InvalidArgumentException $exception) {
@@ -182,13 +186,15 @@ class IdpController extends Controller
 
     public function storeArea(Request $request)
     {
-        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
         $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
         if (! $bawahan) {
             $request->validate(['nip' => ['unique:pengguna,nip'], 'username' => ['unique:pengguna,username']]);
-            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => auth()->user()->unit_induk, 'status_aktif' => true]);
+            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => $data['unit_induk'], 'status_aktif' => true]);
+        } else {
+            $bawahan->update(['unit_induk' => $data['unit_induk']]);
         }
-        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'business_area' => $data['unit_induk'], 'periode_idp' => $data['periode_idp']]);
 
         return back()->with('success', 'Bawahan berhasil ditambahkan.');
     }
@@ -197,14 +203,14 @@ class IdpController extends Controller
     {
         $user = auth()->user();
         abort_unless($idp->bawahan && $idp->bawahan->unit_induk === $user->unit_induk, 403);
-        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
         $bawahan = Pengguna::findOrFail($idp->id_bawahan);
-        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username']]);
+        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'unit_induk' => $data['unit_induk']]);
         if (! empty($data['password'])) {
             $bawahan->password_hash = Hash::make($data['password']);
         }
         $bawahan->save();
-        $idp->update(['business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        $idp->update(['business_area' => $data['unit_induk'], 'periode_idp' => $data['periode_idp']]);
 
         return back()->with('success', 'Bawahan berhasil diperbarui.');
     }
@@ -643,7 +649,7 @@ class IdpController extends Controller
         $request->validate(['file' => ['required', 'file', 'mimes:xlsx,xls,csv', 'max:5120']]);
         $rows = Excel::toArray(new \stdClass, $request->file('file'))[0] ?? [];
         $headers = array_map(fn ($header) => strtolower(trim((string) $header)), array_shift($rows) ?? []);
-        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'business_area', 'periode_idp'];
+        $requiredHeaders = ['nip', 'nama', 'job_code', 'username', 'password', 'unit_induk', 'periode_idp'];
         if ($headers !== $requiredHeaders) {
             return back()->with('error', 'Format Excel tidak sesuai. Unduh Template Excel terlebih dahulu.');
         }
@@ -654,7 +660,7 @@ class IdpController extends Controller
                         continue;
                     }
                     $data = array_map(fn ($value) => is_string($value) ? trim($value) : ($value === null ? null : (string) $value), array_combine($headers, array_pad($row, count($headers), null)));
-                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+                    $validator = Validator::make($data, ['nip' => ['required', 'string', 'max:50'], 'nama' => ['required', 'string', 'max:150'], 'job_code' => ['required', 'string', 'exists:jabatan,job_code'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
                     if ($validator->fails()) {
                         throw new \InvalidArgumentException('Baris '.($index + 2).': '.implode(' ', $validator->errors()->all()));
                     }
@@ -664,9 +670,11 @@ class IdpController extends Controller
                         throw new \InvalidArgumentException('Baris '.($index + 2).': NIP atau username sudah dipakai karyawan lain.');
                     }
                     if (! $bawahan) {
-                        $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => auth()->user()->unit_induk, 'status_aktif' => true]);
+                        $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => Jabatan::where('job_code', $data['job_code'])->value('id_jabatan'), 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => $data['unit_induk'], 'status_aktif' => true]);
+                    } else {
+                        $bawahan->update(['unit_induk' => $data['unit_induk']]);
                     }
-                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => auth()->id(), 'periode_idp' => $data['periode_idp']], ['business_area' => $data['business_area']]);
+                    IDP::updateOrCreate(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => auth()->id(), 'periode_idp' => $data['periode_idp']], ['business_area' => $data['unit_induk']]);
                 }
             });
         } catch (\InvalidArgumentException $exception) {
@@ -678,13 +686,15 @@ class IdpController extends Controller
 
     public function storeAtasan(Request $request)
     {
-        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100'], 'password' => ['required', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
         $bawahan = Pengguna::where('nip', $data['nip'])->orWhere('username', $data['username'])->first();
         if (! $bawahan) {
             $request->validate(['nip' => ['unique:pengguna,nip'], 'username' => ['unique:pengguna,username']]);
-            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => auth()->user()->unit_induk, 'status_aktif' => true]);
+            $bawahan = Pengguna::create(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'password_hash' => Hash::make($data['password']), 'role' => 'bawahan', 'unit_induk' => $data['unit_induk'], 'status_aktif' => true]);
+        } else {
+            $bawahan->update(['unit_induk' => $data['unit_induk']]);
         }
-        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => auth()->id(), 'business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        IDP::create(['id_bawahan' => $bawahan->id_pengguna, 'id_atasan' => auth()->id(), 'business_area' => $data['unit_induk'], 'periode_idp' => $data['periode_idp']]);
 
         return back()->with('success', 'Bawahan berhasil ditambahkan.');
     }
@@ -692,14 +702,14 @@ class IdpController extends Controller
     public function updateAtasan(Request $request, IDP $idp)
     {
         abort_unless($idp->id_atasan === auth()->id(), 403);
-        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'business_area' => ['nullable', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
+        $data = $request->validate(['nama' => ['required', 'string', 'max:150'], 'nip' => ['required', 'string', 'max:50', 'unique:pengguna,nip,'.$idp->id_bawahan.',id_pengguna'], 'id_jabatan' => ['nullable', 'exists:jabatan,id_jabatan'], 'username' => ['required', 'string', 'max:100', 'unique:pengguna,username,'.$idp->id_bawahan.',id_pengguna'], 'password' => ['nullable', 'string', 'min:6'], 'unit_induk' => ['required', 'string', 'max:100'], 'periode_idp' => ['required', 'in:Batch-1,Batch-2']]);
         $bawahan = Pengguna::findOrFail($idp->id_bawahan);
-        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username']]);
+        $bawahan->fill(['nama' => $data['nama'], 'nip' => $data['nip'], 'id_jabatan' => $data['id_jabatan'], 'username' => $data['username'], 'unit_induk' => $data['unit_induk']]);
         if (! empty($data['password'])) {
             $bawahan->password_hash = Hash::make($data['password']);
         }
         $bawahan->save();
-        $idp->update(['business_area' => $data['business_area'], 'periode_idp' => $data['periode_idp']]);
+        $idp->update(['business_area' => $data['unit_induk'], 'periode_idp' => $data['periode_idp']]);
 
         return back()->with('success', 'Bawahan berhasil diperbarui.');
     }
