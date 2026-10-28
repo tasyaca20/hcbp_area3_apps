@@ -195,7 +195,6 @@
               </div>
             </div>
             <div class="flex justify-end">
-              <a class="font-label-sm text-label-sm text-tertiary-fixed-dim hover:text-tertiary-fixed hover:underline transition-colors hover:text-primary" href="#">Lupa Password?</a>
             </div>
             <button class="w-full mt-sm py-3 rounded-lg font-label-md text-label-md text-on-primary shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm hover:scale-[1.02] hover:brightness-110" style="background-color: rgb(34, 197, 94)" type="submit">Login</button>
           </form>
