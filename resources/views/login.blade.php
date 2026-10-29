@@ -146,6 +146,10 @@
 </head>
 
 <body class="bg-surface-container-low min-h-screen flex flex-col relative overflow-x-hidden">
+    {{-- Background ilustrasi full layar --}}
+    <div class="fixed inset-0 z-0 pointer-events-none select-none"
+        style="background-image: url('{{ asset('images/login-hero.webp') }}'); background-size: cover; background-position: center bottom; background-repeat: no-repeat;">
+    </div>
     <header class="w-full flex justify-between items-center px-margin-mobile md:px-margin-desktop py-lg z-20 relative">
         <div class="flex items-center gap-md">
             <img class="h-6 md:h-27 w-auto object-contain"
@@ -217,13 +221,10 @@
             </div>
         </div>
     </main>
-    <div class="absolute bottom-0 left-0 w-full z-10 pointer-events-none">
-        <img class="w-full h-auto min-h-[150px] object-cover object-bottom"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc_-Z1e9d4l74Z74pPhGHSZQnVKUsgcWk3ypls-W1qZhhZM1M9O7PmTkrvxMeoYkWRL6PXbaAOn2h9bmMv_uHNFrPQNJJBqSKMycuoP7wCt-mE06BFKiwfYmCP0zKgy1GYKpv9eUG2R_0Wg1l2rzUc1mCSpf2wP5KZ2zpMFH80ONjxoMjXW8_6veSk-4bw6nRBaDrGf9cZhxhCLzYRKVcFyCozJaUG8U91YXRZ9WOfFToMf949mQ2Ok6OkSDAEseeRlmU" />
-        <div class="absolute bottom-md md:bottom-lg left-0 w-full text-center px-margin-mobile">
-            <p class="font-label-sm text-label-sm text-white/90 uppercase tracking-widest drop-shadow-md">transformasi
-                hc 2.0 | unleashing energy and beyond</p>
-        </div>
+    <div class="absolute bottom-md md:bottom-lg left-0 w-full text-center px-margin-mobile z-10 pointer-events-none">
+        <p class="font-label-sm text-label-sm uppercase tracking-widest text-white drop-shadow-md">
+            transformasi
+            hc 2.0 | unleashing energy and beyond</p>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
