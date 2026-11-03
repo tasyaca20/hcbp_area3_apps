@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DaftarIdpExport;
+use App\Exports\PemantauanCoachingExport;
+use App\Exports\PemantauanIdpExport;
+use App\Exports\PenetapanIdpExport;
 use App\Exports\TemplateImportIdpAtasanExport;
 use App\Models\CoachingBukti;
 use App\Models\EvaluasiIDP;
@@ -35,6 +39,11 @@ class IdpController extends Controller
     public function downloadTemplateImportMaster()
     {
         return Excel::download(new TemplateImportIdpAtasanExport, 'template-import-idp-master.xlsx');
+    }
+
+    public function exportDaftar(Request $request)
+    {
+        return Excel::download(new DaftarIdpExport($request->string('search')->trim()->value()), 'daftar-idp-'.now()->format('Ymd-His').'.xlsx');
     }
 
     public function importMaster(Request $request)
@@ -128,6 +137,11 @@ class IdpController extends Controller
         $summaryRows = IDP::query()->with(['bawahan', 'rencanaPengembangan' => fn ($q) => $q->with('kompetensi')])->orderBy('id_daftar_idp')->get();
 
         return view('admin-master.idp.penetapan', ['rows' => $query->paginate(10)->withQueryString(), 'summaryRows' => $summaryRows]);
+    }
+
+    public function exportPenetapan(Request $request)
+    {
+        return Excel::download(new PenetapanIdpExport($request->string('search')->trim()->value()), 'penetapan-idp-'.now()->format('Ymd-His').'.xlsx');
     }
 
     public function daftarArea(Request $request)
@@ -332,6 +346,11 @@ class IdpController extends Controller
         ]);
     }
 
+    public function exportPemantauan(Request $request)
+    {
+        return Excel::download(new PemantauanIdpExport($request->string('search')->trim()->value()), 'pemantauan-idp-'.now()->format('Ymd-His').'.xlsx');
+    }
+
     public function pemantauanArea(Request $request)
     {
         $user = auth()->user();
@@ -343,6 +362,11 @@ class IdpController extends Controller
     public function pemantauanCoaching(Request $request)
     {
         return $this->coachingMonitoringView('admin-master.coaching.pemantauan', search: $request->string('search')->trim()->value());
+    }
+
+    public function exportPemantauanCoaching(Request $request)
+    {
+        return Excel::download(new PemantauanCoachingExport($request->string('search')->trim()->value()), 'pemantauan-coaching-'.now()->format('Ymd-His').'.xlsx');
     }
 
     public function pemantauanCoachingArea(Request $request)

@@ -37,6 +37,9 @@
                 <button id="templateButton" type="button"
                     class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Template
                     Excel</button>
+                <a href="{{ route('admin-master.idp.daftar.export', ['search' => request('search')]) }}"
+                    class="rounded-lg border border-[#31599b] px-4 py-2 text-sm font-semibold text-[#31599b] hover:bg-blue-50">Export
+                    Excel</a>
                 <button id="addButton" class="rounded-lg bg-[#31599b] px-4 py-2 text-sm font-semibold text-white">Tambah
                     Bawahan</button>
             </div>

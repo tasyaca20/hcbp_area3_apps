@@ -90,8 +90,13 @@
 
     <div class="mt-6 bg-white border border-slate-200 rounded-2xl p-6">
         <div class="mb-4 flex items-center justify-between gap-4">
-            <h2 class="text-lg font-bold">{{ $cardTitle }}</h2><span class="text-xs text-slate-400">View Only - Tidak
-                bisa aksi</span>
+            <h2 class="text-lg font-bold">{{ $cardTitle }}</h2>
+            <div class="flex items-center gap-3"><span class="text-xs text-slate-400">View Only - Tidak
+                    bisa aksi</span>
+                <a href="{{ route('admin-master.idp.penetapan.export', ['search' => request('search')]) }}"
+                    class="rounded-lg border border-[#31599b] px-4 py-2 text-sm font-semibold text-[#31599b] hover:bg-blue-50">Export
+                    Excel</a>
+            </div>
         </div>
         <div class="mb-4 flex justify-end">
             <form method="GET" data-search class="flex items-center gap-2"><input name="search"

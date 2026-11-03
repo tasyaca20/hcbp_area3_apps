@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EvaluasiIdpExport;
 use App\Models\Evaluasi;
 use App\Models\EvaluasiBukti;
 use App\Models\IDP;
 use App\Models\Notifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EvaluasiController extends Controller
 {
@@ -38,6 +40,11 @@ class EvaluasiController extends Controller
             'rows' => $query->paginate(10)->withQueryString(),
             'summaryRows' => $summaryRows,
         ]);
+    }
+
+    public function exportAdminMaster(Request $request)
+    {
+        return Excel::download(new EvaluasiIdpExport($request->string('search')->trim()->value()), 'evaluasi-idp-'.now()->format('Ymd-His').'.xlsx');
     }
 
     public function indexAdminArea(Request $request)
